@@ -1,6 +1,6 @@
 # CS234 Learning State
 
-Last updated: 2026-07-04
+Last updated: 2026-07-06
 
 ## Current Progress
 
@@ -11,6 +11,7 @@ Last updated: 2026-07-04
   - `notes/lec_notes/lec1_notes.md`
   - `notes/lec_notes/lec2_notes.md`
   - `notes/lec_notes/lec3_notes.md`
+- Lecture 3 notes revised against the latest `cs234-rl-tutor` teaching standard.
 - Next lecture: Lecture 4, `lecture/lec4/lecture4pre.pdf`
 
 ## Lecture 1 Covered

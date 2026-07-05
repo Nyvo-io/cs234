@@ -135,19 +135,56 @@ $$
 
 ## 4. Markov Decision Process（MDP）
 
-MDP 是 MRP 加动作：
+**MDP**：在 MRP 基础上加入动作选择。
+
+**定义**：
 
 $$
-\mathcal{M}
-=
-(\mathcal{S}, \mathcal{A}, P, R, \gamma)
+\mathcal{M} = (\mathcal{S}, \mathcal{A}, P, R, \gamma)
 $$
 
-这条公式在说什么：
+其中：
+- $\mathcal{S}$：状态集合
+- $\mathcal{A}$：动作集合
+- $P$：转移概率，$P(s' \mid s, a)$ = 在状态 $s$ 执行动作 $a$ 后转移到 $s'$ 的概率
+- $R$：奖励函数，$R(s, a)$ = 在状态 $s$ 执行动作 $a$ 的即时奖励
+- $\gamma$：折扣因子
 
-一个 MDP 由状态集合、动作集合、转移模型、奖励函数和折扣因子构成。它是本课程 planning/control 的标准数学对象。
+**MRP vs. MDP 的区别**：
 
-它解决什么问题：
+|        | MRP            | MDP               |
+| ------ | -------------- | ----------------- |
+| 转移     | $P(s' \mid s)$ | $P(s' \mid s, a)$ |
+| 奖励     | $R(s)$         | $R(s, a)$         |
+| 有动作选择？ | ❌ 状态自动转移       | ✅ 智能体选择动作         |
+
+**具体例子**（RiverSwim，6 状态 2 动作）：
+
+```
+状态：0 (最左) ... 5 (最右)
+动作：LEFT, RIGHT
+
+转移概率示例（状态 0）：
+- 选 LEFT:  100% 停留在 0，得奖励 +0.005
+- 选 RIGHT: 60% 到状态 1，40% 停留在 0，得奖励 0
+
+转移概率示例（状态 5）：
+- 选 LEFT:  100% 到状态 4，得奖励 0
+- 选 RIGHT: 60% 停留在 5，40% 到状态 4，得奖励 +1.0
+```
+
+用数学表示：
+
+$$
+\begin{aligned}
+P(0 \mid 0, \text{LEFT}) &= 1.0, \quad R(0, \text{LEFT}) = 0.005\\
+P(1 \mid 0, \text{RIGHT}) &= 0.6, \quad P(0 \mid 0, \text{RIGHT}) = 0.4, \quad R(0, \text{RIGHT}) = 0
+\end{aligned}
+$$
+
+**关键理解**：
+
+MDP 的核心问题是"如何选择动作"。不同动作会导致不同的转移和奖励。
 
 MRP 只能描述世界如何随机演化，不能描述 agent 如何选择。MDP 加入动作以后，可以讨论“选择什么动作会改变未来”，也就能讨论最优策略。
 
@@ -229,66 +266,78 @@ $$
 
 ## 6. MDP + Policy = MRP
 
-给定一个 MDP 和一个策略 $\pi$，动作选择就固定了。因此 MDP 会诱导出一个 MRP：
+*首次完整讲解：Lecture 1 §11「策略」和 §14「MRP」。这里展示给定策略后，MDP 如何退化成 MRP。*
+
+**核心思想**：给定策略 $\pi$ 后，动作选择固定，MDP 变成 MRP。
+
+**策略诱导的 MRP**：
 
 $$
 (\mathcal{S}, R^\pi, P^\pi, \gamma)
 $$
 
-策略诱导的奖励函数：
+### 6.1 策略诱导的奖励函数
 
 $$
-R^\pi(s)
-=
-\sum_{a \in \mathcal{A}}
-\pi(a \mid s)R(s,a)
+R^\pi(s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) R(s, a)
 $$
 
-这条公式在说什么：
+**白话解释**：状态 $s$ 的平均奖励 = 各动作奖励的加权平均（权重是策略选该动作的概率）。
 
-如果在状态 $s$ 下策略会随机选择不同动作，那么该状态的一步奖励就是各动作奖励的加权平均，权重是策略选动作的概率。
+**具体例子**（RiverSwim 状态 0）：
 
-它解决什么问题：
-
-它把“有动作的 MDP”变成“没有动作的 MRP”。这样我们就可以用 Lecture 1 的 MRP 价值计算方法来评估策略。
-
-符号解释：
-
-- $R^\pi(s)$：策略 $\pi$ 诱导出的状态奖励。
-- $\pi(a \mid s)$：状态 $s$ 下选择动作 $a$ 的概率。
-- $R(s,a)$：采取动作 $a$ 的即时奖励期望。
-
-直觉：
-
-如果策略在某状态 70% 选右、30% 选左，那么这个状态的平均奖励就是右动作奖励和左动作奖励的加权平均。
-
-策略诱导的转移模型：
+假设策略是：
 
 $$
-P^\pi(s' \mid s)
-=
-\sum_{a \in \mathcal{A}}
-\pi(a \mid s)P(s' \mid s,a)
+\pi(\text{LEFT} \mid 0) = 0.3, \quad \pi(\text{RIGHT} \mid 0) = 0.7
 $$
 
-这条公式在说什么：
+奖励是：
 
-在状态 $s$ 下，策略先随机选动作，再由该动作的转移模型决定下一状态。最终从 $s$ 到 $s'$ 的概率，是对所有动作的加权平均。
+$$
+R(0, \text{LEFT}) = 0.005, \quad R(0, \text{RIGHT}) = 0
+$$
 
-它解决什么问题：
+那么状态 0 的诱导奖励：
 
-它让我们能在固定策略下计算状态转移，不再显式保留动作选择。
+$$
+\begin{aligned}
+R^\pi(0) &= 0.3 \times 0.005 + 0.7 \times 0\\
+&= 0.0015
+\end{aligned}
+$$
 
-符号解释：
+### 6.2 策略诱导的转移概率
 
-- $P^\pi(s' \mid s)$：策略 $\pi$ 下从 $s$ 到 $s'$ 的转移概率。
-- $P(s' \mid s,a)$：采取动作 $a$ 后转移到 $s'$ 的概率。
+$$
+P^\pi(s' \mid s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) P(s' \mid s, a)
+$$
 
-直觉：
+**白话解释**：从 $s$ 到 $s'$ 的概率 = 对所有可能动作，”选该动作的概率 × 该动作导致 $s'$ 的概率”的总和。
 
-策略把动作的不确定性“混进”了状态转移。
+**具体例子**（RiverSwim 状态 0 → 状态 1）：
 
-### 6.1 最小数值例子：动作如何被策略平均掉
+转移概率：
+
+$$
+P(1 \mid 0, \text{LEFT}) = 0, \quad P(1 \mid 0, \text{RIGHT}) = 0.6
+$$
+
+策略诱导的转移：
+
+$$
+\begin{aligned}
+P^\pi(1 \mid 0) &= \pi(\text{LEFT} \mid 0) \times 0 + \pi(\text{RIGHT} \mid 0) \times 0.6\\
+&= 0.3 \times 0 + 0.7 \times 0.6\\
+&= 0.42
+\end{aligned}
+$$
+
+**关键理解**：
+
+- 策略固定后，动作不确定性”消失”了，变成了状态转移的一部分
+- 现在可以用 Lecture 1 的 MRP 方法计算价值
+- 这是 **policy evaluation** 的基础
 
 假设状态 $s$ 有两个动作：向左和向右。策略选择它们的概率为：
 
@@ -346,136 +395,75 @@ $$
 
 ## 7. MDP Policy Evaluation
 
-策略评估（policy evaluation）问：
+**Policy Evaluation**：给定策略 $\pi$，计算它的价值函数 $V^\pi(s)$。
 
-给定策略 $\pi$，它的价值函数 $V^\pi$ 是多少？
-
-对于随机策略，Bellman 方程是：
+**Bellman 方程（随机策略）**：
 
 $$
-V^\pi(s)
-=
-\sum_{a \in \mathcal{A}}
-\pi(a \mid s)
-\left[
-R(s,a)
-+
-\gamma
-\sum_{s' \in \mathcal{S}}
-P(s' \mid s,a)V^\pi(s')
-\right]
+V^\pi(s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) \left[ R(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s,a) V^\pi(s') \right]
 $$
 
-这条公式在说什么：
+**白话解释**：
 
-状态 $s$ 的策略价值等于：先按策略 $\pi$ 可能选择的所有动作取平均；每个动作的价值等于即时奖励加上折扣后的下一状态价值期望。
+状态 $s$ 的价值 = 对所有可能动作：策略选该动作的概率 × (该动作的即时奖励 + 折扣后的未来价值)
 
-它解决什么问题：
+**具体例子**（两动作选择）：
 
-它把“这个策略长期表现如何”写成可计算的递推方程。给定 $P$、$R$ 和 $\pi$，我们可以通过迭代求 $V^\pi$。
-
-符号解释：
-
-- $V^\pi(s)$：策略 $\pi$ 下状态 $s$ 的价值。
-- $\pi(a \mid s)$：策略在状态 $s$ 下选择动作 $a$ 的概率。
-- $R(s,a)$：即时奖励期望。
-- $P(s' \mid s,a)$：转移概率。
-- $\gamma$：折扣因子。
-
-直觉：
-
-评估策略时，不问“有没有更好的动作”，只问“如果一直按这个策略走，能得到多少长期奖励”。
-
-### 7.1 最小数值例子：同时平均动作与下一状态
-
-继续使用 §6.1 的策略。除了好状态 $g$，再加入普通状态 $b$，并设：
+假设状态 $s$ 有两个动作，策略是：
 
 $$
-V^\pi(g)=5,
-\qquad
-V^\pi(b)=1,
-\qquad
-\gamma=0.9
+\pi(\text{left} \mid s) = 0.25, \quad \pi(\text{right} \mid s) = 0.75
 $$
 
-两个动作的转移分别为：
+奖励和转移：
+
+```
+动作 left:  奖励 0，80% 到状态 b (V=1)，20% 到状态 g (V=5)
+动作 right: 奖励 4，20% 到状态 b (V=1)，80% 到状态 g (V=5)
+```
+
+设 $\gamma = 0.9$。
+
+**第 1 步**：计算每个动作的 backup：
 
 $$
 \begin{aligned}
-P(g\mid s,\text{left})&=0.2,
-&P(b\mid s,\text{left})&=0.8,\\
-P(g\mid s,\text{right})&=0.8,
-&P(b\mid s,\text{right})&=0.2
+\text{backup}(s, \text{left}) &= 0 + 0.9 \times (0.8 \times 1 + 0.2 \times 5) = 1.62\\
+\text{backup}(s, \text{right}) &= 4 + 0.9 \times (0.2 \times 1 + 0.8 \times 5) = 7.78
 \end{aligned}
 $$
 
-先计算两个动作对应的“一步奖励加未来价值”。这里暂时只计算 Bellman backup，状态动作价值 $Q^\pi$ 会在 §13 正式定义：
+**第 2 步**：按策略概率加权：
 
 $$
 \begin{aligned}
-\operatorname{backup}(s,\text{left})
-&=
-0+0.9(0.2\times 5+0.8\times 1)\\
-&=
-1.62,\\[4pt]
-\operatorname{backup}(s,\text{right})
-&=
-4+0.9(0.8\times 5+0.2\times 1)\\
-&=
-7.78
+V^\pi(s) &= 0.25 \times 1.62 + 0.75 \times 7.78\\
+&= 0.405 + 5.835\\
+&= 6.24
 \end{aligned}
 $$
 
-最后按策略概率对动作求平均：
+### 7.1 确定性策略的简化
+
+*首次完整讲解：§7。确定性策略是随机策略的特殊情况（某动作概率为 1）。*
+
+**确定性策略 Bellman 方程**：
 
 $$
-\begin{aligned}
-V^\pi(s)
-&=
-0.25\times 1.62+0.75\times 7.78\\
-&=
-6.24
-\end{aligned}
+V^\pi(s) = R(s, \pi(s)) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s, \pi(s)) V^\pi(s')
 $$
 
-这个例子展示了两层期望：内层根据 $P(s'\mid s,a)$ 平均下一状态，外层根据 $\pi(a\mid s)$ 平均动作。
+动作固定为 $\pi(s)$，不需要对动作求和。
 
-### 7.2 确定性策略的简化
+**和 Assignment 1 的关系**：
 
-如果策略是确定性的，即 $\pi(s)$ 直接返回动作，则：
-
-$$
-V^\pi(s)
-=
-R(s,\pi(s))
-+
-\gamma
-\sum_{s' \in \mathcal{S}}
-P(s' \mid s,\pi(s))V^\pi(s')
-$$
-
-*首次完整讲解：本讲 §7「MDP Policy Evaluation」。确定性策略只是随机策略中某个动作概率为 1 的特殊情况。*
-
-这条公式在说什么：
-
-在状态 $s$，动作已经固定为 $\pi(s)$，所以不需要对动作求和，只需要看这个动作的即时奖励和转移分布。
-
-它解决什么问题：
-
-Assignment 1 的策略是用 `np.array(num_states)` 表示的确定性策略，因此实现时就是这个简化版本。
+`policy_evaluation(policy, R, T, gamma)` 中，策略是确定性的：`policy[state] = action`
 
 代码映射：
 
-- $\pi(s)$ -> `policy[state]`
-- $R(s,\pi(s))$ -> `R[state, policy[state]]`
-- $P(s' \mid s,\pi(s))$ -> `T[state, policy[state], next_state]`
-- $V^\pi(s')$ -> `value_function[next_state]`
-
-实现骨架对应：
-
 ```python
 action = policy[state]
-new_value[state] = R[state, action] + gamma * np.sum(T[state, action] * value_function)
+new_value[state] = R[state, action] + gamma * np.sum(T[state, action, :] * value_function)
 ```
 
 ## 8. Policy Evaluation 的迭代算法
@@ -715,69 +703,82 @@ if np.array_equal(new_policy, policy):
     break
 ```
 
-## 13. State-Action Value: $Q^\pi(s,a)$
+## 13. State-Action Value Function: $Q^\pi(s,a)$
 
-课件定义状态动作价值函数（state-action value function, Q-value）：
+**Q-value（状态-动作价值函数）**：在状态 $s$ 先执行动作 $a$，之后按策略 $\pi$ 行动的期望回报。
 
-$$
-Q^\pi(s,a)
-=
-R(s,a)
-+
-\gamma
-\sum_{s' \in \mathcal{S}}
-P(s' \mid s,a)V^\pi(s')
-$$
-
-这条公式在说什么：
-
-$Q^\pi(s,a)$ 表示：在状态 $s$ 先采取动作 $a$，之后一直按照策略 $\pi$ 行动，未来能获得的期望折扣回报。
-
-它解决什么问题：
-
-只知道 $V^\pi(s)$ 还不够做改进，因为改进要比较“在同一个状态下换不同动作会怎样”。$Q^\pi(s,a)$ 正好给出每个动作的长期效果。
-
-符号解释：
-
-- $Q^\pi(s,a)$：策略 $\pi$ 下，先做动作 $a$ 再跟随 $\pi$ 的状态动作价值。
-- $R(s,a)$：动作 $a$ 的即时奖励。
-- $P(s' \mid s,a)$：动作 $a$ 导致下一状态 $s'$ 的概率。
-- $V^\pi(s')$：之后按照 $\pi$ 行动时下一状态的价值。
-
-直觉：
-
-$V^\pi(s)$ 是“站在这个状态按原策略走值多少钱”；$Q^\pi(s,a)$ 是“如果第一步我指定成动作 $a$，之后再按原策略走值多少钱”。
-
-### 13.1 最小数值例子
-
-沿用 §7.1 的两动作例子，设：
+**定义**：
 
 $$
-R(s,\text{right})=4,
-\quad
-\gamma=0.9,
-\quad
-V^\pi(g)=5,
-\quad
-V^\pi(b)=1
+Q^\pi(s,a) = R(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s,a) V^\pi(s')
 $$
 
-向右后，以 0.8 概率到 $g$，以 0.2 概率到 $b$。因此：
+**白话解释**：
+
+$Q^\pi(s,a)$ = 动作 $a$ 的即时奖励 + 折扣后的未来价值（按 $\pi$ 继续）
+
+**V 和 Q 的关系**：
+
+- $V^\pi(s)$：在状态 $s$，按策略 $\pi$ 行动的价值
+- $Q^\pi(s,a)$：在状态 $s$，**第一步强制选 $a$**，之后按 $\pi$ 行动的价值
+
+**具体例子**（两动作比较）：
+
+假设状态 $s$ 有两个动作 left 和 right：
+
+```
+动作 right: 奖励 +4，80% 到 g (V=5)，20% 到 b (V=1)
+动作 left:  奖励 0，  20% 到 g (V=5)，80% 到 b (V=1)
+```
+
+设 $\gamma = 0.9$。
+
+**计算 Q(s, right)**：
 
 $$
 \begin{aligned}
-Q^\pi(s,\text{right})
-&=
-4+0.9
-\left(
-0.8\times 5+0.2\times 1
-\right)\\
-&=
-7.78
+Q^\pi(s, \text{right}) &= 4 + 0.9 \times (0.8 \times 5 + 0.2 \times 1)\\
+&= 4 + 0.9 \times (4 + 0.2)\\
+&= 4 + 0.9 \times 4.2\\
+&= 4 + 3.78\\
+&= 7.78
 \end{aligned}
 $$
 
-这个 7.78 包含两部分：即时奖励贡献 4，折扣后的下一状态价值期望贡献 3.78。它评价的是“第一步指定向右，之后执行 $\pi$”这一选择。
+**计算 Q(s, left)**：
+
+$$
+\begin{aligned}
+Q^\pi(s, \text{left}) &= 0 + 0.9 \times (0.2 \times 5 + 0.8 \times 1)\\
+&= 0.9 \times (1 + 0.8)\\
+&= 0.9 \times 1.8\\
+&= 1.62
+\end{aligned}
+$$
+
+**关键理解**：
+
+- $Q^\pi(s, \text{right}) = 7.78 > Q^\pi(s, \text{left}) = 1.62$
+- 这说明在状态 $s$，选 right 比 left 更好（即使之后都按 $\pi$ 走）
+- 这是 **policy improvement** 的基础
+
+**V 和 Q 的联系**：
+
+$$
+V^\pi(s) = \sum_{a \in \mathcal{A}} \pi(a \mid s) Q^\pi(s,a)
+$$
+
+如果策略在 $s$ 选动作 $a$ 的概率是 $\pi(a \mid s)$，那么 $V$ 就是所有 $Q$ 的加权平均。
+
+**和 Assignment 1 的关系**：
+
+`policy_improvement` 需要对每个状态计算所有动作的 Q 值，然后选最大的：
+
+```python
+for s in range(num_states):
+    Q_values = [R[s,a] + gamma * np.sum(T[s,a,:] * V[s]) for a in range(num_actions)]
+    new_policy[s] = np.argmax(Q_values)
+```
 
 和 Assignment 1 的关系：
 
@@ -800,76 +801,70 @@ backup_val = R[state, action] + gamma * np.sum(T[state, action] * V)
 
 ## 14. Policy Improvement
 
-给定当前策略 $\pi_i$ 的价值函数 $V^{\pi_i}$，先计算：
+*Q 函数首次完整讲解：§13。这里用 Q 函数来改进策略。*
+
+**Policy Improvement**：基于当前策略的价值函数，构造更好的策略。
+
+**算法**：
+
+1. 计算所有状态-动作对的 Q 值：
 
 $$
-Q^{\pi_i}(s,a)
-=
-R(s,a)
-+
-\gamma
-\sum_{s' \in \mathcal{S}}
-P(s' \mid s,a)V^{\pi_i}(s')
+Q^{\pi_i}(s,a) = R(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s,a) V^{\pi_i}(s')
 $$
 
-*首次完整讲解：本讲 §13「State-Action Value」。这里把 $Q^{\pi_i}$ 用作策略改进的比较标准。*
-
-然后改进策略：
+2. 对每个状态，选择 Q 值最大的动作：
 
 $$
-\pi_{i+1}(s)
-=
-\arg\max_a Q^{\pi_i}(s,a),
-\quad \forall s \in \mathcal{S}
+\pi_{i+1}(s) = \arg\max_a Q^{\pi_i}(s,a), \quad \forall s \in \mathcal{S}
 $$
 
-这组公式在说什么：
+**白话解释**：
 
-对每个状态，比较所有可选动作。如果某个动作在“先做它、之后按旧策略走”的意义下最好，就把新策略在该状态的动作改成它。
+“在每个状态，看看如果第一步换成别的动作（之后还按旧策略走），会不会更好？如果会，就换。”
 
-它解决什么问题：
+**具体例子**（从 §13 继续）：
 
-它提供了从一个策略构造更好策略的方法。我们不需要枚举所有策略，只需要局部地检查每个状态的一步改进。
-
-符号解释：
-
-- $\pi_i$：第 $i$ 个策略。
-- $V^{\pi_i}$：当前策略的价值函数。
-- $Q^{\pi_i}(s,a)$：在 $s$ 先做 $a$，然后跟随当前策略的价值。
-- $\arg\max_a$：选择使表达式最大的动作。
-
-直觉：
-
-先问：“如果我只在当前状态改第一步，之后还按老策略走，会不会更好？”如果会，就更新这一状态的动作。令人有力的是，把所有状态都这样更新后，新策略整体不会更差。
-
-### 14.1 最小数值例子
-
-在 §7.1 和 §13.1 的例子中：
+状态 $s$ 有两个动作，当前策略价值函数下：
 
 $$
-Q^{\pi_i}(s,\text{left})=1.62,
-\qquad
-Q^{\pi_i}(s,\text{right})=7.78
+Q^{\pi_i}(s, \text{left}) = 1.62, \quad Q^{\pi_i}(s, \text{right}) = 7.78
 $$
 
-因此新策略在状态 $s$ 选择：
+新策略选择：
 
 $$
-\begin{aligned}
-\pi_{i+1}(s)
-&=
-\arg\max_{a\in\{\text{left},\text{right}\}}
-Q^{\pi_i}(s,a)\\
-&=
-\text{right}
-\end{aligned}
+\pi_{i+1}(s) = \arg\max \{1.62, 7.78\} = \text{right}
 $$
 
-这里 $\arg\max$ 返回的是动作 `right`，不是最大值 7.78；最大值本身由 $\max_a Q^{\pi_i}(s,a)$ 返回。
+**Policy Improvement 定理**：
 
-和 starter code 的关系：
+$$
+V^{\pi_{i+1}}(s) \ge V^{\pi_i}(s), \quad \forall s
+$$
 
-`policy_improvement(policy, R, T, V_policy, gamma)` 应对每个 state 遍历 action，用 `bellman_backup` 或相同公式算出每个动作值，再取 `argmax`。
+新策略在每个状态的价值都不低于旧策略（通常会更好，除非旧策略已经最优）。
+
+**为什么一定不会更差？**
+
+因为 $\pi_{i+1}$ 至少可以选择 $\pi_i$ 本来要选的动作：
+
+$$
+\max_a Q^{\pi_i}(s,a) \ge Q^{\pi_i}(s, \pi_i(s)) = V^{\pi_i}(s)
+$$
+
+**和 Assignment 1 的关系**：
+
+`policy_improvement(policy, R, T, V_policy, gamma)` 实现：
+
+```python
+for s in range(num_states):
+    Q_values = []
+    for a in range(num_actions):
+        Q = R[s,a] + gamma * np.sum(T[s,a,:] * V_policy)
+        Q_values.append(Q)
+    new_policy[s] = np.argmax(Q_values)
+```
 
 ## 15. Policy Improvement 的单调性
 
@@ -1007,63 +1002,106 @@ $$
 
 ## 18. Value Iteration（VI）
 
-值迭代（value iteration）的无限 horizon discounted 形式：
+*Bellman Optimality Operator 首次完整讲解：§17。Value iteration 就是反复应用该 operator。*
+
+**Value Iteration**：直接迭代最优价值函数，不需要显式维护策略。
+
+**更新公式**：
 
 $$
-V_{k+1}(s)
-=
-\max_a
-\left[
-R(s,a)
-+
-\gamma
-\sum_{s' \in \mathcal{S}}
-P(s' \mid s,a)V_k(s')
-\right]
+V_{k+1}(s) = \max_a \left[ R(s,a) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s,a) V_k(s') \right]
 $$
 
-*首次完整讲解：本讲 §17「Bellman Optimality Operator」。Value iteration 就是反复应用该 operator。*
-
-等价写法：
+或写成 operator 形式：
 
 $$
-V_{k+1} = BV_k
+V_{k+1} = B V_k
 $$
 
-这条公式在说什么：
+**白话解释**：
 
-从初始价值函数 $V_0$ 开始，反复应用 Bellman optimality operator。每轮都根据上一轮价值估计，更新每个状态的最优价值估计。
+每轮更新时，对每个状态 $s$：
+1. 计算所有动作的 backup
+2. 取最大值作为新的价值估计
 
-它解决什么问题：
+**具体例子**（两动作，两轮迭代）：
 
-Value iteration 不显式维护一个策略再完整评估它，而是直接迭代最优价值函数。
+初始化：$V_0(s) = 0, V_0(g) = 0, V_0(b) = 0$
 
-符号解释：
+**第 1 轮**（只看即时奖励）：
 
-- $V_k$：第 $k$ 轮价值估计。
-- $B$：Bellman optimality operator。
-- $R(s,a)$、$P(s' \mid s,a)$、$\gamma$ 同前。
-
-直觉：
-
-第 1 轮看到一步奖励；第 2 轮看到两步以内的最佳未来；迭代越多，越远的未来奖励被纳入。
-
-终止条件：
+```
+动作 left:  backup = 0 + 0.9 × (0.2×0 + 0.8×0) = 0
+动作 right: backup = 4 + 0.9 × (0.8×0 + 0.2×0) = 4
+```
 
 $$
-\lVert V_{k+1} - V_k \rVert_\infty
-\le
-\epsilon
+V_1(s) = \max\{0, 4\} = 4
 $$
 
-和 starter code 的关系：
+**第 2 轮**（考虑一步后的价值）：
 
-`value_iteration(R, T, gamma, tol)` 应循环：
+假设 $V_1(g) = 5, V_1(b) = 1$（从其他状态传播来的）
 
-1. 对每个 state，计算所有 actions 的 backup。
-2. `new_value[state] = max(action_values)`。
-3. 如果 `np.max(np.abs(new_value - value_function)) <= tol`，停止。
-4. 用最终 value function 提取 greedy policy。
+```
+动作 left:  backup = 0 + 0.9 × (0.2×5 + 0.8×1) = 1.62
+动作 right: backup = 4 + 0.9 × (0.8×5 + 0.2×1) = 7.78
+```
+
+$$
+V_2(s) = \max\{1.62, 7.78\} = 7.78
+$$
+
+**终止条件**：
+
+$$
+\lVert V_{k+1} - V_k \rVert_\infty \le \epsilon
+$$
+
+当价值函数变化小于阈值 $\epsilon$ 时停止。
+
+**提取策略**：
+
+VI 收敛后，用 greedy policy 提取最优策略：
+
+$$
+\pi^*(s) = \arg\max_a \left[ R(s,a) + \gamma \sum_{s'} P(s' \mid s,a) V^*(s') \right]
+$$
+
+**和 Assignment 1 的关系**：
+
+`value_iteration(R, T, gamma, tol)` 实现：
+
+```python
+V = np.zeros(num_states)
+while True:
+    new_V = np.zeros(num_states)
+    for s in range(num_states):
+        action_values = []
+        for a in range(num_actions):
+            q = R[s,a] + gamma * np.sum(T[s,a,:] * V)
+            action_values.append(q)
+        new_V[s] = max(action_values)
+    
+    if np.max(np.abs(new_V - V)) <= tol:
+        break
+    V = new_V
+
+# 提取策略
+policy = np.zeros(num_states, dtype=int)
+for s in range(num_states):
+    Q = [R[s,a] + gamma * np.sum(T[s,a,:] * V) for a in range(num_actions)]
+    policy[s] = np.argmax(Q)
+```
+
+**PI vs. VI 对比**：
+
+| | Policy Iteration | Value Iteration |
+|---|---|---|
+| 维护对象 | 策略 + 价值 | 只有价值 |
+| 每轮操作 | 完整 policy evaluation + improvement | 一次 Bellman optimality backup |
+| 收敛速度 | 通常更快（步数少） | 每步更简单 |
+| 适用场景 | 动作少、需要中间策略 | 动作多、只要最终策略 |
 
 ## 19. 从 Value Function 提取 Greedy Policy
 
@@ -1440,7 +1478,7 @@ R(s,\pi(s))
 T(s,\pi(s),s')V^\pi(s')
 $$
 
-*首次完整讲解：本讲 §7.2「确定性策略的简化」，迭代实现见 §8。*
+*首次完整讲解：本讲 §7.1「确定性策略的简化」，迭代实现见 §8。*
 
 代码思路：
 
@@ -1661,7 +1699,7 @@ P(s' \mid s,a)V^\pi(s')
 \right]
 $$
 
-确定性 policy evaluation（首次完整讲解：§7.2）：
+确定性 policy evaluation（首次完整讲解：§7.1）：
 
 $$
 V^\pi(s)
