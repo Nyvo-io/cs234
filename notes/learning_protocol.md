@@ -20,8 +20,8 @@
 
 1. 在终端输出当前页/当前主题的核心解释、提问和简短反馈。
 2. 完整笔记写入 Markdown 文件：
-   - `course/cs234/notes/lecN_notes.md`
-   - 必要时补充 `course/cs234/notes/lecN_formulas.md`
+   - `course/cs234/notes/lec_notes/lecN_notes.md`
+   - 必要时补充 `course/cs234/notes/lec_notes/lecN_formulas.md`
 3. 每讲结束更新：
    - `course/cs234/notes/learning_state.md`
    - 必要时更新 `course/cs234/notes/confusions.md`

@@ -74,6 +74,8 @@ R(s)
 P(s' \mid s)V_{k-1}(s')
 $$
 
+*首次完整讲解：Lecture 1 §20「迭代动态规划计算 MRP 价值」。这里是复习，并为 MDP policy evaluation 做过渡。*
+
 这条公式在说什么：
 
 第 $k$ 轮对状态 $s$ 的价值估计，等于当前状态即时奖励，加上下一状态价值的折扣期望。这里没有动作，因为 MRP 中没有 agent 可以选择动作。
@@ -96,6 +98,40 @@ $$
 和本讲的关系：
 
 MDP 只是在 MRP 上加入动作。加入动作以后，我们既要能评估固定策略，也要能找到更好的策略。
+
+### 3.1 最小数值例子
+
+假设 MRP 中状态 $A$ 的即时奖励为 1，并且下一步必然到达状态 $B$：
+
+$$
+R(A)=1,
+\qquad
+P(B\mid A)=1
+$$
+
+再设：
+
+$$
+\gamma=0.9,
+\qquad
+V_{k-1}(B)=4
+$$
+
+代入迭代公式：
+
+$$
+\begin{aligned}
+V_k(A)
+&=
+R(A)+\gamma P(B\mid A)V_{k-1}(B)\\
+&=
+1+0.9\times 1\times 4\\
+&=
+4.6
+\end{aligned}
+$$
+
+这个结果表示：状态 $A$ 当前得到 1 分；它必然通向价值估计为 4 的状态 $B$，折扣后的未来部分贡献 3.6，所以本轮把 $A$ 的价值更新为 4.6。
 
 ## 4. Markov Decision Process（MDP）
 
@@ -139,6 +175,8 @@ R(s,a)
 \mathbb{E}[r_t \mid s_t=s, a_t=a]
 $$
 
+*首次完整讲解：Lecture 1 §10「MDP 模型：Transition Model 与 Reward Model」。本节只补充不同奖励函数写法及 Assignment 1 的记号对应。*
+
 这条公式在说什么：
 
 给定当前状态和动作，奖励模型返回即时奖励的期望。即使实际奖励有随机性，$R(s,a)$ 也代表它的平均值。
@@ -161,6 +199,8 @@ $$
 =
 \Pr(a_t=a \mid s_t=s)
 $$
+
+*首次完整讲解：Lecture 1 §11「策略（Policy）」。本节沿用随机策略定义，把动作概率代入 MDP policy evaluation。*
 
 这条公式在说什么：
 
@@ -248,6 +288,58 @@ $$
 
 策略把动作的不确定性“混进”了状态转移。
 
+### 6.1 最小数值例子：动作如何被策略平均掉
+
+假设状态 $s$ 有两个动作：向左和向右。策略选择它们的概率为：
+
+$$
+\pi(\text{left}\mid s)=0.25,
+\qquad
+\pi(\text{right}\mid s)=0.75
+$$
+
+两个动作的即时奖励分别为：
+
+$$
+R(s,\text{left})=0,
+\qquad
+R(s,\text{right})=4
+$$
+
+策略诱导的平均奖励是：
+
+$$
+\begin{aligned}
+R^\pi(s)
+&=
+0.25\times 0+0.75\times 4\\
+&=
+3
+\end{aligned}
+$$
+
+再假设到达好状态 $g$ 的概率为：
+
+$$
+P(g\mid s,\text{left})=0.2,
+\qquad
+P(g\mid s,\text{right})=0.8
+$$
+
+策略诱导的转移概率为：
+
+$$
+\begin{aligned}
+P^\pi(g\mid s)
+&=
+0.25\times 0.2+0.75\times 0.8\\
+&=
+0.65
+\end{aligned}
+$$
+
+因此，一旦策略固定，我们可以直接说“状态 $s$ 的平均即时奖励是 3，到达 $g$ 的概率是 0.65”，不必在诱导出的 MRP 中继续显式保留动作。
+
 和 Assignment 1 的关系：
 
 `policy_evaluation(policy, R, T, gamma)` 输入的是确定性策略 `policy[state] = action`。因此公式会简化，不需要对所有动作按概率求和。
@@ -294,7 +386,61 @@ $$
 
 评估策略时，不问“有没有更好的动作”，只问“如果一直按这个策略走，能得到多少长期奖励”。
 
-### 7.1 确定性策略的简化
+### 7.1 最小数值例子：同时平均动作与下一状态
+
+继续使用 §6.1 的策略。除了好状态 $g$，再加入普通状态 $b$，并设：
+
+$$
+V^\pi(g)=5,
+\qquad
+V^\pi(b)=1,
+\qquad
+\gamma=0.9
+$$
+
+两个动作的转移分别为：
+
+$$
+\begin{aligned}
+P(g\mid s,\text{left})&=0.2,
+&P(b\mid s,\text{left})&=0.8,\\
+P(g\mid s,\text{right})&=0.8,
+&P(b\mid s,\text{right})&=0.2
+\end{aligned}
+$$
+
+先计算两个动作对应的“一步奖励加未来价值”。这里暂时只计算 Bellman backup，状态动作价值 $Q^\pi$ 会在 §13 正式定义：
+
+$$
+\begin{aligned}
+\operatorname{backup}(s,\text{left})
+&=
+0+0.9(0.2\times 5+0.8\times 1)\\
+&=
+1.62,\\[4pt]
+\operatorname{backup}(s,\text{right})
+&=
+4+0.9(0.8\times 5+0.2\times 1)\\
+&=
+7.78
+\end{aligned}
+$$
+
+最后按策略概率对动作求平均：
+
+$$
+\begin{aligned}
+V^\pi(s)
+&=
+0.25\times 1.62+0.75\times 7.78\\
+&=
+6.24
+\end{aligned}
+$$
+
+这个例子展示了两层期望：内层根据 $P(s'\mid s,a)$ 平均下一状态，外层根据 $\pi(a\mid s)$ 平均动作。
+
+### 7.2 确定性策略的简化
 
 如果策略是确定性的，即 $\pi(s)$ 直接返回动作，则：
 
@@ -307,6 +453,8 @@ R(s,\pi(s))
 \sum_{s' \in \mathcal{S}}
 P(s' \mid s,\pi(s))V^\pi(s')
 $$
+
+*首次完整讲解：本讲 §7「MDP Policy Evaluation」。确定性策略只是随机策略中某个动作概率为 1 的特殊情况。*
 
 这条公式在说什么：
 
@@ -347,6 +495,8 @@ R(s,a)
 P(s' \mid s,a)V^\pi_{k-1}(s')
 \right]
 $$
+
+*公式来源：本讲 §7 的 Bellman policy evaluation；迭代思想首次讲解于 Lecture 1 §20。下一节 Exercise L2E1 给出一轮更新的具体数值计算。*
 
 这条公式在说什么：
 
@@ -457,17 +607,31 @@ $$
 
 如何找到最优策略？
 
-课件写成：
+最优价值函数定义为：
 
 $$
-\pi^*(s)
+V^*(s)
 =
-\arg\max_{\pi} V^\pi(s)
+\max_\pi V^\pi(s),
+\quad \forall s\in\mathcal{S}
 $$
 
-这条公式在说什么：
+最优策略是能够在所有状态实现该最优价值的策略：
 
-我们希望找到一个策略，使每个状态下的长期期望回报尽可能高。
+$$
+\pi^*
+\in
+\left\{
+\pi
+\mid
+V^\pi(s)=V^*(s),
+\ \forall s\in\mathcal{S}
+\right\}
+$$
+
+这组公式在说什么：
+
+第一条先定义每个状态可以达到的最大策略价值；第二条说明最优策略是一个完整的状态到动作规则，它必须同时实现这些最优价值。
 
 它解决什么问题：
 
@@ -476,11 +640,30 @@ Policy evaluation 只能回答“这个策略怎么样”。Control 要回答“
 符号解释：
 
 - $\pi^*$：最优策略。
+- $V^*(s)$：状态 $s$ 的最优价值。
 - $V^\pi(s)$：策略 $\pi$ 下状态 $s$ 的价值。
 
 直觉：
 
 评估是打分；控制是找高分策略。
+
+### 11.1 最小数值例子
+
+在一个只有状态 $s$ 的简单 MDP 中，假设仅有两个候选策略：
+
+$$
+V^{\pi_1}(s)=3,
+\qquad
+V^{\pi_2}(s)=5
+$$
+
+那么：
+
+$$
+V^*(s)=\max\{3,5\}=5
+$$
+
+因此 $\pi_2$ 是这个例子中的最优策略。注意，$V^*(s)$ 是数值 5，而 $\pi_2$ 是策略；不能把“动作或策略”和“价值数值”写成同一个数学对象。
 
 重要结论：
 
@@ -497,6 +680,8 @@ Policy evaluation 只能回答“这个策略怎么样”。Control 要回答“
 $$
 |\mathcal{A}|^{|\mathcal{S}|}
 $$
+
+*公式来源：本讲 §10「Deterministic Policy 空间大小」。这里用它说明暴力 policy search 的组合爆炸。*
 
 这通常不可行。
 
@@ -563,6 +748,37 @@ $Q^\pi(s,a)$ 表示：在状态 $s$ 先采取动作 $a$，之后一直按照策�
 
 $V^\pi(s)$ 是“站在这个状态按原策略走值多少钱”；$Q^\pi(s,a)$ 是“如果第一步我指定成动作 $a$，之后再按原策略走值多少钱”。
 
+### 13.1 最小数值例子
+
+沿用 §7.1 的两动作例子，设：
+
+$$
+R(s,\text{right})=4,
+\quad
+\gamma=0.9,
+\quad
+V^\pi(g)=5,
+\quad
+V^\pi(b)=1
+$$
+
+向右后，以 0.8 概率到 $g$，以 0.2 概率到 $b$。因此：
+
+$$
+\begin{aligned}
+Q^\pi(s,\text{right})
+&=
+4+0.9
+\left(
+0.8\times 5+0.2\times 1
+\right)\\
+&=
+7.78
+\end{aligned}
+$$
+
+这个 7.78 包含两部分：即时奖励贡献 4，折扣后的下一状态价值期望贡献 3.78。它评价的是“第一步指定向右，之后执行 $\pi$”这一选择。
+
 和 Assignment 1 的关系：
 
 `bellman_backup(state, action, R, T, gamma, V)` 本质上就是计算：
@@ -596,6 +812,8 @@ R(s,a)
 P(s' \mid s,a)V^{\pi_i}(s')
 $$
 
+*首次完整讲解：本讲 §13「State-Action Value」。这里把 $Q^{\pi_i}$ 用作策略改进的比较标准。*
+
 然后改进策略：
 
 $$
@@ -623,6 +841,31 @@ $$
 直觉：
 
 先问：“如果我只在当前状态改第一步，之后还按老策略走，会不会更好？”如果会，就更新这一状态的动作。令人有力的是，把所有状态都这样更新后，新策略整体不会更差。
+
+### 14.1 最小数值例子
+
+在 §7.1 和 §13.1 的例子中：
+
+$$
+Q^{\pi_i}(s,\text{left})=1.62,
+\qquad
+Q^{\pi_i}(s,\text{right})=7.78
+$$
+
+因此新策略在状态 $s$ 选择：
+
+$$
+\begin{aligned}
+\pi_{i+1}(s)
+&=
+\arg\max_{a\in\{\text{left},\text{right}\}}
+Q^{\pi_i}(s,a)\\
+&=
+\text{right}
+\end{aligned}
+$$
+
+这里 $\arg\max$ 返回的是动作 `right`，不是最大值 7.78；最大值本身由 $\max_a Q^{\pi_i}(s,a)$ 返回。
 
 和 starter code 的关系：
 
@@ -736,6 +979,22 @@ $$
 
 如果 policy evaluation 是“按给定策略看未来”，那么 Bellman optimality backup 是“每一步都假设自己会选当前看起来最好的动作”。
 
+### 17.1 最小数值例子
+
+仍使用前面的两动作数据。对当前价值估计 $V(g)=5$、$V(b)=1$，两个动作的 backup 分别为 1.62 和 7.78，因此：
+
+$$
+\begin{aligned}
+(BV)(s)
+&=
+\max\{1.62,7.78\}\\
+&=
+7.78
+\end{aligned}
+$$
+
+Bellman optimality operator 保留的是最大价值 7.78。若还要知道对应动作，则需要另取 $\arg\max$，结果是 `right`。
+
 和 Assignment 1 Q3 的关系：
 
 Q3 中的 Bellman residual：
@@ -762,6 +1021,8 @@ R(s,a)
 P(s' \mid s,a)V_k(s')
 \right]
 $$
+
+*首次完整讲解：本讲 §17「Bellman Optimality Operator」。Value iteration 就是反复应用该 operator。*
 
 等价写法：
 
@@ -821,6 +1082,8 @@ P(s' \mid s,a)V(s')
 \right]
 $$
 
+*首次完整讲解：本讲 §14「Policy Improvement」。这里的区别是使用 value iteration 最终得到的 $V$，而不是某个待改进策略的 $V^{\pi_i}$。*
+
 这条公式在说什么：
 
 在每个状态下，选择让 Bellman backup 最大的动作。
@@ -860,6 +1123,8 @@ R^\pi(s)
 \sum_{s' \in \mathcal{S}}
 P^\pi(s' \mid s)V(s')
 $$
+
+*首次完整讲解：本讲 §6 给出 $R^\pi$、$P^\pi$，§7 给出固定策略的 Bellman policy evaluation。这里把同一更新封装成 operator $B^\pi$。*
 
 对确定性策略也可写成：
 
@@ -911,7 +1176,7 @@ $$
 
 这条公式在说什么：
 
-对任意两个价值函数 $V$ 和 $V'$，经过 Bellman optimality backup 后，它们之间的最大差距至少被缩小到原来的 $\gamma$ 倍。
+对任意两个价值函数 $V$ 和 $V'$，经过 Bellman optimality backup 后，它们之间的最大差距不超过原差距的 $\gamma$ 倍。
 
 它解决什么问题：
 
@@ -926,6 +1191,26 @@ $$
 直觉：
 
 每做一次 Bellman backup，不同初始猜测之间的差异会缩小。迭代足够久后，它们都会走向同一个 $V^*$。
+
+### 21.1 最小数值例子
+
+假设两个价值估计原来的最大差距为 10，并且 $\gamma=0.9$：
+
+$$
+\lVert V-V'\rVert_\infty=10
+$$
+
+应用一次 Bellman optimality operator 后：
+
+$$
+\lVert BV-BV'\rVert_\infty
+\le
+0.9\times 10
+=
+9
+$$
+
+这不是说新差距一定恰好等于 9，而是说它最多为 9，也可能更小。反复应用后，上界依次变为 $10\times 0.9^k$，最终趋近于 0。
 
 和 Assignment 1 Q3 的关系：
 
@@ -975,6 +1260,8 @@ P(s' \mid s,a)V_k(s')
 \quad k=0,1,\ldots,H-1
 $$
 
+*公式来源：本讲 §18「Value Iteration」。本节的新内容是把下标 $k$ 明确定义为剩余决策次数，从而得到随剩余时间变化的策略。*
+
 这条公式在说什么：
 
 如果还剩 $k+1$ 次决策，那么先选一个动作拿到即时奖励，然后进入下一状态；之后只剩 $k$ 次决策，因此未来部分使用 $V_k$。
@@ -1020,6 +1307,49 @@ Inventory MDP 中，从 $s=3$ 出发：
 - horizon 足够长时，连续买到 $s=10$ 拿 +100 可能更好。
 
 这正是 finite horizon policy 可能依赖时间/剩余步数的例子。
+
+### 23.2 最小数值例子：剩余一步与两步
+
+设状态 $s$ 有两个动作：
+
+- `cash`：立即得到 2，然后终止。
+- `invest`：立即得到 0，并确定到达状态 $g$；在 $g$ 再行动可得到 5。
+
+令 $\gamma=1$ 且 $V_0=0$。只剩一步时：
+
+$$
+\begin{aligned}
+V_1(s)
+&=
+\max\{2,0\}\\
+&=
+2
+\end{aligned}
+$$
+
+此时应选择 `cash`，因为没有时间兑现投资的后续奖励。
+
+先计算：
+
+$$
+V_1(g)=5
+$$
+
+还剩两步时：
+
+$$
+\begin{aligned}
+V_2(s)
+&=
+\max\{2,0+V_1(g)\}\\
+&=
+\max\{2,5\}\\
+&=
+5
+\end{aligned}
+$$
+
+此时应选择 `invest`。同一个状态 $s$ 因剩余步数不同而选择不同动作，这就是 finite-horizon policy 通常依赖时间的具体原因。
 
 ## 24. 另一种 Policy Evaluation：Simulation
 
@@ -1088,6 +1418,8 @@ R(s,a)
 T(s,a,s')V(s')
 $$
 
+*首次完整讲解：Lecture 1 §17 给出 MDP Bellman backup；Lecture 2 §13 说明它在 $V=V^\pi$ 时就是 $Q^\pi(s,a)$。*
+
 代码：
 
 ```python
@@ -1107,6 +1439,8 @@ R(s,\pi(s))
 \sum_{s'}
 T(s,\pi(s),s')V^\pi(s')
 $$
+
+*首次完整讲解：本讲 §7.2「确定性策略的简化」，迭代实现见 §8。*
 
 代码思路：
 
@@ -1137,6 +1471,8 @@ R(s,a)
 \sum_{s'}T(s,a,s')V^\pi(s')
 \right]
 $$
+
+*首次完整讲解：本讲 §14「Policy Improvement」。*
 
 代码思路：
 
@@ -1181,6 +1517,8 @@ R(s,a)
 \sum_{s'}T(s,a,s')V_k(s')
 \right]
 $$
+
+*首次完整讲解：本讲 §18「Value Iteration」。*
 
 代码思路：
 
@@ -1253,7 +1591,7 @@ Lecture 2 后，Assignment 1 的前置知识基本齐了。
 
 ## 29. 本讲必会公式
 
-MDP：
+MDP（首次完整讲解：§4）：
 
 $$
 \mathcal{M}
@@ -1261,7 +1599,7 @@ $$
 (\mathcal{S}, \mathcal{A}, P, R, \gamma)
 $$
 
-策略：
+策略（首次完整讲解：Lecture 1 §11；本讲复习：§5）：
 
 $$
 \pi(a \mid s)
@@ -1269,7 +1607,27 @@ $$
 \Pr(a_t=a \mid s_t=s)
 $$
 
-Policy-induced reward:
+最优价值与最优策略（首次完整讲解：§11）：
+
+$$
+V^*(s)
+=
+\max_\pi V^\pi(s),
+\quad \forall s\in\mathcal{S}
+$$
+
+$$
+\pi^*
+\in
+\left\{
+\pi
+\mid
+V^\pi(s)=V^*(s),
+\ \forall s\in\mathcal{S}
+\right\}
+$$
+
+Policy-induced reward（首次完整讲解：§6）：
 
 $$
 R^\pi(s)
@@ -1278,7 +1636,7 @@ R^\pi(s)
 \pi(a \mid s)R(s,a)
 $$
 
-Policy-induced transition:
+Policy-induced transition（首次完整讲解：§6）：
 
 $$
 P^\pi(s' \mid s)
@@ -1287,7 +1645,7 @@ P^\pi(s' \mid s)
 \pi(a \mid s)P(s' \mid s,a)
 $$
 
-Policy evaluation：
+Policy evaluation（首次完整讲解：§7）：
 
 $$
 V^\pi(s)
@@ -1303,7 +1661,7 @@ P(s' \mid s,a)V^\pi(s')
 \right]
 $$
 
-确定性 policy evaluation：
+确定性 policy evaluation（首次完整讲解：§7.2）：
 
 $$
 V^\pi(s)
@@ -1315,7 +1673,7 @@ R(s,\pi(s))
 P(s' \mid s,\pi(s))V^\pi(s')
 $$
 
-Q-value：
+Q-value（首次完整讲解：§13）：
 
 $$
 Q^\pi(s,a)
@@ -1327,7 +1685,7 @@ R(s,a)
 P(s' \mid s,a)V^\pi(s')
 $$
 
-Policy improvement：
+Policy improvement（首次完整讲解：§14）：
 
 $$
 \pi_{i+1}(s)
@@ -1335,7 +1693,7 @@ $$
 \arg\max_a Q^{\pi_i}(s,a)
 $$
 
-Bellman optimality operator：
+Bellman optimality operator（首次完整讲解：§17）：
 
 $$
 (BV)(s)
@@ -1350,13 +1708,13 @@ P(s' \mid s,a)V(s')
 \right]
 $$
 
-Value iteration：
+Value iteration（首次完整讲解：§18）：
 
 $$
 V_{k+1} = BV_k
 $$
 
-Contraction：
+Contraction（首次完整讲解：§21）：
 
 $$
 \lVert BV - BV' \rVert_\infty
@@ -1365,7 +1723,7 @@ $$
 \lVert V - V' \rVert_\infty
 $$
 
-Policy Bellman operator：
+Policy Bellman operator（首次完整讲解：§20）：
 
 $$
 (B^\pi V)(s)
@@ -1377,7 +1735,7 @@ R(s,\pi(s))
 P(s' \mid s,\pi(s))V(s')
 $$
 
-Finite-horizon value iteration：
+Finite-horizon value iteration（首次完整讲解：§23）：
 
 $$
 V_{k+1}(s)
@@ -1450,5 +1808,5 @@ Lecture 2 是 Assignment 1 的核心前置课。
 6. Contraction 保证 value iteration 在 $\gamma<1$ 时收敛。
 7. Finite horizon 需要跟踪剩余步数，策略通常不是 stationary。
 
-下一步如果继续课程，可以进入 Lecture 3：没有模型时如何做 policy evaluation。  
+下一步如果继续课程，可以进入 Lecture 3：没有模型时如何做 policy evaluation。
 如果巩固 Lecture 1-2，现在更建议开始 Assignment 1，尤其是 Q4 的 RiverSwim 代码。
