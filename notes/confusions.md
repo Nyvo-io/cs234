@@ -33,7 +33,7 @@
    $$
 
    **本课程默认约定**：除非题目或 lecture 明确说明，否则假设 $H$ 表示 episode 总步数，时间索引 $t=0,1,\ldots,H-1$。从时间 $t$ 开始的 return 应写成 $\sum_{k=0}^{H-1-t} \gamma^k r_{t+k}$。
-   
+
    **做题时的策略**：做 Assignment 1 Q1 的 effective horizon 计算时，先仔细阅读题目对 $H$ 或 $H_{\text{rem}}$ 的定义，再选择对应的公式形式。
 
 2. **Reward vs Value**
@@ -88,3 +88,65 @@
 8. **Finite-horizon policy is usually time-dependent**
 
    Infinite-horizon discounted MDP 中存在 stationary optimal policy；finite-horizon MDP 中，最优动作通常依赖剩余步数。同一个状态在剩 10 步和剩 1 步时可能应选择不同动作。
+
+9. **Reward indexing: $r_t$ vs $R_{t+1}$**
+
+   不同课件或教材可能用 $r_t$ 表示在 $(s_t,a_t)$ 后观察到的奖励，也可能用 $R_{t+1}$ 表示同一个奖励。两者只要前后一致都可以，但会让 return 的下标看起来相差一位。
+
+   **本笔记默认约定**：$r_t$ 是在状态 $s_t$ 采取动作 $a_t$ 后、转移到 $s_{t+1}$ 时观察到的奖励。若 episode 有 $T$ 次转移，$t=0,\ldots,T-1$，则：
+
+   $$
+   G_t
+   =
+   \sum_{k=0}^{T-1-t}\gamma^k r_{t+k}
+   $$
+
+   **做题策略**：先根据题目轨迹写出“状态、动作、奖励、下一状态”的对应关系，再套 return 公式。
+
+10. **First-visit MC vs every-visit MC**
+
+    First-visit 指一条 episode 按时间从前往后时，状态第一次出现的位置；不是从 episode 尾部反向计算 return 时最先遇到的位置。
+
+    - First-visit MC：每条 episode 对每个状态最多贡献一个 return。
+    - Every-visit MC：状态每次出现都贡献一个 return。
+
+11. **Monte Carlo target vs TD target**
+
+    MC 使用完整回报：
+
+    $$
+    G_t
+    =
+    r_t+\gamma r_{t+1}+\gamma^2r_{t+2}+\cdots
+    $$
+
+    TD(0) 使用一步 bootstrap target：
+
+    $$
+    r_t+\gamma V(s_{t+1})
+    $$
+
+    $V(s_{t+1})$ 是当前估计，不是真实未来回报。因此 TD 通常有偏，但方差通常低于 MC。
+
+12. **Unbiased vs consistent**
+
+    无偏描述固定样本量下估计器的期望是否等于真值；一致描述样本量趋于无穷时，估计是否以概率收敛到真值。
+
+    无偏不自动保证一致；有限样本有偏也不妨碍估计器最终一致。
+
+13. **Batch MC vs batch TD**
+
+    在固定有限数据集上反复更新：
+
+    - Batch MC 收敛到数据中完整 return 的经验平均。
+    - Batch TD 收敛到最大似然 Markov 模型的 Bellman fixed point。
+
+    两者可能得到不同答案。Batch TD 能跨 episode 共享下一状态信息，但依赖状态表示满足 Markov 假设。
+
+14. **Terminal value vs terminal transition reward**
+
+    对终止状态通常定义 $V(s_{\mathrm{terminal}})=0$，表示终止之后没有未来奖励。这不代表进入终止状态的即时奖励为 0。TD target 在终止转移上应保留 $r_t$：
+
+    $$
+    y_t^{\mathrm{TD}}=r_t
+    $$

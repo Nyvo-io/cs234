@@ -78,7 +78,7 @@ H 是 horizon，r_t 是 reward，gamma 是 discount factor。
 这个目标函数表示：我们要在所有策略中选择一个策略，使它在一段 episode 中获得的折扣累计奖励的期望最大。它把 RL 的目标从“单步预测正确”变成了“整段决策过程的长期收益最大”。
 ```
 
-对带时间下标的公式，必须先说明索引约定。尤其要区分 $H$ 表示整个 episode 的总步数，还是从当前时间 $t$ 开始剩余的步数。**关于 horizon 的两种约定和标准写法，见 `confusions.md` 第 1 条。**
+对带时间下标的公式，必须先说明索引约定。尤其要区分 $H$ 表示整个 episode 的总步数，还是从当前时间 $t$ 开始剩余的步数。相关约定应以 `confusions.md` 中当前记录为准，不依赖固定条目编号。
 
 如果用户在 iTerm2 里看，LaTeX 只会显示源码；如果用户在 Obsidian、Typora、支持 MathJax 的 Markdown 预览器里打开 `.md` 文件，会渲染成美观公式。
 
