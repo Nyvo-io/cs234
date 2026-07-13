@@ -100,7 +100,8 @@ def policy_improvement(policy, R, T, V_policy, gamma):
     new_policy: np.array (num_states)
     """
     num_states, num_actions = R.shape
-    new_policy = np.zeros(num_states, dtype=int)
+    new_policy = np.zeros(num_states, dtype=int) #不加dtype，则默认是float
+    
 
     ############################
     # YOUR IMPLEMENTATION HERE #

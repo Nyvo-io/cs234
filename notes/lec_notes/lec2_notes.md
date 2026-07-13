@@ -829,6 +829,8 @@ backup_val = R[state, action] + gamma * np.sum(T[state, action] * V)
 
 
 
+
+
 ## 14. Policy Improvement
 
 *Q 函数首次完整讲解：§13。这里用 Q 函数来改进策略。*
@@ -873,7 +875,7 @@ $$
 V^{\pi_{i+1}}(s) \ge V^{\pi_i}(s), \quad \forall s
 $$
 
-新策略在每个状态的价值都不低于旧策略（通常会更好，除非旧策略已经最优）。
+新策略(第i+1次的策略)在每个状态的价值都不低于旧策略（通常会更好，除非旧策略已经最优）。
 
 **为什么一定不会更差？**
 
@@ -912,6 +914,7 @@ $$
 这条公式在说什么：
 
 一个策略比另一个策略好，是指它在每个状态的价值都不低于另一个策略。
+
 
 Policy improvement 命题：
 
@@ -971,6 +974,8 @@ $$
 实践中要注意 tie-breaking：
 
 如果两个动作价值相同，`argmax` 会按实现规则选其中一个。为了避免同值动作导致来回变化，代码中保持一致的 tie-breaking 很重要。NumPy 的 `np.argmax` 会返回第一个最大值索引。
+
+
 
 ## 17. Bellman Optimality Operator
 
