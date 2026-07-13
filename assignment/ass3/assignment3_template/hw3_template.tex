@@ -1,0 +1,611 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{fancyhdr} % Required for custom headers
+\usepackage{lastpage} % Required to determine the last page for the footer
+\usepackage{extramarks} % Required for headers and footers
+\usepackage[usenames,dvipsnames]{color} % Required for custom colors
+\usepackage{graphicx} % Required to insert images
+\usepackage{listings} % Required for insertion of code
+\usepackage{courier} % Required for the courier font
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup[table]{skip=4pt}
+\usepackage{framed}
+\usepackage{bm}
+\usepackage[most]{tcolorbox}
+\usepackage{physics}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+basicstyle=\small\ttfamily,
+columns=flexible,
+breaklines=true
+}
+\hypersetup{
+     colorlinks = true,
+     linkcolor = blue,
+     anchorcolor = blue,
+     citecolor = red,
+     filecolor = blue,
+     urlcolor = blue
+     }
+
+\newenvironment{myitemize}
+{ \begin{itemize}
+		\setlength{\itemsep}{0pt}
+		\setlength{\parskip}{0pt}
+		\setlength{\parsep}{0pt}     }
+	{ \end{itemize}                  } 
+
+\newcommand{\answer}[1]{
+    \begin{tcolorbox}[breakable]
+    Answer: #1
+    \end{tcolorbox}
+    \clearpage
+}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\given}{\,|\,}
+\newcommand{\bE}{\mathbb{E}}
+\newcommand{\bH}{\mathbb{H}}
+\newcommand{\bI}{\mathbb{I}}
+\newcommand{\bN}{\mathbb{N}}
+\newcommand{\bR}{\mathbb{R}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+\newcommand{\cA}{\mc{A}}
+\newcommand{\ra}{\rightarrow}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\safereward}{r_{\text{safe}}}
+\newcommand{\lowreward}{\underline{r}_{\text{risk}}}
+\newcommand{\highreward}{\overline{r}_{\text{risk}}}
+\newcommand{\consreward}{r_{\text{cons}}}
+
+% Margins
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\linespread{1.1} % Line spacing
+
+% Set up the header and footer
+\pagestyle{fancy}
+\rhead{\hmwkAuthorName} % Top left header
+\lhead{\hmwkClass: \hmwkTitle} % Top center head
+\lfoot{\lastxmark} % Bottom left footer
+\cfoot{} % Bottom center footer
+\rfoot{Page\ \thepage\ of\ \protect\pageref{LastPage}} % Bottom right footer
+\renewcommand\headrulewidth{0.4pt} % Size of the header rule
+\renewcommand\footrulewidth{0.4pt} % Size of the footer rule
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+%----------------------------------------------------------------------------------------
+%	CODE INCLUSION CONFIGURATION
+%----------------------------------------------------------------------------------------
+
+\definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0} % This is the color used for comments
+\lstloadlanguages{Python}
+\lstset{language=Python,
+        frame=single, % Single frame around code
+        basicstyle=\footnotesize\ttfamily, % Use small true type font
+        keywordstyle=[1]\color{Blue}\bf,
+        keywordstyle=[2]\color{Purple},
+        keywordstyle=[3]\color{Blue}\underbar, % Custom functions underlined and blue
+        identifierstyle=, % Nothing special about identifiers
+        commentstyle=\usefont{T1}{pcr}{m}{sl}\color{MyDarkGreen}\small, % Comments small dark green courier font
+        stringstyle=\color{Purple}, % Strings are purple
+        showstringspaces=false, % Don't put marks in string spaces
+        tabsize=5, % 5 spaces per tab
+        morekeywords={rand},
+        morekeywords=[2]{on, off, interp},
+        morekeywords=[3]{test},
+        morecomment=[l][\color{Blue}]{...}, % Line continuation (...) like blue comment
+        numbers=left, % Line numbers on left
+        firstnumber=1, % Line numbers start with line 1
+        numberstyle=\tiny\color{Blue}, % Line numbers are blue and small
+        stepnumber=5 % Line numbers go in steps of 5
+}
+
+\newcommand{\perlscript}[2]{
+\begin{itemize}
+\item[]\lstinputlisting[caption=#2,label=#1]{#1.pl}
+\end{itemize}
+}
+
+%----------------------------------------------------------------------------------------
+%	NAME AND CLASS SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\hmwkTitle}{Assignment \#3} % Assignment title
+\newcommand{\hmwkClass}{CS\ 234} % Course/class
+\newcommand{\hmwkAuthorName}{} % Your name
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title{
+\vspace{-1in}
+\textmd{\textbf{\hmwkClass:\ \hmwkTitle}}}
+\author{}
+\date{} % Insert date here if you want it to appear below your name
+
+\begin{document}
+
+\maketitle
+\vspace{-.5in}
+\begin{framed}
+{\bf Due date: Feb 20, 2025 at 6:00 PM (18:00) PST}
+\\[1em]
+These questions require thought but do not require long answers. Please be as concise as possible.
+\\[1em]
+We encourage students to discuss in groups for assignments. \textbf{However, each student must finish the
+problem set and programming assignment individually, and must turn in her/his assignment.} We ask
+that you abide by the class Honor Code (see the course website), university Honor Code and the Computer Science department Honor Code, and make
+sure that all of your submitted work is done by yourself. If you have discussed the problems with others,
+please include a statement saying who you discussed problems with. Failure to follow these instructions
+will be reported to the Office of Community Standards. We reserve the right to run a fraud-detection software on your code.
+\\[1em]
+Please review any additional instructions posted on the assignment page at
+\href{http://web.stanford.edu/class/cs234/assignments.html}{http://web.stanford.edu/class/cs234/assignments.html}. When you are ready to submit, please
+follow the instructions on the course website.
+\\[1em]
+\textbf{Note}: We are now requiring students to typeset their homeworks.
+\end{framed}
+
+\section*{Submission guidelines}
+You will be submitting the following on Gradescope:
+\begin{enumerate}
+    \item PDF of this writeup
+    \item Latex submission .zip file. Do \textbf{not} include an enclosing top-level folder; the ZIP file must unpack directly to:
+    \begin{verbatim}
+    main.tex
+    img/
+        hopper.png
+        hopper_rlhf.png
+        hopper_dpo.png
+    \end{verbatim}
+    \item Code submission .zip file. See starter code README for instructions. 
+\end{enumerate}
+
+\section*{An introduction to reinforcement learning from human preferences}
+
+Reinforcement learning from human preferences (RLHF) was a key tool used in enabling the impressive performance of ChatGPT. However, the concept of RLHF came earlier, and is best known from a seminal paper ``Deep reinforcement learning from human preferences." The goal of this assignment is to give you some hands-on experience with RLHF in the context of a robotics task in MuJoCo. You will also get a chance to explore the performance of Direct Preference Optimization (DPO), an alternative to RLHF that allows one to directly learn from preferences without inferring a reward model.  
+You will implement, compare, and contrast several different approaches, including supervised learning (behavior cloning). These methods are all popular approaches used in large language model training, and many other machine learning tasks.
+\\
+\\
+\textbf{Environment setup:}\\
+Please see the starter code README for setting up the environment for this \textit{entire} assignment!
+
+\section{Reward engineering (13 pts writeup)}
+
+In Assignment 2 you applied PPO to solve an environment with a provided reward function. The process of deriving a reward function for a specific task is called reward engineering. Each question in this problem shall be answered \textbf{concisely} with a few sentences.
+
+\subsection{Written Questions}
+
+\begin{enumerate}
+
+    \item[(a)] Why is reward engineering usually hard? What are potential risks that come with specifying an incorrect reward function? Provide an example of a problem and a reward function that appears to be adequate but may have unintended consequences.
+    \answer{
+    %%%%% Start of 1(a) %%%%%
+    
+    %%%%% End of 1(a) %%%%%
+    }
+
+    \item[(b)] Read the description of the \href{https://gymnasium.farama.org/environments/mujoco/hopper/}{Hopper environment}. Using your own words, describe the goal of the environment, and how each term of the reward functions contributes to encourage the agent to achieve it.
+    \answer{
+    %%%%% Start of 1(b) %%%%%
+
+    %%%%% End of 1(b) %%%%%
+    }
+
+    \item[(c)] By default, the episode terminates when the agent leaves the set of ``healthy'' states. What do these ``healthy'' states mean? Name one advantage and one disadvantage of this early termination.
+    \answer{
+    %%%%% Start of 1(c) %%%%%
+
+    %%%%% End of 1(c) %%%%%
+    }
+
+\end{enumerate}
+
+\subsection{Code-Related Questions}
+
+\begin{enumerate}
+
+    \item[(d)] Use the provided starter code to train a policy using PPO to solve the Hopper environment for 3 different seeds. Do this with and without early termination. \textbf{Each seed can take up to 90 minutes to run so please start this early!} 
+
+{\small
+\begin{tcolorbox}
+\begin{verbatim}
+python ppo_hopper.py [--early-termination] --seed SEED
+\end{verbatim}
+\end{tcolorbox}
+}
+
+    Attach here the plot of the episodic returns along training, with and without early termination. You can generate the plot by running
+{\small
+\begin{tcolorbox}
+\begin{verbatim}
+python plot.py --directory results --seeds 1,2,3 --output results/hopper.png
+\end{verbatim}
+\end{tcolorbox}
+}
+    
+    where \texttt{SEEDS} is a comma-separated list of the seeds you used. Also include the plot in your Latex submission folder as \texttt{hopper.png} (in your \texttt{img/} folder). Comment on the performance in terms of training epochs and wall time. Is the standard error in the average returns high or low? How could you obtain a better estimate of the average return on Hopper achieved by a policy optimized with PPO?
+    \answer{
+    %%%%% Start of 1(d) %%%%%
+
+    %%%%% End of 1(d) %%%%%
+    }
+
+    \item[(e)] Pick one of the trained policies and render a video of an evaluation rollout.
+
+    {\small
+    \begin{tcolorbox}
+    \begin{verbatim}
+    # on linux
+    MUJOCO_GL=egl python render.py --checkpoint [PATH TO MODEL CHECKPOINT]
+
+    # on mac/windows
+    python render.py --checkpoint [PATH TO MODEL CHECKPOINT]
+    \end{verbatim}
+    \end{tcolorbox}
+    }
+
+    Does the agent successfully complete the assigned task? Does it complete it in the way you would expect it to, or are you surprised by the agent behavior?
+    \answer{
+    %%%%% Start of 1(e) %%%%%
+
+    %%%%% End of 1(e) %%%%%
+    }
+
+    \item[(f)] Render another video with another policy. How do the two rollouts compare? Do you prefer one over the other?
+    \answer{
+    %%%%% Start of 1(f) %%%%%
+
+    %%%%% End of 1(f) %%%%%
+    }
+
+\end{enumerate}
+
+
+\section{Learning from preferences (19 pts writeup + 8 pts coding)}
+
+In the previous part you trained multiple policies from scratch and compared them at the end of training. In this section, we will see how we can use human preferences on two roll-outs to learn a reward function.
+
+We will follow the framework proposed by Deep Reinforcement Learning from Human Preferences. A reward function $r: \mathcal{O} \times \mathcal{A} \rightarrow \mathbb{R}$ defines a preference relation $\succ$ if for all trajectories $\tau^i = (o^i_t,a^i_t)_{t=0,...,T}$ we have that
+
+$$
+\left(\left(o_0^1, a_0^1\right), \ldots,\left(o_{T}^1, a_{T}^1\right)\right) \succ\left(\left(o_0^2, a_0^2\right), \ldots,\left(o_{T}^2, a_{T}^2\right)\right)
+$$
+
+whenever
+
+$$
+r\left(o_0^1, a_0^1\right)+\cdots+r\left(o_{T}^1, a_{T}^1\right)>r\left(o_0^2, a_0^2\right)+\cdots+r\left(o_{T}^2, a_{T}^2\right) .
+$$
+
+Following the Bradley-Terry preference model, we can calculate the probability of one trajectory $\tau^1$ being preferred over $\tau^2$ as follows:
+
+$$
+\hat{P}\left[\tau^1 \succ \tau^2\right]=\frac{\exp \sum \hat{r}\left(o_t^1, a_t^1\right)}{\exp \sum \hat{r}\left(o_t^1, a_t^1\right)+\exp \sum \hat{r}\left(o_t^2, a_t^2\right)},
+$$
+
+where $\hat{r}$ is an estimate of the reward for a state-action pair. This is similar to a classification problem, and we can fit a function approximator to $\hat{r}$ by minimizing the cross-entropy loss between the values predicted with the above formula and ground truth human preference labels $\mu$.
+
+$$
+\mathcal{L}(\hat{r})=-\sum_{\left(\tau^1, \tau^2, \mu\right) \in \mathcal{D}} \mu \log \hat{P}\left[\tau^1 \succ \tau^2\right]+ (1 - \mu) \log (1 - \hat{P}\left[\tau^1 \succ \tau^2\right]).
+$$
+Once we have learned the reward function\footnote{Recent work on RLHF for reinforcement learning suggests that the pairwise feedback provided by humans on partial trajectories may be more consistent with regret, and that the learned reward function may be better viewed as an advantage function. See Knox et al. AAAI 2024 "Learning optimal advantage from preferences and mistaking it for reward." \url{https://openreview.net/forum?id=euZXhbTmQ7}}, we can apply any policy optimization algorithm (such as PPO) to maximize the returns of a model under it.
+
+\subsection{Written questions}
+
+We parameterize $\hat{r}(o, a)$ with a neural network $\theta$, i.e. $\hat{r}_\theta(o, a)$. Now we want to derive $\nabla_\theta \mathcal{L}(\hat{r})$, the gradient of the loss w.r.t. $\theta$.
+
+\begin{enumerate}
+\item [(a)] First write $\nabla_\theta \log \hat{P}[\tau^1 \succ \tau^2]$ as a function of $\nabla_\theta \hat{r}_\theta(o^j_i, a^{j}_i)$ where $i = 0, ..., T$ and $j = 1, 2$. You may find it useful to rewrite $\hat{P}$ as $\sigma(z_\theta)$ where $\sigma$ is sigmoid and $z_\theta$ is some function of $\theta$.
+\answer{
+%%%%% Start of 2(a) %%%%%
+
+%%%%% End of 2(a) %%%%%
+}
+
+\item [(b)] Then write $\nabla_\theta \mathcal{L}(\hat{r})$ as a function of $\nabla_\theta \hat{r}_\theta(o^j_i, a^{j}_i)$ where $i = 0, ..., T$ and $j = 1, 2$. 
+\end{enumerate}
+\answer{
+%%%%% Start of 2(b) %%%%%
+
+%%%%% End of 2(b) %%%%%
+}
+
+\subsection{Coding questions}
+
+In this problem we are trying to solve the same task as in the previous part, but this time we will learn a reward function from a dataset of preferences rather than manually specifying a reward function. 
+
+\begin{enumerate}
+\item[(c)] You can load a sample from the provided \textbf{long preferences} dataset and render a video of the two trajectories using the following command
+
+{\small
+\begin{tcolorbox}
+\begin{verbatim}
+# on linux
+MUJOCO_GL=egl python render.py --dataset data/long-prefs-hopper.npz --idx IDX
+
+# on mac/windows
+python render.py --dataset data/long-prefs-hopper.npz --idx IDX
+\end{verbatim}
+\end{tcolorbox}
+}
+
+where \texttt{IDX} is an index into the preference dataset (if ommitted a sequence will be chosen at random). Bear in mind that each sequence in the dataset has 200 timesteps which results in an $8$-second video.
+
+Load $5$ different samples from the dataset. For each, take note of which sequence was labeled as preferred (for the coming parts it is helpful to know that $0$ means the first sequence was preferred, $1$ means the second one, and $0.5$ means neither is preferred over the other). Note: you may see that the Hopper terminates / freezes even though it is upright (there is a narrow healthy angle range for the Hopper's torso); assume in this situation that the robot has reached an "unhealthy" state, so it rightfully terminated. Do you agree with the labels (that is, if shown the two trajectories, would you have ranked them the same way they appear in the dataset, knowing that we are trying to solve the Hopper environment)?
+
+From your answers, how often do you estimate you agree with whoever ranked the trajectories? Based on this estimate, would you trust a reward function learned on this data?
+\answer{
+%%%%% Start of 2(c) %%%%%
+
+%%%%% End of 2(c) %%%%%
+}
+
+\item[(d)] Implement the functions in the \texttt{RewardModel} class  (\texttt{run\_rlhf.py}), which is responsible for learning a reward function from preference data.
+
+\item[(e)] Train a model using PPO and the learned reward function with 3 different random seeds. Plot the average returns for both the original reward function and the learned reward function and include it in your response and your LaTeX source submission folder as \texttt{hopper\_rlhf.png} (in the \texttt{img/} folder).
+
+{\small
+\begin{tcolorbox}
+\begin{verbatim}
+# run rlhf
+# Note: You may want to look at the original_scores.png 
+# and learned_scores.png generated in the output folder
+python run_rlhf.py --seed SEED
+
+# plot 
+python plot.py --rlhf-directory results_rlhf \
+    --output results_rlhf/hopper_rlhf.png --seeds 1,2,3
+\end{verbatim}
+\end{tcolorbox}
+}
+
+Do the two correlate?
+\answer{
+%%%%% Start of 2(e) %%%%%
+
+%%%%% End of 2(e) %%%%%
+}
+
+\item[(f)] Given enough preference pairs sampled under the Bradley-Terry model, can we recover the original reward function they were derived from?
+\answer{
+%%%%% Start of 2(f) %%%%%
+
+%%%%% End of 2(f) %%%%%
+}
+
+\item[(g)] Pick one of the policies and render a video of the agent behavior at the end of training.
+
+{\small
+\begin{tcolorbox}
+\begin{verbatim}
+# on linux
+MUJOCO_GL=egl python render.py --checkpoint [PATH TO MODEL CHECKPOINT]
+
+# on mac/windows
+python render.py --checkpoint [PATH TO MODEL CHECKPOINT]
+\end{verbatim}
+\end{tcolorbox}
+}
+
+
+How does it compare to the behavior of the policies trained with the ground truth reward in problem 1? How does it compare to the demonstrations you've seen from the dataset?
+\answer{
+%%%%% Start of 2(g) %%%%%
+
+%%%%% End of 2(g) %%%%%
+}
+
+\end{enumerate}
+
+\section{Direct preference optimization (6 pts writeup + 19 pts coding)}
+
+In the previous question we saw how we could train a model based on preference data. In general you may be given access to a pre-trained model and the corresponding preference data. Learning a reward model and then optimizing a policy for that reward model can have some limitations. An alternative is Direct Preference Optimization (DPO): directly optimize a policy using the preference data, without learning a reward model. DPO in its original form is focused on bandit problems, and proposes optimizing the policy using the following loss:
+
+$$\mathcal{L}_{\mathrm{DPO}}\left(\pi_\theta ; \pi_{\mathrm{ref}}\right)=-\mathbb{E}_{\left(x, y_w, y_l\right) \sim \mathcal{D}}\left[\log \sigma\left(\beta \log \frac{\pi_\theta\left(y_w \mid x\right)}{\pi_{\mathrm{ref}}\left(y_w \mid x\right)}-\beta \log \frac{\pi_\theta\left(y_l \mid x\right)}{\pi_{\mathrm{ref}}\left(y_l \mid x\right)}\right)\right],$$. 
+
+where $x$ is the context/state, and $y_w$ and $y_l$ are two actions (in LLM terms, responses) sampled from the reference policy $\pi_{\mathrm{ref}}$. $y_w$ is the response/action that was preferred (the "winning" response/action) and $y_l$ is the other ("losing") response. 
+$\pi_\theta$ is the policy to be learned, and $\sigma$ is the sigmoid function.
+
+In this part of the assignment you will get to use DPO for learning policies for the same MuJoCo task. While DPO is designed for bandit problems, we will use a simple adaptation of it to handle our RL setting. 
+
+First, to provide some context, consider the general approach for RLHF for text generation:
+
+\begin{enumerate}
+    \item Train a large language model (LLM) to do next token prediction given a context (the tokens that came previously).
+    \item Given a fixed context $x$, generate possible next token sequence predictions $y_1$ and $y_2$, and store the triple $(x, y_1, y_2)$.
+    \item Ask human supervisors to rank $y_1$ and $y_2$ given $x$ according to individual preference.
+    \item Update the LLM to maximize the probability of giving the preferred answers using reinforcement learning.
+\end{enumerate}
+
+In a similar way, given an observation $x$ we could have two ranked sequences of actions $a^1_{1:T}$ and $a^2_{1:T}$, train the model to generate the preferred sequence of actions, and then execute them all\footnote{To understand why we are considering sequences of actions rather than a single action for the next time, recall that $50$ actions corresponded to $2$ seconds of video. If you found it difficult to rank a sequence of $50$ actions based on such a short video, imagine ranking the effect of a single action!}. If the length of the generated action sequence is equal to the environment time horizon, this is called open-loop control. However, this approach lacks robustness, since the plan of actions will not change in response to disturbances or compounding errors. Instead we will use the common approach of receding horizon control (often also called model predictive control), where a multi-step action plan is computed, the first action in that plan is taken, and then a new action plan is computed. MPC/RHC is well known to improve performances, since it allows the agent to react to disturbances. 
+\\
+\\
+Note that there are other algorithms that directly tackle learning from preferences in the multi-step RL setting, such as later work on Contrastive Preference Learning (CPL). Indeed CPL showed that DPO can be viewed as a special case of their setting, for the bandit setting. In this homework we focus on DPO because it is widely used in LLM training, and is a simpler setting which still provides key insights into the difference between RLHF and learning policies directly from preferences. 
+
+\subsection{Coding questions}
+
+In this coding question you will need to modify the \texttt{run\_dpo.py} file. You do not need to modify any other files.
+
+\begin{enumerate}
+    \item[(a)] Implement the \texttt{ActionSequenceModel} class instance methods. When called, the model should return a probability distribution for the actions over the number of next time steps specified at initialization. Use a multivariate normal distribution for each action, with mean and standard deviation predicted by a neural network (see the starter code for more details).\footnote{We have prepared a \href{https://colab.research.google.com/drive/1sw8FJIR5865laTJiI0fqHG3KcGVT23ED}{notebook} to illustrate the behavior of \href{https://pytorch.org/docs/stable/distributions.html\#independent}{\texttt{torch.distributions.Independent}}.}
+    \item[(b)] Implement the \texttt{update} method of the \texttt{SFT} class. This class will be used to pre-train a policy on the preference data by maximizing the log probabilities of the preferred actions given the observations in the dataset.
+    \item[(c)] Implement the \texttt{update} method of the \texttt{DPO} class. This should minimize the DPO loss described above.
+    \item[(d)] Run SFT and DPO for 3 different random seeds each, and plot the evolution of returns over time.
+    {\small
+    \begin{tcolorbox}
+    \begin{verbatim}
+    # run SFT 
+    python run_dpo.py --seed SEED --algo sft
+
+    # run DPO
+    python run_dpo.py --seed SEED --algo dpo
+
+    # plot
+    python plot.py --dpo-directory results_dpo \
+        --output results_dpo/hopper_dpo.png --seeds 1,2,3
+    \end{verbatim}
+    \end{tcolorbox}
+    }
+Include that plot in your response and your LaTeX source submission folder as \texttt{hopper\_dpo.png} (in the \texttt{img/} folder). How does it compare to the returns achieved using RLHF? Comment on the pros and cons of each method applied to this specific example.
+\answer{
+%%%%% Start of 3(d) %%%%%
+
+%%%%% End of 3(d) %%%%%
+}
+
+\item[(e)] Take the best DPO training run and render videos of episodes generated by the SFT policy and the DPO policy. The following command will render 10 episodes from SFT DPO side-by-side. The left one is from SFT policy while the right one is from the DPO policy.
+
+{\small
+\begin{tcolorbox}
+\begin{verbatim}
+# Note: --checkpoint argument should be the path to the dpo.pt the script will
+# find a sft.pt with the same seed following our default naming convention
+
+# on linux
+MUJOCO_GL=egl python render.py --dpo --checkpoint [PATH TO DPO CHECKPOINT]
+
+# on mac/windows
+python render.py --dpo --checkpoint [PATH TO DPO CHECKPOINT]
+\end{verbatim}
+\end{tcolorbox}
+}
+
+How do they compare? Note that both of them may not look great because they are only trained on a small amount of offline data and have not interacted with the environment during training. But you may still observe that one is slightly better than the other in some videos.
+\answer{
+%%%%% Start of 3(e) %%%%%
+
+%%%%% End of 3(e) %%%%%
+}
+
+\end{enumerate}
+
+\section{Best Arm Identification in Multi-armed Bandit (25 pts writeup)}
+
+In many experimental settings we are interested in quickly identifying the ``best" of a set of potential interventions, such as finding the best of a set of experimental drugs at treating cancer, or the website design that maximizes user subscriptions. Here we may be interested in efficient pure exploration, seeking to quickly identify the best arm for future use. 
+
+In this problem, we bound how many samples may be needed to find the best or near-optimal intervention. We frame this as a multi-armed bandit with rewards bounded in $[0,1]$. Recall a bandit problem can be considered as a finite-horizon MDP with just one state ($|\mathcal{S}| = 1$) and horizon $1$: each episode consists of taking a single action and observing a reward. In the bandit setting -- unlike in standard RL --  the action (or ``arm") taken does not affect the distribution of future states.
+We assume a simple multi-armed bandit, meaning that $1 < |\mathcal{A}| < \infty$. Since there is only one state, a policy is simply a distribution over actions. There are exactly $|\mathcal{A}|$ different deterministic policies. Your goal is to design a simple algorithm to identify a near-optimal arm with high probability.
+
+We recall Hoeffding's inequality: if $X_1,\dots,X_n$ are i.i.d. random variables satisfying $0 \le X_i \le 1$ with probability $1$ for all $i$, $\overline X = \E[X_1] = \dots = \E[X_n]$ is the expected value of the random variables, and $\widehat X = \frac{1}{n} \sum_{i=1}^n X_i$ is the sample mean, then for any $\delta > 0$ we have
+\begin{align}
+\Pr\Bigg(|\widehat X - \overline X | > \sqrt{\frac{\log(2/\delta)}{2n}}	\Bigg) < \delta.
+\end{align}
+
+Assuming that the rewards are bounded in $[0,1]$,
+we propose this simple strategy: pull each arm $n_e$ times, and return the action with the highest average payout $\widehat r_a$. The purpose of this exercise is to study the number of samples required to output an arm that is at least $\epsilon$-optimal with high probability.
+Intuitively, as $n_e$ increases the empirical average of the payout $\widehat r_a$ converges to its expected value $\overline r_a$ for every action $a$, and so choosing the arm with the highest empirical payout $\widehat r_a$ corresponds to approximately choosing the arm with the highest expected payout $\overline r_a$.
+
+\begin{enumerate}
+    \item[(a)] We start by bounding the probability of the ``bad event'' in which the empirical mean of some arm differs significantly from its expected return. Starting from Hoeffding's inequality with $n_e$ samples allocated to every action, show that:
+    \begin{align}
+    \Pr\Bigg(\exists a \in \mathcal{A} \quad \text{s.t.} \quad |\widehat r_a - \overline r_a | > \sqrt{\frac{\log(2/\delta)}{2n_e}}	\Bigg) < |\mathcal{A}|\delta.
+    \end{align}
+    Note that, depending on your derivation, you may come up with a tighter upper bound than $|\mathcal{A}|\delta$. This is also acceptable (as long as you argue that your bound is tighter), but showing the inequality above is sufficient.
+    \answer{
+    %%%%% Start of 4(a) %%%%%
+
+    %%%%% End of 4(a) %%%%%
+    }
+
+    \item[(b)] After pulling each arm (action) $n_e$ times our algorithm returns the arm with the highest empirical mean:
+    \begin{equation}
+    a^\dagger = \arg\max_{a} \widehat r_a	
+    \end{equation}
+    Notice that $a^\dagger$ is a random variable.
+    Let ${a^\star} = \arg\max_a \overline r_{a}$ be the true optimal arm. Suppose that we want our algorithm to return at least an $\epsilon$-optimal arm with probability at least $1-\delta'$, as follows:
+
+    \begin{equation}
+    \label{eqn:maxa}
+    \Pr \Bigg(\overline r_{a^\dagger} \geq  \overline r_{a^\star} - \epsilon \Bigg) \geq 1-\delta'.
+    \end{equation}
+    How accurately do we need to estimate each arm in order to pick an arm that is $\epsilon$-optimal? Then derive how many total samples we need total (across all arms) to return an $\epsilon$-optimal arm with prob at least 1- $\delta'$ (that satisfies Equation~\ref{eqn:maxa}).  Express your result as a function of the number of actions, the required precision $\epsilon$ and the failure probability $\delta'$.
+    \answer{
+    %%%%% Start of 4(b) %%%%%
+
+    %%%%% End of 4(b) %%%%%
+    }
+
+    \item[(c)] (Optional challenge, will not be graded) The above derivation only assumed the outcomes were bounded between 0 and 1. In practice people often assume outcomes are drawn from a parametric distribution, and under mild assumptions, one can use the central limit theorem to assume the average outcomes for an arm will follow a normal distribution. Repeat the above analysis under this assumption, for a multi-armed bandit with two arms. Is the resulting number of samples significantly smaller under these assumptions? In real settings it is often very expensive to run experiments. Do you think the method and bound derived in (a-b) would be preferable to making a normal assumption and why or why not? 
+    \answer{
+    %%%%% Start of 4(c) %%%%%
+
+    %%%%% End of 4(c) %%%%%
+    }
+
+\end{enumerate}
+
+\section{Stated vs. Revealed Preferences (4 pts writeup)}
+
+
+\textbf{Context}: You are designing a reinforcement learning algorithm to power a news recommendation app. The app has two types of data about users:
+
+\begin{itemize}
+    \item User Profiles: Users specify what news topics they are interested in reading about, and their preferred format (videos, podcasts, etc). 
+    \item Interaction data: what news articles the user lingered on, how long they lingered on it, and if and who they shared articles/podcasts.
+\end{itemize}
+
+Additionally, the app has metadata about users, such as:
+\begin{itemize}
+    \item Location, browser type, etc.
+    \item Engagement Metrics: Frequency of app usage, average time spent on the app
+    \item Revenue Potential: Whether they are paying users and their likelihood to subscribe to premium services.
+\end{itemize}
+
+
+\begin{enumerate}
+    \item[(a)]  Which of the given data about users represent the stated preferences of the user, and which represents the  revealed preferences?
+    \answer{
+    %%%%% Start of 5(a) %%%%%
+
+    %%%%% End of 5(a) %%%%%
+    }
+
+    \item[(b)] What reward function might a company pick?
+    \answer{
+    %%%%% Start of 5(b) %%%%%
+
+    %%%%% End of 5(b) %%%%%
+    }
+
+    \item[(c)] Assume the company wants to optimize its news feed to cater to user’s preferences.  What are the ethical considerations of prioritizing the user's stated preferences vs revealed preferences? 
+    \answer{
+    %%%%% Start of 5(c) %%%%%
+
+    %%%%% End of 5(c) %%%%%
+    }
+
+    \item[(d)] Suggest a way to incorporate exploration  to test whether a user’s preferences (stated or revealed) might evolve over time. 
+    \answer{
+    %%%%% Start of 5(d) %%%%%
+
+    %%%%% End of 5(d) %%%%%
+    }
+
+\end{enumerate}
+\end{document}

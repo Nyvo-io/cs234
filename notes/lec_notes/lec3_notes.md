@@ -2,11 +2,15 @@
 
 来源：`lecture/lec3/lecture3pre.pdf`，CS234 Winter 2026，Professor Emma Brunskill。
 
+笔记规范：`cs234-rl-tutor v2`。下方 checklist 只表示课件内容已覆盖，不表示学习者已经掌握。
+
+外部资料核验日期：2026-07-10。
+
 本讲主题：在不知道真实转移模型和奖励模型时，只利用策略与环境交互得到的直接经验（direct experience），估计固定策略的价值。这就是无模型策略评估（model-free policy evaluation）。
 
 > 课件标题页编号显示整套 slides 还有附加内容，但当前 `lecture3pre.pdf` 实际包含 53 个 PDF 页面。当前文件没有课件末尾提到的可选解答页，因此例题结果在本笔记中按照课件给出的轨迹与标准定义逐步推导。
 
-## 0. 本讲 Checklist
+## 0. 本讲覆盖清单
 
 - [x] 复习回报、状态价值函数、动作价值函数和动态规划策略评估。
 - [x] 理解无模型策略评估的目标，以及为什么直接经验很重要。
@@ -226,6 +230,7 @@ $$
 3. 连续、高维环境无法枚举全部状态和下一状态。
 4. Robot learning 和 agent 系统通常只能通过执行动作获得反馈。
 
+
 ## 7. 蒙特卡洛策略评估（Monte Carlo Policy Evaluation）
 
 **蒙特卡洛策略评估（Monte Carlo policy evaluation, MC）**：直接把多次完整运行得到的回报取平均。
@@ -361,10 +366,10 @@ $$
 
 ## 9. 每次访问蒙特卡洛（Every-Visit Monte Carlo）
 
-每次访问 MC（every-visit MC）使用每一次出现状态 $s$ 时的回报。沿用刚才的例子，同一 episode 会同时使用 6 和 2，因此当前估计为：
+每次访问 MC（every-visit MC）使用每一次出现状态 $s$ 时的回报。沿用刚才状态 $B$ 的例子，同一 episode 会同时使用 $G_1=14$ 和 $G_3=9$，因此当前估计为：
 
 $$
-\hat V_{\mathrm{EV}}^\pi(s)=\frac{6+2}{2}=4
+\hat V_{\mathrm{EV}}^\pi(B)=\frac{14+9}{2}=11.5
 $$
 
 一般形式为：
@@ -575,14 +580,14 @@ $$
 
 **具体例子**：
 
-真实价值 $\theta=5$。两种无偏估计器在 4 次独立实验中的结果：
+真实价值 $\theta=5$。假设理论分析已经证明两种估计器都无偏；下面展示它们在 4 次独立实验中的一组可能结果：
 
 ```
 方法 A: 4.9, 5.1, 5.0, 5.0
 方法 B: 1.0, 9.0, 2.0, 8.0
 ```
 
-两者平均值都是 5（无偏），但波动程度不同：
+这 4 次结果的经验平均都恰好为 5，但波动程度不同。注意：有限几次结果的平均碰巧等于真值，不能证明估计器无偏；无偏性要求对所有可能数据集取期望。
 
 **方法 A 的方差**：
 
@@ -1519,7 +1524,7 @@ Lecture 3 的主线是：在不知道世界模型时，如何从执行固定策�
 3. 增量更新把 RL 算法统一成“旧估计 + 学习率 × 误差”。
 4. Bias、variance、MSE 和 consistency 必须分开判断。
 5. TD(0) 用一步真实奖励加下一状态估计构造 target，能够在线 bootstrap。
-6. MC 通常无偏但高方差；TD 通常有偏但低方差。
+6. First-visit MC 的样本均值无偏但通常高方差；every-visit MC 有限样本一般有偏但一致；TD 通常有限样本有偏且方差较低。
 7. Certainty equivalence 先学习最大似然 MDP，再使用动态规划。
 8. 固定数据集上，batch MC 拟合经验 return，batch TD 拟合经验 Markov 模型的 Bellman 解。
 9. 本讲已经为 Assignment 2 的 return 计算和 baseline 价值估计打下基础，但整份 Assignment 2 仍需后续 lecture。
@@ -1528,3 +1533,17 @@ Lecture 3 的主线是：在不知道世界模型时，如何从执行固定策�
 
 - Assignment 1 尚未完成时，可以现在开始写 Assignment 1。
 - 继续课程时进入 Lecture 4：没有模型时的控制（model-free control）。
+
+## 41. 延伸阅读
+
+### 41.1 经典基础
+
+- Sutton, “Learning to Predict by the Methods of Temporal Differences”（1988）：TD prediction 的奠基论文，明确提出用相邻预测之间的差异进行增量学习。<https://link.springer.com/article/10.1007/BF00115009>
+- Sutton & Barto, *Reinforcement Learning: An Introduction*（2nd ed., 2018），Monte Carlo 与 Temporal-Difference Learning 章节：本讲 first/every-visit MC、TD(0) 和 batch example 的标准教材来源。<https://mitpress.mit.edu/9780262039246/reinforcement-learning/>
+- Tsitsiklis & Van Roy, “An Analysis of Temporal-Difference Learning with Function Approximation”（1997）：分析在线 TD 与线性函数近似的收敛和近似误差，也说明将本讲表格结论推广到函数近似时需要额外条件。<https://web.mit.edu/~jnt/www/Papers/J063-97-bvr-td.pdf>
+
+### 41.2 前沿动态（截至 2026-07-10 核实）
+
+- TDRM 将 temporal-difference 目标用于训练更平滑的 LLM process reward model，是 TD 思想进入语言模型 reward/value estimation 的直接现代延伸；其任务设定和损失不能直接当作本讲 tabular TD(0)。<https://openreview.net/forum?id=j2oWVgTFNX>
+- 2026 年的 LLM post-training 综述用 trajectory provenance 区分 off-policy 数据与 on-policy rollout，可帮助把本讲“数据由哪个策略产生”连接到现代 LLM 训练管线。<https://arxiv.org/abs/2604.07941>
+- TD-M(PC)$^2$（L4DC 2026）结合 learned value/policy prior、temporal-difference learning 与 model predictive control，体现了 model-free value estimation 和 model-based planning 在机器人连续控制中的融合。<https://proceedings.mlr.press/v331/lin26a.html>

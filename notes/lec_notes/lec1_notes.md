@@ -2,9 +2,11 @@
 
 来源：`lecture/lec1/lecture1pre.pdf`，CS234 Winter 2026, Professor Emma Brunskill。
 
-核验日期：2026-06-27。现代 AI 例子中涉及近年进展的部分，已用公开来源补充核验，链接放在文末。
+笔记规范：`cs234-rl-tutor v2`。下方 checklist 只表示课件内容已覆盖，不表示学习者已经掌握。
 
-## 0. 本讲 Checklist
+外部资料核验日期：2026-07-10。现代 AI 例子中涉及近年进展的部分，已用公开来源补充核验，链接放在文末。
+
+## 0. 本讲覆盖清单
 
 - [x] 理解强化学习（reinforcement learning, RL）的基本定义：从经验/数据中学习，在不确定性下做长期有利的决策。
 - [x] 理解 RL 的四个核心难点：优化（optimization）、延迟后果（delayed consequences）、探索（exploration）、泛化（generalization）。
@@ -184,14 +186,14 @@ RL 的目标是找到最优或足够好的决策方式。这里的“方式”�
 3. 环境返回奖励 $r_t$
 4. 环境转移到新状态 $s_{t+1}$（智能体可能看不到完整状态）
 
-**具体例子**（Mars Rover，H=5）：
+**具体例子（自拟资源采集任务，$H=5$）**：
 
 ```
-t=0: 在 Class 7 → 选择 Sample → 得奖励 +10 → 停留在 Class 7
-t=1: 在 Class 7 → 选择 Move   → 得奖励 0   → 转移到 Class 6
-t=2: 在 Class 6 → 选择 Sample → 得奖励 +1  → 停留在 Class 6
-t=3: 在 Class 6 → 选择 Move   → 得奖励 0   → 转移到 Class 5
-t=4: 在 Class 5 → 选择 Sample → 得奖励 +1  → episode 结束
+t=0: 在 s_0 → 选择 Collect → 得到 r_0=+10 → 停留在 s_0
+t=1: 在 s_0 → 选择 Move    → 得到 r_1=0   → 转移到 s_1
+t=2: 在 s_1 → 选择 Collect → 得到 r_2=+1  → 停留在 s_1
+t=3: 在 s_1 → 选择 Move    → 得到 r_3=0   → 转移到 s_2
+t=4: 在 s_2 → 选择 Collect → 得到 r_4=+1  → episode 结束
 ```
 
 每一行是一个时间步。**是的，一个时间步对应一次决策和执行。**
@@ -732,7 +734,7 @@ Policy evaluation 的核心思想：给定策略 $\pi$ 后，MDP 退化成 MRP�
 
 **Horizon H**：一个 episode 最多可以执行多少个时间步。
 
-**具体例子**（Mars Rover，H=5）：
+**具体例子**（H=5）：
 
 假设 H = 5，那么一个 episode 最多包含 5 个时间步：
 
@@ -800,16 +802,16 @@ $$
 - $\gamma \in [0,1]$：折扣因子，越远的奖励权重越小
 - $H$：episode 总步数
 
-**具体例子**（Mars Rover，H=5，γ=0.9）：
+**具体例子（沿用 §6.1 的自拟资源采集任务，$H=5$，$\gamma=0.9$）**：
 
 假设从 $t=0$ 开始，观察到的奖励序列：
 
 ```
-t=0: 在 Class 7，Sample，r_0 = +10
-t=1: 在 Class 7，Move，  r_1 = 0
-t=2: 在 Class 6，Sample，r_2 = +1
-t=3: 在 Class 6，Move，  r_3 = 0
-t=4: 在 Class 5，Sample，r_4 = +1
+t=0: 在 s_0，Collect，r_0 = +10
+t=1: 在 s_0，Move，   r_1 = 0
+t=2: 在 s_1，Collect，r_2 = +1
+t=3: 在 s_1，Move，   r_3 = 0
+t=4: 在 s_2，Collect，r_4 = +1
 ```
 
 从 $t=0$ 开始的回报：
@@ -845,16 +847,18 @@ Inventory 的有限 horizon 与 RiverSwim 的折扣因子都在改变同一个�
 
 ### 15.3 状态价值函数（State Value Function）
 
-**状态价值函数 $V(s)$**：从状态 $s$ 出发，未来能获得的回报的期望值。
+**状态价值函数（state-value function）**：从状态 $s$ 出发，未来能获得的回报的期望值。
+
+在有限时域中，剩余时间会影响价值，因此应显式写成 $V_t(s)$（绝对时间）或 $V_h(s)$（还剩 $h$ 步）。本节沿用总步数 $H$ 和绝对时间 $t$ 的约定：
 
 **数学定义**：
 
 $$
-V(s) = \mathbb{E}[G_t \mid s_t = s] = \mathbb{E}\left[\sum_{k=0}^{H-1-t} \gamma^k r_{t+k} \mid s_t = s\right]
+V_t(s) = \mathbb{E}[G_t \mid s_t = s] = \mathbb{E}\left[\sum_{k=0}^{H-1-t} \gamma^k r_{t+k} \mid s_t = s\right]
 $$
 
 其中：
-- $V(s)$：状态 $s$ 的价值
+- $V_t(s)$：时刻 $t$、状态 $s$ 的有限时域价值
 - $\mathbb{E}[\cdot]$：对未来随机转移和奖励取期望
 - $G_t$：从当前开始的回报（见 §15.2）
 - $s_t = s$：当前状态为 $s$
@@ -863,7 +867,9 @@ $$
 
 价值函数回答这个问题：”如果我现在在状态 $s$，未来平均能拿到多少总奖励？”
 
-**具体例子**（两状态 MRP）：
+对于无限时域 stationary MRP，价值不再显式依赖绝对时间，通常简写为 $V(s)$。
+
+**具体例子（自拟两状态 MRP）**：
 
 假设从状态 $A$ 出发，重复运行 5 次，观察到的回报分别为：
 
@@ -887,11 +893,11 @@ $$
 - 价值是期望值，不是某一次的实际回报。
 - 价值考虑的是”从这里出发的未来”，不包括”怎么到这里的过去”。
 
-**例子对比**（Mars Rover）：
+**课程 Mars Rover 对比**：
 
-- **Class 7**（最右端）：即时奖励 +10，价值很高
-- **Class 5**（中间）：即时奖励 0，但如果策略倾向向右，它通向 Class 7 的概率高，价值中等
-- **Class 1**（最左端）：即时奖励 0.005，且远离高奖励区域，价值低
+- $s_7$ 的即时奖励是 $+10$，$s_1$ 的即时奖励是 $+1$，中间状态的即时奖励是 0。
+- 当 $\gamma=0$ 时，价值恰好等于这些即时奖励。
+- 当 $\gamma>0$ 时，$s_5$ 等中间状态虽然即时奖励为 0，但其价值取决于策略和到达两端的转移概率；不能仅凭即时奖励给它排序。
 
 *后续完整讲解：Lecture 3 会正式把样本平均发展成 Monte Carlo policy evaluation。*
 
@@ -931,7 +937,7 @@ t=9: r=0
 t=10: r=+10
 ```
 
-计算两条路径的回报（假设从 t=0 开始，前 10 步）：
+计算两条路径从 $t=0$ 开始的无限时域折扣回报；路径 B 只在 $t=10$ 获得一次奖励：
 
 **γ = 0.5（短视）**：
 - 路径 A：$G = 0.1 + 0.5 \times 0.1 + 0.5^2 \times 0.1 + \cdots \approx 0.2$
@@ -963,6 +969,8 @@ RiverSwim 中：
 - γ 小时：最优策略可能一直停在左边拿稳定小奖励 +0.005
 - γ 大时：未来右端大奖励 +1.0 足以 justify 长期向右探索
 
+
+
 ## 17. MRP 的 Bellman 方程
 
 **Bellman 方程**：将长期价值拆解为”一步奖励 + 折扣后的未来价值”。
@@ -987,6 +995,8 @@ $$
 **为什么这样做有用**：
 
 直接计算 $V(s) = \mathbb{E}[G_t \mid s_t=s]$ 需要考虑所有可能的未来轨迹，计算量爆炸。Bellman 方程利用 Markov 性，只需看一步转移，然后递归引用下一状态的价值。
+
+它把原本需要展开的所有未来路径压缩为局部递推关系，使动态规划和线性代数求解成为可能。
 
 **具体例子**（两状态 MRP）：
 
@@ -1053,6 +1063,7 @@ $$
 - $R(s,a)$ -> `R[state, action]`
 - $T(s,a,s')$ -> `T[state, action, next_state]`
 - $\gamma$ -> `gamma`
+
 
 ## 18. Bellman 方程的矩阵形式
 
@@ -1137,96 +1148,13 @@ $$
 **计算复杂度**：
 
 矩阵求逆：$O(n^3)$，其中 $n = |\mathcal{S}|$。状态多时很昂贵，实际常用迭代方法。
-V - \gamma P V = R
-$$
 
-合并：
 
-$$
-(I - \gamma P)V = R
-$$
-
-解析解：
-
-$$
-V = (I - \gamma P)^{-1}R
-$$
-
-这组公式在说什么：
-
-MRP 的价值函数可以通过解线性方程组得到。只要矩阵 $I-\gamma P$ 可逆，就能直接求出所有状态的价值。
-
-它解决什么问题：
-
-这说明价值函数不是神秘对象，而是 Bellman 方程的解。对小规模有限 MRP，可以直接用线性代数求解。
-
-符号解释：
-
-- $I$：单位矩阵。
-- $(I-\gamma P)^{-1}$：矩阵逆。
-- 其他符号同上。
-
-直觉：
-
-价值函数是一个自洽解：你猜的每个状态价值必须和“一步奖励 + 后续价值期望”一致。
-
-算法关系：
-
-直接矩阵求逆通常复杂度约为 $O(N^3)$，$N=|\mathcal{S}|$。状态很多时，这会很贵，因此实际常用迭代方法。
-
-### 19.1 最小数值例子：直接求逆
-
-对两状态 MRP：
-
-$$
-I-\gamma P
-=
-\begin{bmatrix}
-1 & -0.5\\
-0 & 0.5
-\end{bmatrix}
-$$
-
-它的逆为：
-
-$$
-(I-\gamma P)^{-1}
-=
-\begin{bmatrix}
-1 & 1\\
-0 & 2
-\end{bmatrix}
-$$
-
-因此：
-
-$$
-\begin{aligned}
-V
-&=
-(I-\gamma P)^{-1}R\\
-&=
-\begin{bmatrix}
-1 & 1\\
-0 & 2
-\end{bmatrix}
-\begin{bmatrix}
-1\\
-2
-\end{bmatrix}\\
-&=
-\begin{bmatrix}
-3\\
-4
-\end{bmatrix}
-\end{aligned}
-$$
-
-解析解与 §17.1 逐状态求出的结果完全一致。
 
 ## 20. 迭代动态规划计算 MRP 价值
 
 *Bellman 方程首次完整讲解：§17；解析解：§19。这里的新内容是从初始猜测反复更新，逐步逼近真实价值。*
+
 
 **迭代算法**：
 
@@ -1242,6 +1170,8 @@ $$
 V_k(s) = R(s) + \gamma \sum_{s' \in \mathcal{S}} P(s' \mid s) V_{k-1}(s')
 $$
 
+
+
 **白话理解**：
 
 从一个简单猜测开始（所有状态价值为 0），每轮用上一轮的价值估计来计算新的价值，不断重复直到收敛。
@@ -1256,6 +1186,7 @@ V_k(A) &= 1 + 0.5 \times V_{k-1}(B)\\
 V_k(B) &= 2 + 0.5 \times V_{k-1}(B)
 \end{aligned}
 $$
+
 
 **完整迭代轨迹**：
 
@@ -1370,19 +1301,19 @@ $$
 
 只看眼前一步，远处的 +10 对现在没有任何吸引力。
 
-最小数值例子：若当前状态的即时奖励为 $r(s)=0.005$，即使未来可能到达奖励 10 的状态，在 $\gamma=0$ 时仍有：
+课件给出的具体答案（Mars Rover，$\pi(s)=\text{TryRight}$，$\gamma=0$）：
 
 $$
-V^\pi(s)=0.005
+V^\pi = [\,+1,\ 0,\ 0,\ 0,\ 0,\ 0,\ +10\,]
 $$
 
-因为所有未来项都至少乘有一个 $\gamma$，所以会被置为 0。
+每个状态的价值恰好等于它自己的即时奖励：$s_1$ 是 $+1$，$s_7$ 是 $+10$，中间状态全是 0。即使策略一直向右、未来大概率到达 $s_7$ 的 $+10$，也不会给中间状态增加任何价值——因为所有未来项都至少乘有一个 $\gamma$，在 $\gamma=0$ 时被置为 0。
 
 和 Assignment 1 的关系：
 
 RiverSwim 中，如果 $\gamma$ 太小，最右边大奖励传播不到最左边，agent 就可能选择在左边拿稳定小奖励。
 
-## 23. Assignment 1 准备度
+## 23. Assignment Readiness
 
 Assignment 1 包含四题：
 
@@ -1589,9 +1520,19 @@ RL 研究的是智能体如何在不确定环境中，通过行动、反馈和�
 
 ## 29. 核验来源与延伸阅读
 
-- DeepSeek-R1 论文：DeepSeek-AI 描述了通过强化学习激励 LLM 推理能力，并强调无需人工标注推理轨迹的纯 RL 方向。<https://arxiv.org/abs/2501.12948>
+*本节于 2026-07-10 联网核实更新。经典基础只收录本讲序列决策、动态规划和价值函数的正典来源；前沿动态展示这些概念在近期 LLM 与机器人系统中的延伸。*
+
+### 29.1 经典基础（本讲概念的原始出处）
+
+- Richard Bellman, *Dynamic Programming*（1957）：动态规划与 Bellman 递推的经典来源。<https://books.google.com/books/about/Dynamic_Programming.html?id=ZzoS0QEACAAJ>
+- Sutton & Barto, *Reinforcement Learning: An Introduction*（2nd ed., 2018）：系统覆盖 MDP、return、value function、Bellman equation 以及后续 RL 算法。<https://mitpress.mit.edu/9780262039246/reinforcement-learning/>
+
+### 29.2 前沿动态（截至 2026-07-10 核实）
+
+- RL for Large Reasoning Models 综述：清华团队系统梳理了 DeepSeek-R1 之后“用 RL 训练大型推理模型”方向的奖励设计、算法与基础设施，可作为从本课程基础走向该研究方向的系统桥梁。<https://arxiv.org/abs/2509.08827>（配套论文列表：<https://github.com/TsinghuaC3I/Awesome-RL-for-LRMs>）
+- DeepSeek-R1：论文展示了用强化学习激励 LLM 推理行为；2025 年 9 月的 Nature 版本补充了训练方法、实验和限制。<https://www.nature.com/articles/s41586-025-09422-z>
+- RLVR 边界之争：一个仍在进行的学术争论——可验证奖励强化学习（RLVR）究竟是让模型学会了新推理能力，还是只提高了采样效率（base model 在大 pass@k 下反超 RL 模型）。正方见 "Limit of RLVR"：<https://limit-of-rlvr.github.io/>；反方提出 CoT-Pass@K 指标证明 RLVR 确实扩展了推理边界：<https://arxiv.org/abs/2506.14245>。这个争论直接涉及本讲的核心问题：奖励信号到底教会了策略什么。
+- LLM Post-Training 统一视角综述（2026-04）：把 SFT、偏好优化、RL 等后训练方法统一为 off-policy / on-policy 两条主线来组织。on-policy 与 off-policy 的区分会在本课程后面正式讲到，读这篇时可以对照。<https://arxiv.org/abs/2604.07941>
+- 国产开源权重模型的 RL 实践：Qwen3 技术报告（含可切换推理模式的混合推理设计）<https://arxiv.org/abs/2505.09388>；GLM-4.5 技术报告（面向 agent、推理、代码的 RL 后训练）<https://arxiv.org/abs/2508.06471>。两者都展示了 RLHF/RLVR 在工业级大模型训练管线中的具体落地。
+- Physical Intelligence $\pi_0$ 与 $\pi_{0.5}$：$\pi_0$ 官方博客介绍多机器人、多任务的 generalist policy。<https://www.pi.website/blog/pi0>。$\pi_{0.5}$ 进一步研究开放世界泛化；其 2025-09 开源发布由官方 `openpi` 仓库记录。<https://www.pi.website/blog/pi05>、<https://github.com/Physical-Intelligence/openpi>。更新的 $\pi_{0.7}$ 使用多模态条件和轻量 world model 生成的视觉 subgoal。<https://www.pi.website/blog/pi07>
 - Google DeepMind IMO 2025：官方博客记录 Gemini Deep Think 获得 35/42 的 gold-medal level performance。这里作为现代数学推理系统的背景例子，不把它当作本讲 MRP/MDP 算法细节。<https://deepmind.google/discover/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/>
-- OpenAI o1：OpenAI 介绍 o1 时说明大规模强化学习用于训练模型更有效地使用 chain of thought。<https://openai.com/index/learning-to-reason-with-llms/>
-- Physical Intelligence $\pi_0$：官方博客介绍 generalist robot policy，覆盖多机器人和多任务数据。<https://www.pi.website/blog/pi0>
-- PPO 原论文：Schulman et al., "Proximal Policy Optimization Algorithms", 2017。<https://arxiv.org/abs/1707.06347>
-- InstructGPT / RLHF 论文：Ouyang et al., "Training language models to follow instructions with human feedback", 2022。<https://arxiv.org/abs/2203.02155>

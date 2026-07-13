@@ -1,18 +1,20 @@
 # CS234 Learning State
 
-Last updated: 2026-07-06
+Last updated: 2026-07-10
 
 ## Current Progress
 
-- Completed: Lecture 1, `lecture/lec1/lecture1pre.pdf`
-- Completed: Lecture 2, `lecture/lec2/lecture2pre.pdf`
-- Completed: Lecture 3, `lecture/lec3/lecture3pre.pdf`
+- Coverage complete: Lecture 1, `lecture/lec1/lecture1pre.pdf`
+- Coverage complete: Lecture 2, `lecture/lec2/lecture2pre.pdf`
+- Coverage complete: Lecture 3, `lecture/lec3/lecture3pre.pdf`
 - Notes written:
   - `notes/lec_notes/lec1_notes.md`
   - `notes/lec_notes/lec2_notes.md`
   - `notes/lec_notes/lec3_notes.md`
-- Lecture 3 notes revised against the latest `cs234-rl-tutor` teaching standard.
-- Next lecture: Lecture 4, `lecture/lec4/lecture4pre.pdf`
+- Concept registry: `notes/concept_index.md`
+- Lecture 1–3 received source-fidelity and content-critical corrections during the v2 skill migration; their full presentation style remains compatible with legacy sections.
+- Mastery evidence has not yet been recorded systematically; coverage completion does not imply mastery.
+- Next lecture: Lecture 4, `lecture/lecture4pre.pdf`
 
 ## Lecture 1 Covered
 

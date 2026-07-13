@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+
+# Python environments and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local editor and assistant state
+.vscode/
+.idea/
+.claude/
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+
+# LaTeX build products
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Generated or duplicate assignment archives
+*.zip
+
+# Reversible backup of the former nested notes repository
+notes/.git.pre-root-backup/

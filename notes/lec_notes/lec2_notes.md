@@ -2,9 +2,13 @@
 
 来源：`lecture/lec2/lecture2pre.pdf`，CS234 Winter 2026, Professor Emma Brunskill。
 
+笔记规范：`cs234-rl-tutor v2`。下方 checklist 只表示课件内容已覆盖，不表示学习者已经掌握。
+
+外部资料核验日期：2026-07-10。
+
 本讲目标：在已知世界模型（transition model 和 reward model）的前提下，计算好策略。核心算法是策略迭代（policy iteration, PI）和值迭代（value iteration, VI）。
 
-## 0. 本讲 Checklist
+## 0. 本讲覆盖清单
 
 - [x] 复习 MRP 的迭代价值计算。
 - [x] 定义 Markov decision process（MDP）。
@@ -133,6 +137,8 @@ $$
 
 这个结果表示：状态 $A$ 当前得到 1 分；它必然通向价值估计为 4 的状态 $B$，折扣后的未来部分贡献 3.6，所以本轮把 $A$ 的价值更新为 4.6。
 
+
+
 ## 4. Markov Decision Process（MDP）
 
 **MDP**：在 MRP 基础上加入动作选择。
@@ -166,7 +172,7 @@ $$
 
 转移概率示例（状态 0）：
 - 选 LEFT:  100% 停留在 0，得奖励 +0.005
-- 选 RIGHT: 60% 到状态 1，40% 停留在 0，得奖励 0
+- 选 RIGHT: 60% 停留在状态 0，40% 到状态 1，得奖励 0
 
 转移概率示例（状态 5）：
 - 选 LEFT:  100% 到状态 4，得奖励 0
@@ -178,7 +184,7 @@ $$
 $$
 \begin{aligned}
 P(0 \mid 0, \text{LEFT}) &= 1.0, \quad R(0, \text{LEFT}) = 0.005\\
-P(1 \mid 0, \text{RIGHT}) &= 0.6, \quad P(0 \mid 0, \text{RIGHT}) = 0.4, \quad R(0, \text{RIGHT}) = 0
+P(0 \mid 0, \text{RIGHT}) &= 0.6, \quad P(1 \mid 0, \text{RIGHT}) = 0.4, \quad R(0, \text{RIGHT}) = 0
 \end{aligned}
 $$
 
@@ -263,6 +269,9 @@ $$
 - Robot policy 可以把传感器状态映射到控制动作。
 - LLM policy 可以把上下文映射到下一个 token 或工具动作的概率分布。
 - PPO/RLHF 中优化的对象也是策略分布，但后续 lecture 才会正式进入 policy gradient。
+
+
+
 
 ## 6. MDP + Policy = MRP
 
@@ -466,6 +475,8 @@ action = policy[state]
 new_value[state] = R[state, action] + gamma * np.sum(T[state, action, :] * value_function)
 ```
 
+
+
 ## 8. Policy Evaluation 的迭代算法
 
 课件给出的迭代形式：
@@ -500,7 +511,7 @@ $$
 
 代码停止条件：
 
-Assignment 1 的 `tol` 可以用 infinity norm：
+Assignment 1 的 `tol` 可以用 infinity norm(无穷范数)：
 
 $$
 \lVert V_{\text{new}} - V_{\text{old}} \rVert_\infty
@@ -509,9 +520,15 @@ $$
 \le \text{tol}
 $$
 
+**tolerance**：误差
+
+找出所有状态里，**本轮变化最大的那个状态**。  如果连它都变化很小，那说明所有状态都已经稳定了
+
 和 starter code 的关系：
 
 `policy_evaluation(policy, R, T, gamma, tol)` 应该循环更新 `value_function`，直到最大状态价值变化小于 `tol`。
+
+
 
 ## 9. Exercise L2E1：一轮 Policy Evaluation
 
@@ -560,6 +577,8 @@ $$
 
 即时奖励是 0，但通向 $s_7$ 的概率让 $s_6$ 有未来价值。
 
+
+
 ## 10. Deterministic Policy 空间大小与最优策略唯一性
 
 Mars rover 例子有 7 个状态、2 个动作。确定性策略数是：
@@ -588,6 +607,9 @@ $$
 
 - 最优价值函数（optimal value function）在标准 discounted finite MDP 中唯一。
 - 最优策略（optimal policy）不一定唯一。
+
+
+
 
 ## 11. MDP Control
 
@@ -635,6 +657,8 @@ Policy evaluation 只能回答“这个策略怎么样”。Control 要回答“
 
 评估是打分；控制是找高分策略。
 
+
+
 ### 11.1 最小数值例子
 
 在一个只有状态 $s$ 的简单 MDP 中，假设仅有两个候选策略：
@@ -659,7 +683,9 @@ $$
 
 - Deterministic：每个状态选一个固定动作即可，不一定需要随机。
 - Stationary：策略不依赖时间步，只依赖当前状态。
-- Unique? 不一定，最优策略可能有多个。
+- Unique： 不一定，最优策略可能有多个。
+
+
 
 ## 12. Policy Search 与 Policy Iteration
 
@@ -680,7 +706,7 @@ $$
 
 算法：
 
-```text
+```python
 Set i = 0
 Initialize pi_0(s) randomly for all states s
 While i == 0 or pi_i changed from pi_{i-1}:
@@ -703,6 +729,8 @@ if np.array_equal(new_policy, policy):
     break
 ```
 
+
+
 ## 13. State-Action Value Function: $Q^\pi(s,a)$
 
 **Q-value（状态-动作价值函数）**：在状态 $s$ 先执行动作 $a$，之后按策略 $\pi$ 行动的期望回报。
@@ -715,7 +743,7 @@ $$
 
 **白话解释**：
 
-$Q^\pi(s,a)$ = 动作 $a$ 的即时奖励 + 折扣后的未来价值（按 $\pi$ 继续）
+$Q^\pi(s,a)$ = 动作 $a$ 的即时奖励 + 折扣后的未来价值（按 $\pi$ 继续。也就是当前状态s，执行动作action后的价值
 
 **V 和 Q 的关系**：
 
@@ -776,7 +804,7 @@ $$
 
 ```python
 for s in range(num_states):
-    Q_values = [R[s,a] + gamma * np.sum(T[s,a,:] * V[s]) for a in range(num_actions)]
+    Q_values = [R[s,a] + gamma * np.sum(T[s,a,:] * V) for a in range(num_actions)]
     new_policy[s] = np.argmax(Q_values)
 ```
 
@@ -798,6 +826,8 @@ $$
 ```python
 backup_val = R[state, action] + gamma * np.sum(T[state, action] * V)
 ```
+
+
 
 ## 14. Policy Improvement
 
@@ -866,6 +896,8 @@ for s in range(num_states):
     new_policy[s] = np.argmax(Q_values)
 ```
 
+
+
 ## 15. Policy Improvement 的单调性
 
 课件定义：
@@ -893,7 +925,7 @@ $$
 
 这条命题在说什么：
 
-用 policy improvement 得到的新策略不会比旧策略差。这就是 policy iteration 的核心保证。
+用 policy improvement 得到的新策略不会比旧策略差。这就是 policy iteration (策略迭代) 的核心保证。
 
 它解决什么问题：
 
@@ -920,6 +952,8 @@ $$
 容易混淆点：
 
 Policy improvement 不是说每一次每个状态的动作都会变。它说如果按 greedy 改进得到新策略，那么新策略的价值不低于旧策略。
+
+
 
 ## 16. Policy Iteration 何时停止？
 
@@ -999,6 +1033,9 @@ BV - V
 $$
 
 衡量的是一个任意价值函数 $V$ 离 Bellman optimality fixed point 有多远。
+
+
+
 
 ## 18. Value Iteration（VI）
 
@@ -1082,10 +1119,11 @@ while True:
             q = R[s,a] + gamma * np.sum(T[s,a,:] * V)
             action_values.append(q)
         new_V[s] = max(action_values)
-    
-    if np.max(np.abs(new_V - V)) <= tol:
-        break
+
+    converged = np.max(np.abs(new_V - V)) <= tol
     V = new_V
+    if converged:
+        break
 
 # 提取策略
 policy = np.zeros(num_states, dtype=int)
@@ -1102,6 +1140,9 @@ for s in range(num_states):
 | 每轮操作 | 完整 policy evaluation + improvement | 一次 Bellman optimality backup |
 | 收敛速度 | 通常更快（步数少） | 每步更简单 |
 | 适用场景 | 动作少、需要中间策略 | 动作多、只要最终策略 |
+
+
+
 
 ## 19. 从 Value Function 提取 Greedy Policy
 
@@ -1199,7 +1240,13 @@ $$
 - $B^\pi$ 用于评估给定策略。
 - $B$ 用于最优控制和值迭代。
 
+
+
+
+
+
 ## 21. Contraction Operator
+
 
 课件定义 contraction 的直觉：如果对两个输入应用同一个 operator 后，它们之间的距离变小，那么这个 operator 是 contraction。
 
@@ -1265,14 +1312,14 @@ $$
 
 ## 22. Value Iteration 什么时候收敛？
 
-课件给出两个条件：
+课件给出两个高层条件：
 
 - $\gamma < 1$。
-- 或者最终以概率 1 到达 terminal state。
+- 或者在满足适当 episodic/properness 条件时最终以概率 1 到达 terminal state。
 
 本课程和 Assignment 1 的主要情形是 discounted infinite horizon，即 $\gamma < 1$。
 
-如果 $\gamma=1$ 且没有终止状态，未来奖励和可能发散，Bellman operator 不再是严格 contraction，收敛保证会变复杂。
+如果 $\gamma=1$ 且没有终止状态，未来奖励和可能发散，Bellman operator 不再是严格 contraction，收敛保证会变复杂。仅仅存在某个会终止的策略并不足以保证最优 Bellman 更新收敛；必须检查具体 episodic MDP 的终止与 properness 假设。
 
 ## 23. Finite-Horizon Value Iteration
 
@@ -1848,3 +1895,15 @@ Lecture 2 是 Assignment 1 的核心前置课。
 
 下一步如果继续课程，可以进入 Lecture 3：没有模型时如何做 policy evaluation。
 如果巩固 Lecture 1-2，现在更建议开始 Assignment 1，尤其是 Q4 的 RiverSwim 代码。
+
+## 33. 延伸阅读
+
+### 33.1 经典基础
+
+- Richard Bellman, *Dynamic Programming*（1957）：动态规划和 Bellman 递推的经典来源；本讲的 policy/value iteration 建立在这套思想上。<https://books.google.com/books/about/Dynamic_Programming.html?id=ZzoS0QEACAAJ>
+- Sutton & Barto, *Reinforcement Learning: An Introduction*（2nd ed., 2018），尤其是有限 MDP 与动态规划章节：系统整理 policy evaluation、policy iteration、value iteration 和 generalized policy iteration。MIT Press 书目页：<https://mitpress.mit.edu/9780262039246/reinforcement-learning/>
+
+### 33.2 前沿动态（截至 2026-07-10 核实）
+
+- DreamerV3 的 Nature 论文展示了现代 model-based RL 如何学习 world model，并在模型预测的未来轨迹中训练 actor 与 critic。它与本讲“已知模型后向前推演”的思想直接相连，但模型和价值函数在这里是从数据学习的高维近似，而不是已知表格。<https://www.nature.com/articles/s41586-025-08744-2>
+- Physical Intelligence 的 $\pi_{0.7}$ 使用语言子任务和轻量 world model 生成的视觉 subgoal 来调节机器人策略。这是“模型/子目标辅助长程决策”的现实例子，不应等同于本讲的精确 value iteration。<https://www.pi.website/blog/pi07>
