@@ -35,6 +35,14 @@ def bellman_backup(state, action, R, T, gamma, V): #当前在状态 state，执�
 
     return backup_val
 
+
+####
+#我不知道最终 V 是多少
+#所以我先初始化 V = 0
+#然后对每个 state 反复做 bellman_backup
+#直到 V 稳定
+####
+
 def policy_evaluation(policy, R, T, gamma, tol=1e-3): #当前策略下的价值函数
     """
     Compute the value function induced by a given policy for the input MDP
@@ -62,11 +70,12 @@ def policy_evaluation(policy, R, T, gamma, tol=1e-3): #当前策略下的价值�
     num_states, num_actions = R.shape #从R中取出信息，R是一维向量
     value_function = np.zeros(num_states) #value_function = [0., 0., 0., 0., 0.]
 
-    while true:
+    #迭代求出value数组
+    while True:
         new_value_function = np.zeros(num_states)
-        for state in range(num_states):
+        for state in range(num_states): #求value数组每一位(状态)的值
             action = policy[state]
-            new_value_function[state] = bellman_backup(state, action, R, T, gamma, V)
+            new_value_function[state] = bellman_backup(state, action, R, T, gamma, value_function)
         
         diff = np.max(np.abs(new_value_function - value_function))
 
@@ -77,10 +86,6 @@ def policy_evaluation(policy, R, T, gamma, tol=1e-3): #当前策略下的价值�
 
     return value_function
 
-    ############################
-    # YOUR IMPLEMENTATION HERE #
-
-    ############################
     return value_function
 
 
@@ -101,18 +106,22 @@ def policy_improvement(policy, R, T, V_policy, gamma):
     """
     num_states, num_actions = R.shape
     new_policy = np.zeros(num_states, dtype=int) #不加dtype，则默认是float
-    
 
-    ############################
-    # YOUR IMPLEMENTATION HERE #
+    #先算出某个状态下的所有动作的Q，然后挑选这个状态最大的那个Q值。 依此算出每一状态
 
-    ############################
+    for s in range(num_states):
+        Q_values = []
+        for a in range(num_actions):
+            Q = R[s,a]+ gamma * np.sum(T[s,a,:]*V_policy)
+            Q_values.append(Q)
+
+        new_policy[s] = np.argmax(Q_values)
+
     return new_policy
 
 
 def policy_iteration(R, T, gamma, tol=1e-3):
     """Runs policy iteration.
-
     You should call the policy_evaluation() and policy_improvement() methods to
     implement this method.
     Parameters
@@ -130,6 +139,22 @@ def policy_iteration(R, T, gamma, tol=1e-3):
     num_states, num_actions = R.shape
     V_policy = np.zeros(num_states)
     policy = np.zeros(num_states, dtype=int)
+
+ 
+    while True:
+        # 1. policy evaluation：计算当前 policy 对应的 V
+        V_policy = policy_evaluation(policy, R, T, gamma, tol)
+
+        # 2. policy improvement：根据当前 V_policy 找到更好的 policy
+        new_policy = policy_improvement(policy, R, T, V_policy, gamma)
+
+        # 3. 如果新策略和旧策略一样，说明已经收敛
+        if np.array_equal(new_policy, policy):
+            break
+
+        # 4. 否则继续用新策略进入下一轮
+        policy = new_policy
+
     ############################
     # YOUR IMPLEMENTATION HERE #
 
@@ -139,6 +164,7 @@ def policy_iteration(R, T, gamma, tol=1e-3):
 
 def value_iteration(R, T, gamma, tol=1e-3):
     """Runs value iteration.
+
     Parameters
     ----------
     R: np.array (num_states, num_actions)
@@ -151,13 +177,50 @@ def value_iteration(R, T, gamma, tol=1e-3):
     value_function: np.array (num_states)
     policy: np.array (num_states)
     """
+
     num_states, num_actions = R.shape
     value_function = np.zeros(num_states)
     policy = np.zeros(num_states, dtype=int)
-    ############################
-    # YOUR IMPLEMENTATION HERE #
 
-    ############################
+    while True:
+        new_value_function = np.zeros(num_states)
+
+    #对每个状态 state：
+    #    把所有 action 都试一遍
+    #    算出每个动作的价值 Q
+    #    取最大的 Q 作为这个状态新的 V
+
+        for state in range(num_states):
+            Q_values = np.zeros(num_actions)
+
+            for action in range(num_actions):
+                Q_values[action] = bellman_backup(
+                    state, action, R, T, gamma, value_function
+                )
+
+            new_value_function[state] = np.max(Q_values)
+
+
+        diff = np.max(np.abs(new_value_function - value_function))
+
+        value_function = new_value_function
+
+        if diff < tol:
+            break
+
+     #根据最终的 V_policy，提取最优 policy。
+     #因为 value_function[state] 是“这个状态的最终价值”，但 policy 要的是动作编号
+    for state in range(num_states):
+        Q_values = np.zeros(num_actions)
+
+        #对当前 state，把所有动作都试一遍，算每个动作的价值，选取最大的值(和value_function里的值相等)对应的动作
+        for action in range(num_actions):
+            Q_values[action] = bellman_backup(
+                state, action, R, T, gamma, value_function
+            )
+        #提取策略，哪个 action 的 Q 值最大，这个状态就选择哪个 action
+        policy[state] = np.argmax(Q_values)
+
     return value_function, policy
 
 

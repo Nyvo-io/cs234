@@ -6,7 +6,7 @@
 
 外部资料核验日期：2026-07-10。
 
-本讲目标：在已知世界模型（transition model 和 reward model）的前提下，计算好策略。核心算法是策略迭代（policy iteration, PI）和值迭代（value iteration, VI）。
+本讲目标：在已知世界模型（transition model 和 reward model）的前提下，计算好策略。核心算法是策略迭代（policy iteration, PI）和价值迭代（value iteration, VI）。
 
 ## 0. 本讲覆盖清单
 
@@ -402,6 +402,7 @@ $$
 
 `policy_evaluation(policy, R, T, gamma)` 输入的是确定性策略 `policy[state] = action`。因此公式会简化，不需要对所有动作按概率求和。
 
+
 ## 7. MDP Policy Evaluation
 
 **Policy Evaluation**：给定策略 $\pi$，计算它的价值函数 $V^\pi(s)$。
@@ -415,6 +416,10 @@ $$
 **白话解释**：
 
 状态 $s$ 的价值 = 对所有可能动作：策略选该动作的概率 × (该动作的即时奖励 + 折扣后的未来价值)
+
+![[attachments/Pasted image 20260715210558.png]]
+
+
 
 **具体例子**（两动作选择）：
 
@@ -522,9 +527,13 @@ $$
 
 **tolerance**：误差
 
-找出所有状态里，**本轮变化最大的那个状态**。  如果连它都变化很小，那说明所有状态都已经稳定了
+找出所有状态里，**本轮变化最大的那个状态**。  如果连它都变化很小，那说明所有状态都已经稳定了。
 
-和 starter code 的关系：
+最开始V数组是全0，不停的迭代，最后稳定后，得到了按照策略pi，每个状态的价值
+
+
+
+   和 starter code 的关系：
 
 `policy_evaluation(policy, R, T, gamma, tol)` 应该循环更新 `value_function`，直到最大状态价值变化小于 `tol`。
 
@@ -689,6 +698,10 @@ $$
 
 ## 12. Policy Search 与 Policy Iteration
 
+
+	和下面Value Iteration区分开
+
+
 暴力搜索所有确定性策略需要检查：
 
 $$
@@ -701,8 +714,14 @@ $$
 
 策略迭代（policy iteration）更高效。它交替做两件事：
 
-1. Policy evaluation：评估当前策略。
+1. Policy evaluation：评估当前策略。固定一个策略 π，计算它的价值。
 2. Policy improvement：基于当前价值函数改进策略。
+
+Policy evaluation上面讲过，Policy improvement下面会讲。
+
+
+![[attachments/Pasted image 20260717020312.png]]
+
 
 算法：
 
@@ -731,7 +750,12 @@ if np.array_equal(new_policy, policy):
 
 
 
+
+
 ## 13. State-Action Value Function: $Q^\pi(s,a)$
+
+Q是在policy evaluation计算出v之后再去计算的。所以此时不用迭代求V，直接用就好
+
 
 **Q-value（状态-动作价值函数）**：在状态 $s$ 先执行动作 $a$，之后按策略 $\pi$ 行动的期望回报。
 
@@ -748,7 +772,7 @@ $Q^\pi(s,a)$ = 动作 $a$ 的即时奖励 + 折扣后的未来价值（按 $\pi$
 **V 和 Q 的关系**：
 
 - $V^\pi(s)$：在状态 $s$，按策略 $\pi$ 行动的价值
-- $Q^\pi(s,a)$：在状态 $s$，**第一步强制选 $a$**，之后按 $\pi$ 行动的价值
+- $Q^\pi(s,a)$：在状态 $s$，**第一步强制选 $a$**，之后按 $\pi$ 行动的价值。也就是执行a动作后的价值计算
 
 **具体例子**（两动作比较）：
 
@@ -853,7 +877,12 @@ $$
 
 **白话解释**：
 
-“在每个状态，看看如果第一步换成别的动作（之后还按旧策略走），会不会更好？如果会，就换。”
+“在每个状态，看看如果第一步换成别的动作（之后还按原来的策略走），会不会更好？如果会，就换。”
+
+
+在状态 s，我先尝试选动作 a，然后从下一步开始继续按照旧策略 π行动，长期价值是多少？如果某个新动作比旧策略原来的动作更好，那至少说明：在状态 s 这里，第一步换成这个动作，不会比旧策略差。 然后依此把每个状态都遍历一遍
+
+
 
 **具体例子**（从 §13 继续）：
 
@@ -1013,6 +1042,8 @@ $$
 
 如果 policy evaluation 是“按给定策略看未来”，那么 Bellman optimality backup 是“每一步都假设自己会选当前看起来最好的动作”。
 
+
+
 ### 17.1 最小数值例子
 
 仍使用前面的两动作数据。对当前价值估计 $V(g)=5$、$V(b)=1$，两个动作的 backup 分别为 1.62 和 7.78，因此：
@@ -1048,6 +1079,7 @@ $$
 
 **Value Iteration**：直接迭代最优价值函数，不需要显式维护策略。
 
+
 **更新公式**：
 
 $$
@@ -1060,11 +1092,15 @@ $$
 V_{k+1} = B V_k
 $$
 
+
 **白话解释**：
 
 每轮更新时，对每个状态 $s$：
 1. 计算所有动作的 backup
 2. 取最大值作为新的价值估计
+
+把当前状态的所有动作都算一遍，然后选择在当前状态产生最大价值的动作，同时也选择这个动作产生的价值。不断的循环迭代，直到V函数收敛
+
 
 **具体例子**（两动作，两轮迭代）：
 
@@ -1102,6 +1138,7 @@ $$
 
 当价值函数变化小于阈值 $\epsilon$ 时停止。
 
+
 **提取策略**：
 
 VI 收敛后，用 greedy policy 提取最优策略：
@@ -1137,7 +1174,9 @@ for s in range(num_states):
     policy[s] = np.argmax(Q)
 ```
 
+
 **PI vs. VI 对比**：
+目的都是推导出最优策略
 
 | | Policy Iteration | Value Iteration |
 |---|---|---|
@@ -1146,10 +1185,33 @@ for s in range(num_states):
 | 收敛速度 | 通常更快（步数少） | 每步更简单 |
 | 适用场景 | 动作少、需要中间策略 | 动作多、只要最终策略 |
 
+**policy iteration** 是：
+
+```
+先有一个 policy
+评估这个 policy 得到 V
+再改进 policy
+再评估
+再改进
+...
+```
+
+**value iteration** 是：
+
+```
+不先固定 policy
+每个状态直接尝试所有 action
+哪个 action 的 backup 最大，就用哪个
+反复更新 V
+最后根据最终 V 推出 policy
+```
+
 
 
 
 ## 19. 从 Value Function 提取 Greedy Policy
+
+得出最优策略：
 
 给定价值函数 $V$，greedy policy 是：
 
@@ -1170,7 +1232,7 @@ $$
 
 这条公式在说什么：
 
-在每个状态下，选择让 Bellman backup 最大的动作。
+在每个状态下，选择让 Bellman backup 最大的动作(把该状态下的每一个Q都算出来)。
 
 它解决什么问题：
 
@@ -1194,7 +1256,12 @@ policy[state] = np.argmax(action_values)
 
 无限 horizon 的 starter code 中，提取 policy 时应使用收敛后的 `value_function`。有限 horizon 中，如果还有 $k$ 步可走，则使用对应的 $V_{k-1}$ 或 $V_k$ 取决于索引约定。下面单独说明。
 
+
+
+
 ## 20. Bellman Operator for a Policy: $B^\pi$
+
+Bellman Operator：贝尔曼算子
 
 对固定策略 $\pi$，Bellman backup operator 是：
 
@@ -1226,6 +1293,9 @@ $$
 
 $B^\pi$ 是“按照固定策略 $\pi$ 做一次 Bellman 更新”。它不对动作取最大值。
 
+![[attachments/Pasted image 20260718191343.png]]
+
+
 它解决什么问题：
 
 Policy evaluation 就是寻找 $B^\pi$ 的 fixed point：
@@ -1234,23 +1304,32 @@ $$
 V^\pi = B^\pi V^\pi
 $$
 
+![[attachments/Pasted image 20260718193348.png]]
+
+
 符号解释：
 
 - $B^\pi$：固定策略的 Bellman operator。
-- $B$：最优 Bellman operator，会对动作取最大。
+- $B$：最优 Bellman operator，会取产生最大价值的动作。
 - $V^\pi$：$B^\pi$ 的 fixed point。
 
 容易混淆点：
 
-- $B^\pi$ 用于评估给定策略。
-- $B$ 用于最优控制和值迭代。
+- $B^\pi$ 用于评估给定策略，就是把它当作一个函数，乘上V，就是对这个V按照给定策略做了一次Bellman backup。按照给定策略，计算当前状态的价值
 
+- $B$ 用于最优控制和值迭代。直接挑选给当前状态产生最大价值的最优动作
 
+![[attachments/Pasted image 20260718200231.png]]
 
+![[attachments/Pasted image 20260718200405.png]]
 
 
 
 ## 21. Contraction Operator
+
+收缩算子
+
+后面都在讲Value Iteration为什么会收敛
 
 
 课件定义 contraction 的直觉：如果对两个输入应用同一个 operator 后，它们之间的距离变小，那么这个 operator 是 contraction。
@@ -1267,6 +1346,9 @@ $$
 这条公式在说什么：
 
 对任意两个价值函数 $V$ 和 $V'$，经过 Bellman optimality backup 后，它们之间的最大差距不超过原差距的 $\gamma$ 倍。
+原来两个价值函数最多差 d。  
+经过一次 Bellman 更新后，它们最多只差 γd。
+
 
 它解决什么问题：
 
@@ -1281,6 +1363,10 @@ $$
 直觉：
 
 每做一次 Bellman backup，不同初始猜测之间的差异会缩小。迭代足够久后，它们都会走向同一个 $V^*$。
+
+![[attachments/Pasted image 20260718201039.png]]
+
+
 
 ### 21.1 最小数值例子
 
@@ -1315,6 +1401,7 @@ $$
 
 这和 $B$ 的证明类似，但没有 $\max_a$，通常更直接。
 
+
 ## 22. Value Iteration 什么时候收敛？
 
 课件给出两个高层条件：
@@ -1325,6 +1412,7 @@ $$
 本课程和 Assignment 1 的主要情形是 discounted infinite horizon，即 $\gamma < 1$。
 
 如果 $\gamma=1$ 且没有终止状态，未来奖励和可能发散，Bellman operator 不再是严格 contraction，收敛保证会变复杂。仅仅存在某个会终止的策略并不足以保证最优 Bellman 更新收敛；必须检查具体 episodic MDP 的终止与 properness 假设。
+
 
 ## 23. Finite-Horizon Value Iteration
 
@@ -1383,6 +1471,7 @@ $$
 
 这里的 $k$ 是“剩余决策数”，不是绝对时间步。Assignment 1 Q1 说 horizon $H$ 是 episode 最多能交互的时间步数，从起始状态开始有 $H$ 次动作机会。
 
+
 ### 23.1 Finite-Horizon Policy 是否 stationary？
 
 一般不是。
@@ -1440,6 +1529,7 @@ V_2(s)
 $$
 
 此时应选择 `invest`。同一个状态 $s$ 因剩余步数不同而选择不同动作，这就是 finite-horizon policy 通常依赖时间的具体原因。
+
 
 ## 24. 另一种 Policy Evaluation：Simulation
 
