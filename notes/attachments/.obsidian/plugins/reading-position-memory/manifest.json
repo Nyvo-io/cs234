@@ -1,0 +1,9 @@
+{
+  "id": "reading-position-memory",
+  "name": "Reading Position Memory",
+  "version": "1.0.3",
+  "minAppVersion": "1.5.0",
+  "description": "按笔记记忆并恢复 Live Preview 和 Reading View 的阅读位置。",
+  "author": "Local vault",
+  "isDesktopOnly": false
+}

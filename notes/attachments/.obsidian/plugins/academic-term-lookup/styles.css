@@ -1,0 +1,170 @@
+.modal.academic-term-lookup-shell {
+  width: min(640px, calc(100vw - 32px));
+  max-width: 640px;
+}
+
+/* AI-cached terms stay visibly interactive without a heavy highlight block. */
+a.academic-term-lookup-cached-term,
+a[href^="academic-term-lookup:"] {
+  color: var(--text-accent);
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+a.academic-term-lookup-cached-term:hover,
+a[href^="academic-term-lookup:"]:hover {
+  color: var(--text-accent-hover);
+  text-decoration-style: solid;
+}
+
+.academic-term-lookup-shell .modal-content {
+  overflow-x: hidden;
+  padding: 28px 32px 24px;
+}
+
+.academic-term-lookup-modal {
+  min-width: 0;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.academic-term-lookup-header {
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.academic-term-lookup-header h2 {
+  margin: 0 0 12px;
+  font-size: 26px;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.academic-term-lookup-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.academic-term-lookup-pronunciation,
+.academic-term-lookup-note {
+  color: var(--text-muted);
+  font-size: var(--font-smaller);
+}
+
+.academic-term-lookup-source {
+  padding: 3px 7px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  font-size: var(--font-smallest);
+  line-height: 1.4;
+}
+
+.academic-term-lookup-result {
+  padding: 20px 0 4px;
+}
+
+.academic-term-lookup-meanings {
+  margin: 0;
+  padding-left: 28px;
+}
+
+.academic-term-lookup-meanings li {
+  padding: 7px 0 7px 4px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.academic-term-lookup-meanings li::marker {
+  color: var(--text-faint);
+}
+
+.academic-term-lookup-pos {
+  margin-right: 8px;
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+.academic-term-lookup-definition {
+  color: var(--text-normal);
+}
+
+.academic-term-lookup-example {
+  border-left: 3px solid var(--interactive-accent);
+  padding-left: 0.8em;
+  color: var(--text-muted);
+}
+
+.academic-term-lookup-ai-result {
+  display: grid;
+  gap: 0;
+}
+
+.academic-term-lookup-ai-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--background-modifier-border-hover);
+}
+
+.academic-term-lookup-ai-row:last-child {
+  border-bottom: 0;
+}
+
+.academic-term-lookup-ai-label {
+  color: var(--text-muted);
+  font-size: var(--font-smaller);
+  font-weight: 600;
+}
+
+.academic-term-lookup-ai-value {
+  min-width: 0;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.academic-term-lookup-ai-value > :first-child {
+  margin-top: 0;
+}
+
+.academic-term-lookup-ai-value > :last-child {
+  margin-bottom: 0;
+}
+
+.academic-term-lookup-ai-value .math-block {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.academic-term-lookup-import {
+  width: 100%;
+  font-family: var(--font-monospace);
+}
+
+.academic-term-lookup-actions {
+  display: flex;
+  gap: 0.6em;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+@media (max-width: 520px) {
+  .academic-term-lookup-shell .modal-content {
+    padding: 24px 20px 20px;
+  }
+
+  .academic-term-lookup-ai-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

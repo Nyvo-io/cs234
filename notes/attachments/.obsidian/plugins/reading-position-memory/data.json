@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "positions": {
+    "notes/lec_notes/lec3_notes.md": {
+      "source": {
+        "top": 29759,
+        "left": 0,
+        "anchor": {
+          "line": 1136,
+          "ch": 0,
+          "viewportOffset": -8.796875
+        },
+        "updatedAt": 1784797762580
+      }
+    },
+    "notes/lec_notes/lec4_notes.md": {
+      "source": {
+        "top": 54384,
+        "left": 0,
+        "anchor": {
+          "line": 2222,
+          "ch": 0,
+          "viewportOffset": -73.796875
+        },
+        "updatedAt": 1785394163972
+      }
+    },
+    "notes/lec_notes/lec5_notes.md": {
+      "source": {
+        "top": 0,
+        "left": 0,
+        "anchor": {
+          "line": 0,
+          "ch": 0,
+          "viewportOffset": 78.5
+        },
+        "updatedAt": 1785397624274
+      }
+    },
+    "notes/lec_notes/lec6_notes.md": {
+      "source": {
+        "top": 11187,
+        "left": 0,
+        "anchor": {
+          "line": 478,
+          "ch": 0,
+          "viewportOffset": -88.0390625
+        },
+        "updatedAt": 1784861677793
+      }
+    },
+    "COURSE_MATERIALS_WINTER_2026.md": {
+      "source": {
+        "top": 54,
+        "left": 0,
+        "anchor": {
+          "line": 0,
+          "ch": 0,
+          "viewportOffset": 38
+        },
+        "updatedAt": 1785394180807
+      }
+    }
+  }
+}

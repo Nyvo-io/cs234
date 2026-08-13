@@ -17,6 +17,7 @@ __pycache__/
 .claude/
 **/.obsidian/workspace.json
 **/.obsidian/workspace-mobile.json
+**/.obsidian/plugins/academic-term-lookup/data.json
 
 # LaTeX build products
 *.aux

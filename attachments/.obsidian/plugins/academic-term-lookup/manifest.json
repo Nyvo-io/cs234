@@ -1,0 +1,9 @@
+{
+  "id": "academic-term-lookup",
+  "name": "Academic Term Lookup",
+  "version": "1.4.3",
+  "minAppVersion": "1.5.0",
+  "description": "查询学术术语，并按课程保存可点击的 AI 翻译记录。",
+  "author": "Local vault",
+  "isDesktopOnly": true
+}

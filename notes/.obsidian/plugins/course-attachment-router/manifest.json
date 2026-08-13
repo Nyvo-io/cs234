@@ -1,0 +1,9 @@
+{
+  "id": "course-attachment-router",
+  "name": "Course Attachment Router",
+  "version": "1.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "按当前笔记的顶层课程目录保存附件。",
+  "author": "Local vault",
+  "isDesktopOnly": true
+}

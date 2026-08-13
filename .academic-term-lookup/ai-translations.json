@@ -1,0 +1,343 @@
+{
+  "version": 1,
+  "notes": {
+    "notes/lec_notes/lec4_notes.md": {
+      "oracle": {
+        "term": "oracle",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "oracle",
+          "content": "词性：名词（noun）\n\n推荐译法：预言机\n\n其他可能译法：神谕；理想查询器（解释性译法）\n\n领域备注：在强化学习与理论计算机科学中，**预言机（oracle）**指一种假想的黑盒机制，能够直接返回某个查询的精确答案。此处它返回真实的 $Q^\\pi(s,a)$，从而可将策略价值函数学习暂时视为以 $Q^\\pi(s,a)$ 为标签的监督学习问题。它并非实际的环境模型或学习算法。\n\n例句：假设存在一个预言机，对任意状态—动作对 $(s,a)$ 都能返回真实的动作价值 $Q^\\pi(s,a)$。"
+        },
+        "updatedAt": "2026-07-29T07:25:54.031Z"
+      },
+      "backup": {
+        "term": "backup",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "backup",
+          "content": "词性：名词；亦可作动词\n\n推荐译法：**备份**（具体为“贝尔曼备份”）\n\n其他可能译法：**贝尔曼更新**、**回溯更新**；不宜译为数据意义上的“备份”\n\n领域备注：在强化学习中，**Bellman backup** 指利用即时奖励及后继状态的价值估计来更新当前价值，即应用贝尔曼算子。这里的“backup 后再投影”是指先进行贝尔曼更新，再将所得价值函数投影到当前函数类中。该操作通常包含自举（bootstrap），与文件或数据备份无关。\n\n例句：近似动态规划先执行一次**贝尔曼备份**，再将更新后的价值函数投影到可表示的函数类中。"
+        },
+        "updatedAt": "2026-07-29T08:28:38.710Z"
+      },
+      "bellman operator": {
+        "term": "Bellman operator",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Bellman operator",
+          "content": "词性：名词短语\n\n推荐译法：**贝尔曼算子**\n\n其他可能译法：**Bellman 算子**；**贝尔曼操作子**（较少见）\n\n领域备注：强化学习与动态规划中的核心算子，用于将价值函数映射为一次贝尔曼更新后的价值函数。例如，最优贝尔曼算子可写为  \n$$\n(\\mathcal{T}V)(s)=\\max_a\\left[r(s,a)+\\gamma\\sum_{s'}P(s' \\mid s,a)V(s')\\right].\n$$\n当 $\\gamma<1$ 时，标准贝尔曼算子通常在上确界范数下是 $\\gamma$-**压缩映射**（contraction）。但在函数逼近中，复合算子 $\\Pi\\mathcal{T}$ 还包含投影 $\\Pi$；若该投影在所用范数下不具非扩张性，则 $\\Pi\\mathcal{T}$ 未必仍为压缩映射，迭代可能振荡或发散。\n\n例句：虽然贝尔曼算子 $\\mathcal{T}$ 是压缩映射，但加入函数逼近投影后，复合算子 $\\Pi\\mathcal{T}$ 不一定保持收缩性。"
+        },
+        "updatedAt": "2026-07-29T08:34:46.148Z"
+      },
+      "online prediction": {
+        "term": "online prediction",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "online prediction",
+          "content": "词性：名词短语\n\n推荐译法：**在线网络预测值**\n\n其他可能译法：在线预测值、当前网络预测值\n\n领域备注：在深度强化学习（尤其是 DQN）中，此处指**在线网络（online network）**对当前状态—动作价值 $Q(s,a)$ 的估计值，用于与目标值 $y$ 计算损失；不要理解为一般意义上的“实时预测”。它与**目标网络（target network）**给出的目标估计相区别。\n\n例句：第二条样本的目标值为 $y_2=1+0.9\\times6=6.4$，在线网络预测值为 $4$，因此平方误差为 $(6.4-4)^2=5.76$。"
+        },
+        "updatedAt": "2026-07-30T06:27:29.746Z"
+      },
+      "online network": {
+        "term": "online network",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "online network",
+          "content": "词性：名词短语\n\n推荐译法：在线网络\n\n其他可能译法：在线神经网络、当前网络\n\n领域备注：在深度强化学习（尤其是 DQN 及其变体）中，**在线网络**指持续通过梯度更新、用于选择动作或估计当前动作价值的网络，通常与参数更新较慢的**目标网络**（target network）相对。此处的 *online* 不一定表示“在线学习”。\n\n例句：智能体使用在线网络选择动作并与环境交互，同时定期将其参数同步到目标网络。"
+        },
+        "updatedAt": "2026-07-30T06:30:55.857Z"
+      }
+    },
+    "notes/lec_notes/lec5_notes.md": {
+      "gradient-free optimization": {
+        "term": "gradient-free optimization",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "gradient-free optimization",
+          "content": "词性：名词短语\n\n推荐译法：无梯度优化\n\n其他可能译法：免梯度优化、零阶优化（强调仅使用函数值时）\n\n领域备注：指不显式计算或使用目标函数梯度的优化方法，如随机搜索、进化策略和单纯形法等。在强化学习的直接策略搜索中，这类方法可仅依据策略回报评估来更新参数。`gradient-free optimization` 与 `derivative-free optimization`（无导数优化）含义接近，但后者还明确涵盖不使用更高阶导数的情形；`zeroth-order optimization` 通常特指仅依赖函数值查询的方法。结合该课件与 gradient、conjugate gradient、quasi-Newton 方法的对比，译为“无梯度优化”最贴切。\n\n例句：直接策略搜索既可采用无梯度优化，也可利用策略梯度进行更高效的参数更新。"
+        },
+        "updatedAt": "2026-07-30T06:59:03.353Z"
+      },
+      "dynamics-free": {
+        "term": "dynamics-free",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "dynamics-free",
+          "content": "词性：形容词（复合形容词）\n\n推荐译法：**无需环境动力学模型的**\n\n其他可能译法：**动力学无关的**、**免动力学模型的**；不建议直译为“无动力学的”\n\n领域备注：在强化学习语境中，此处表示算法不需要显式知道、计算或对环境转移概率 $P(s'\\mid s,a)$ 求导，而是通过与环境交互获得的样本来估计期望或更新策略。它并不表示环境不存在动力学。若强调与 model-free RL 的对应关系，也可根据上下文译为“无模型的”，但该译法语义范围更宽。\n\n例句：该方法是**无需环境动力学模型的**，因为其梯度估计仅依赖实际采样的状态转移，而不需要对 $P(s'\\mid s,a)$ 求导。"
+        },
+        "updatedAt": "2026-07-31T07:17:03.802Z"
+      },
+      "sampled trajectories": {
+        "term": "sampled trajectories",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "sampled trajectories",
+          "content": "词性：名词短语（复数）\n\n推荐译法：采样轨迹\n\n其他可能译法：采样得到的轨迹、抽样轨迹\n\n领域备注：在强化学习与 MDP 中，**sampled trajectories** 指按照策略与环境动态交互后采样得到的状态、动作和奖励序列，例如 $\\tau=(s_0,a_0,r_0,s_1,\\ldots)$。此处通常利用这些轨迹的经验回报来估计 $Q^{\\pi_\\theta}(s_t,a_t)$。规范且简洁的译法是“采样轨迹”。\n\n例句：实际算法需要从**采样轨迹**中估计动作价值函数 $Q^{\\pi_\\theta}(s_t,a_t)$。"
+        },
+        "updatedAt": "2026-08-03T07:17:50.144Z"
+      },
+      "dynamics": {
+        "term": "dynamics",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "dynamics",
+          "content": "词性：名词，通常用复数形式\n\n推荐译法：动力学\n\n其他可能译法：动态规律；状态转移机制；环境动态\n\n领域备注：在强化学习中，**dynamics** 通常指环境的状态转移规律，即状态转移概率 $P(s_{t+1}\\mid s_t,a_t)$，有时也包含奖励生成机制。此处 “不要求知道 dynamics” 表示 REINFORCE 是一种**无模型（model-free）**方法，不需要预先知道环境模型。规范译法优先采用“动力学”或更明确的“环境动力学”。\n\n例句：REINFORCE 不需要已知环境动力学，但必须通过完整或足够长的轨迹估计回报 $G_t$。"
+        },
+        "updatedAt": "2026-08-04T07:28:17.847Z"
+      },
+      "variance": {
+        "term": "variance",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "variance",
+          "content": "词性：名词（noun）\n\n推荐译法：方差\n\n其他可能译法：差异；变化程度（仅适用于非严格统计语境）\n\n领域备注：在机器学习与强化学习中，**variance** 通常指随机变量、梯度估计或回报估计相对于其期望的波动程度。上下文“variance 是否小到能稳定学习”中，建议译为“**方差是否足够小，以保证学习稳定**”。例如，策略梯度方法常使用基线来降低梯度估计的方差。\n\n例句：引入基线可以降低策略梯度估计的方差，从而提高学习的稳定性。"
+        },
+        "updatedAt": "2026-08-04T07:37:21.898Z"
+      },
+      "action-independent baseline": {
+        "term": "action-independent baseline",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "action-independent baseline",
+          "content": "词性：名词短语\n\n推荐译法：与动作无关的基线\n\n其他可能译法：动作无关基线；不依赖动作的基线\n\n领域备注：用于强化学习中的策略梯度估计。该基线可以依赖状态等信息，但不能依赖当前采样动作。利用 $\\sum_a \\pi_\\theta(a\\mid s)\\nabla_\\theta\\log\\pi_\\theta(a\\mid s)=0$，减去此类基线通常不会引入偏差，并可降低估计方差。\n\n例句：从回报中减去与动作无关的基线可以降低策略梯度的方差，而不改变其期望。"
+        },
+        "updatedAt": "2026-08-04T07:49:38.960Z"
+      },
+      "vanilla policy gradient": {
+        "term": "Vanilla policy gradient",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Vanilla policy gradient",
+          "content": "词性：名词短语\n\n推荐译法：**基础策略梯度**（Vanilla Policy Gradient，VPG）\n\n其他可能译法：**朴素策略梯度**、**标准策略梯度**、**原生策略梯度**；不建议直译为“香草策略梯度”。\n\n领域备注：强化学习术语，通常指未引入 PPO、TRPO 等复杂约束或裁剪机制的基本策略梯度算法。VPG 一般属于**同策略（on-policy）**方法，因此旧策略产生的数据难以被当前策略稳定复用；具体文献中的 VPG 可能还包含价值基线或优势估计，不应一概等同于最原始的 REINFORCE。\n\n例句：**基础策略梯度难以稳定复用数据，因为其梯度估计依赖当前策略生成的轨迹。**"
+        },
+        "updatedAt": "2026-08-04T08:51:03.125Z"
+      },
+      "infinite-horizon discounted objective": {
+        "term": "infinite-horizon discounted objective",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "infinite-horizon discounted objective",
+          "content": "词性：名词短语\n\n推荐译法：无限时域折扣目标\n\n其他可能译法：无限时间范围折扣目标；无限时域折扣回报目标\n\n领域备注：强化学习中的标准术语，指在无限时域上优化折扣累积回报。典型形式为  \n$$\nJ(\\pi)=\\mathbb{E}_{s_0\\sim\\mu,\\pi}\\left[\\sum_{t=0}^{\\infty}\\gamma^t r_t\\right],\n$$\n其中 $\\gamma\\in[0,1)$ 为折扣因子。若上下文强调被最大化的具体量，也可译为“无限时域折扣回报目标”；通常“无限时域”比“无限期限”更符合控制与强化学习领域的习惯。\n\n例句：我们采用无限时域折扣目标，以最大化策略 $\\pi$ 的期望折扣累积回报。"
+        },
+        "updatedAt": "2026-08-04T09:14:30.191Z"
+      }
+    },
+    "notes/lec_notes/lec6_notes.md": {
+      "performance difference lemma": {
+        "term": "Performance difference lemma",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Performance difference lemma",
+          "content": "词性：名词短语\n\n推荐译法：**性能差异引理**\n\n其他可能译法：**策略性能差异引理**（更明确地强调策略之间的性能差异）；**绩效差异引理**（较少见）\n\n领域备注：强化学习中的经典引理，用于将两个策略 $\\pi$ 与 $\\pi'$ 的期望回报之差表示为优势函数的期望。常见形式为\n$$\nJ(\\pi')-J(\\pi)\n=\n\\frac{1}{1-\\gamma}\n\\mathbb{E}_{s\\sim d_{\\pi'},\\,a\\sim\\pi'(\\cdot\\mid s)}\n\\left[A^\\pi(s,a)\\right].\n$$\n因此，期望中的动作通常要求满足 $a\\sim\\pi'(\\cdot\\mid s)$；若动作来自另一策略，可用重要性采样恒等式进行分布校正。\n\n例句：**性能差异引理**仍要求 $a\\sim\\pi'(\\cdot\\mid s)$；对于固定状态，可以利用重要性采样恒等式将该期望改写为在行为策略下的期望。"
+        },
+        "updatedAt": "2026-08-04T14:24:20.876Z"
+      },
+      "importance sampling identity": {
+        "term": "importance sampling identity",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "importance sampling identity",
+          "content": "词性：名词短语\n\n推荐译法：重要性采样恒等式\n\n其他可能译法：重要性抽样恒等式\n\n领域备注：在强化学习中，该恒等式通过重要性权重将目标策略 $\\pi'$ 下的期望改写为行为策略 $\\pi$ 下的期望。对固定状态 $s$，若 $\\pi(a\\mid s)>0$ 对所有满足 $\\pi'(a\\mid s)>0$ 的动作成立，则\n$$\n\\mathbb{E}_{a\\sim\\pi'(\\cdot\\mid s)}[f(a)]\n=\n\\mathbb{E}_{a\\sim\\pi(\\cdot\\mid s)}\n\\left[\n\\frac{\\pi'(a\\mid s)}{\\pi(a\\mid s)}f(a)\n\\right].\n$$\n其中比率 $\\frac{\\pi'(a\\mid s)}{\\pi(a\\mid s)}$ 称为重要性权重。\n\n例句：对固定状态 $s$，可利用**重要性采样恒等式**，将 $a\\sim\\pi'$ 下的期望转换为 $a\\sim\\pi$ 下的加权期望。"
+        },
+        "updatedAt": "2026-08-04T14:25:53.138Z"
+      },
+      "kullback--leibler divergence": {
+        "term": "Kullback--Leibler divergence",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Kullback--Leibler divergence",
+          "content": "词性：名词短语\n\n推荐译法：**Kullback–Leibler 散度**\n\n其他可能译法：**KL 散度**、**相对熵**、**信息散度**\n\n领域备注：用于衡量一个概率分布相对于另一个概率分布的差异，通常不对称，因此严格来说不是距离。对离散分布 $P$ 和 $Q$，定义为\n$$\nD_{\\mathrm{KL}}(P\\|Q)=\\sum_x P(x)\\log\\frac{P(x)}{Q(x)}.\n$$\n若存在某个 $x$ 使 $P(x)>0$ 而 $Q(x)=0$，则 $D_{\\mathrm{KL}}(P\\|Q)=+\\infty$。\n\n例句：离散分布 $P$ 相对于 $Q$ 的 **Kullback–Leibler 散度**为 $D_{\\mathrm{KL}}(P\\|Q)=\\sum_x P(x)\\log\\frac{P(x)}{Q(x)}$。"
+        },
+        "updatedAt": "2026-08-05T06:43:48.817Z"
+      },
+      "minibatch gradient update": {
+        "term": "minibatch gradient update",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "minibatch gradient update",
+          "content": "词性：名词短语\n\n推荐译法：小批量梯度更新\n\n其他可能译法：基于小批量的梯度更新；迷你批次梯度更新（较少用于规范学术文本）\n\n领域备注：在机器学习中，`minibatch` 指从完整训练批次或数据集中抽取的小批量样本。该术语表示利用一个小批量上计算的梯度更新模型参数。结合 PPO 上下文，建议表述为“对当前策略参数执行 $K$ 次小批量梯度更新”。需注意，这不一定意味着复用同一个 minibatch，也可能指将当前 batch 划分为多个 minibatch 后依次更新。\n\n例句：保持旧策略概率和优势估计不变，对当前策略参数执行 $K$ 次小批量梯度更新。"
+        },
+        "updatedAt": "2026-08-05T07:04:28.430Z"
+      },
+      "objective": {
+        "term": "objective",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "objective",
+          "content": "词性：名词（noun）\n\n推荐译法：**目标函数**\n\n其他可能译法：**优化目标**、**目标**（上下文明确时的简称）\n\n领域备注：在强化学习与优化中，`objective` 通常指需要最大化或最小化的标量函数。此处指两种 PPO 变体采用不同的目标函数，例如裁剪代理目标函数（clipped surrogate objective）或带 KL 惩罚的目标函数。\n\n例句：两种 PPO 变体复用同一批数据，但使用不同的**目标函数**更新当前策略参数。"
+        },
+        "updatedAt": "2026-08-05T07:04:52.976Z"
+      },
+      "clipped surrogate objective": {
+        "term": "Clipped surrogate objective",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Clipped surrogate objective",
+          "content": "词性：名词短语  \n推荐译法：截断代理目标函数  \n其他可能译法：裁剪代理目标函数、截断替代目标函数  \n领域备注：强化学习术语，常见于近端策略优化（PPO）。该目标函数通过截断新旧策略的概率比率，限制策略更新幅度，从而提高训练稳定性。  \n例句：PPO 通过最大化截断代理目标函数来避免过大的策略更新。"
+        },
+        "updatedAt": "2026-08-05T07:24:29.244Z"
+      },
+      "td residual": {
+        "term": "TD residual",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "TD residual",
+          "content": "词性：名词短语\n\n推荐译法：**价值时序差分残差**（简称 **价值 TD 残差**）\n\n其他可能译法：**价值时序差分误差**、**价值 TD 误差**、**一步 TD 误差**\n\n领域备注：在强化学习中，通常指价值函数的一步预测残差：\n$$\n\\delta_t = r_{t+1} + \\gamma V(s_{t+1}) - V(s_t).\n$$\n它表示 TD 目标与当前价值估计之差。文献中 *TD residual* 与 *TD error* 常混用；若强调样本层面的一步预测偏差，通常译为“TD 误差”，若强调更新方程中的残差，则“TD 残差”更贴合原文。它不应与基于期望算子的 **Bellman residual（贝尔曼残差）** 完全等同。\n\n例句：价值 TD 残差 $\\delta_t$ 可用于更新当前状态的价值估计。"
+        },
+        "updatedAt": "2026-08-05T08:09:34.553Z"
+      },
+      "telescoping": {
+        "term": "telescoping",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "telescoping",
+          "content": "词性：形容词／现在分词（此处名词化，表示一种求和消去现象）\n\n推荐译法：逐项相消\n\n其他可能译法：裂项相消；望远镜式消去；伸缩求和\n\n领域备注：在强化学习中，若 TD 残差为 $\\delta_t=r_t+\\gamma V(s_{t+1})-V(s_t)$，则按折扣权重对相邻残差求和时，中间的价值估计项会逐项抵消；这对应数学中的 **telescoping sum（裂项相消和）**。\n\n例句：对折扣后的相邻 TD 残差求和时，价值估计的中间项会逐项相消。"
+        },
+        "updatedAt": "2026-08-05T08:11:04.871Z"
+      },
+      "majorize--maximize": {
+        "term": "Majorize--maximize",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Majorize--maximize",
+          "content": "词性：复合动词短语，亦可作定语\n\n推荐译法：**上界化—最大化**（即“构造上界并最大化”）\n\n其他可能译法：**主化—最大化**（直译，但较少见）；若原文实际为 *minorize--maximize*，则应译为 **下界化—最大化** 或 **次化—最大化**\n\n领域备注：在 MM 优化中，规范搭配通常是 *majorize--minimize*（上界化—最小化）或 *minorize--maximize*（下界化—最大化）。若目标是证明最大化过程中的单调改进，通常应使用目标函数的紧下界并将其最大化；“上界化—最大化”一般不能直接保证目标值单调增加，建议核对原文是否存在术语误用。\n\n例句：为保证目标函数值单调不减，算法在每次迭代中构造一个与原目标相切的下界，并将其最大化。"
+        },
+        "updatedAt": "2026-08-06T08:05:06.801Z"
+      },
+      "minorize--maximize": {
+        "term": "Minorize--maximize",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Minorize--maximize",
+          "content": "词性：动词短语；亦可作复合定语\n\n推荐译法：下界化—最大化\n\n其他可能译法：次化—最大化；构造下界并最大化\n\n领域备注：优化与机器学习中的 MM 方法之一。其核心是在当前迭代点为目标函数构造一个相切的下界代理函数（minorizer），再将该代理函数最大化，从而保证原目标函数值单调不减。与“上界化—最小化”（majorize–minimize）互为对偶表述。\n\n例句：从下界化—最大化视角看，每次迭代都通过最大化代理下界来保证目标函数得到改进。"
+        },
+        "updatedAt": "2026-08-06T08:07:42.691Z"
+      },
+      "demonstration trajectories": {
+        "term": "demonstration trajectories",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "demonstration trajectories",
+          "content": "词性：名词短语（复数）\n\n推荐译法：示范轨迹\n\n其他可能译法：专家示范轨迹、演示轨迹\n\n领域备注：在模仿学习与逆强化学习中，**demonstration trajectories** 通常指由专家策略生成的状态—动作序列，常记为 $\\tau=(s_0,a_0,s_1,a_1,\\ldots)$。若需强调数据来源，可译为“专家示范轨迹”；“示范轨迹”是更简洁、规范的译法。\n\n例句：学习者利用专家提供的示范轨迹来推断目标行为，而无须显式设计奖励函数。"
+        },
+        "updatedAt": "2026-08-06T08:33:41.385Z"
+      },
+      "mdp": {
+        "term": "MDP",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "MDP",
+          "content": "词性：名词（缩写）\n\n推荐译法：马尔可夫决策过程（Markov Decision Process, MDP）\n\n其他可能译法：马尔科夫决策过程、马可夫决策过程（较少使用）\n\n领域备注：强化学习中的基本数学模型，通常表示为五元组 $(\\mathcal S,\\mathcal A,P,R,\\gamma)$。在该上下文中，MDP 的状态转移会形成反馈回路：策略影响动作，动作影响后续状态，因此训练时的专家状态分布 $d^{\\pi^*}$ 与部署时的学习策略状态分布 $d^{\\pi_\\theta}$ 可能不同，造成分布偏移。\n\n例句：在 MDP 中，学习策略的决策会改变其未来访问的状态分布。"
+        },
+        "updatedAt": "2026-08-06T08:52:57.914Z"
+      },
+      "deterministic": {
+        "term": "deterministic",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "deterministic",
+          "content": "词性：形容词\n\n推荐译法：**确定性的**（如：确定性策略）\n\n其他可能译法：**确定型的**；**确定的**。一般不译为“决定性的”。\n\n领域备注：在强化学习中，**确定性策略**（deterministic policy）将每个状态唯一映射到一个动作，即 $a=\\pi(s)$；相对概念是**随机策略**（stochastic policy）。此处虽然专家策略和当前分类器可以是确定性的，但以概率 $\\beta_i$ 在二者之间进行选择的 mixture 本身仍具有随机性。\n\n例句：当专家策略和当前分类器都是确定性策略时，混合策略仍以概率 $\\beta_i$ 采用专家动作，以概率 $1-\\beta_i$ 采用学习器动作。"
+        },
+        "updatedAt": "2026-08-06T09:13:00.447Z"
+      },
+      "discounted expectation vector": {
+        "term": "discounted expectation vector",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "discounted expectation vector",
+          "content": "词性：名词短语\n\n推荐译法：**折扣特征期望向量**\n\n其他可能译法：**折扣期望向量**；**期望折扣特征向量**；若强调状态特征的累计访问次数，也可译为**折扣特征访问频率向量**\n\n领域备注：常见于强化学习与逆强化学习，通常定义为  \n$$\n\\mu^\\pi(s_0)\n=\n\\mathbb{E}_\\pi\\left[\\sum_{t=0}^{\\infty}\\gamma^t\\phi(s_t)\\mid s_0\\right],\n$$\n其中 $\\phi(s_t)$ 为状态特征，$\\gamma$ 为折扣因子。这里的“期望”作用于整条轨迹上的折扣特征累积量。若奖励可写为 $r(s)=w^\\top\\phi(s)$，则策略价值可表示为 $V^\\pi(s_0)=w^\\top\\mu^\\pi(s_0)$。\n\n例句：从初始状态 $s_0$ 出发，策略 $\\pi$ 的**折扣特征期望向量**概括了该策略在未来轨迹中对各状态特征的预期折扣访问量。"
+        },
+        "updatedAt": "2026-08-07T05:45:05.137Z"
+      },
+      "feature count": {
+        "term": "feature count",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "feature count",
+          "content": "词性：名词短语\n\n推荐译法：特征计数\n\n其他可能译法：特征计数向量；累计特征计数（若指轨迹或策略下累积的特征值）\n\n领域备注：在强化学习与逆强化学习中，*feature count* 通常指策略诱导的特征累计量或其期望，而非“特征的数量”。若其定义为 $\\sum_t \\gamma^t \\phi(s_t,a_t)$ 的期望，也常可具体称为“期望特征计数”。\n\n例句：不同的随机策略可能产生相同的期望特征计数。"
+        },
+        "updatedAt": "2026-08-07T06:47:10.165Z"
+      },
+      "feature expectations": {
+        "term": "feature expectations",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "feature expectations",
+          "content": "词性：名词短语（复数）\n\n推荐译法：**特征期望**\n\n其他可能译法：**特征期望值**；**期望特征计数**（强调轨迹上的累计特征时）\n\n领域备注：在逆强化学习中，通常指策略或路径分布下**累计特征向量的期望**，例如 $\\mathbb{E}_{\\tau}[\\sum_t \\gamma^t f(s_t,a_t)]$。MaxEnt IRL 在匹配专家示范的特征期望的同时，选择熵最大的路径分布。“特征匹配”是相关约束或过程的名称，并非该术语的直接译法。\n\n例句：最大熵逆强化学习要求学习到的路径分布与专家示范具有相同的**特征期望**。"
+        },
+        "updatedAt": "2026-08-07T07:05:54.815Z"
+      }
+    },
+    "notes/lec_notes/lec7_notes.md": {
+      "partition value": {
+        "term": "partition value",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "partition value",
+          "content": "词性：名词短语\n\n推荐译法：**配分函数值**\n\n其他可能译法：**配分值**、**归一化因子值**\n\n领域备注：在最大熵强化学习或最大熵逆强化学习中，*partition value* 通常指状态 $s$ 对应的配分函数 $Z(s)$ 的取值。它通过 backward pass（后向递推）计算，并用于归一化局部动作概率，例如 $P(a\\mid s)=Z(s,a)/Z(s)$。不宜直译为“划分值”。\n\n例句：后向递推首先计算每个状态的**配分函数值**，然后据此得到局部动作概率。"
+        },
+        "updatedAt": "2026-08-11T02:01:41.707Z"
+      },
+      "scalar advantage": {
+        "term": "scalar advantage",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "scalar advantage",
+          "content": "词性：名词短语\n\n推荐译法：**标量优势值**\n\n其他可能译法：**标量优势**、**标量优势函数值**\n\n领域备注：在强化学习中，advantage 通常指优势函数 $A^\\pi(s_t,a_t)$ 在给定状态—动作对上的取值，用于衡量该动作相对于基准价值的优劣。此处强调 **scalar**，是为了与向量形式的 score-function 梯度 $\\nabla_\\theta \\log \\pi_\\theta(a_t\\mid s_t)$ 区分；二者相乘后仍得到策略参数空间中的梯度向量。\n\n例句：每个时间步的 score-function 向量都由对应的标量优势值 $A_t$ 加权。"
+        },
+        "updatedAt": "2026-08-11T03:25:21.662Z"
+      },
+      "reward difference": {
+        "term": "reward difference",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "reward difference",
+          "content": "词性：名词短语\n\n推荐译法：**奖励差值**\n\n其他可能译法：**奖励之差**；**回报差值**（不推荐，可能与 return「回报」混淆）\n\n领域备注：在强化学习与偏好建模中，通常指有符号差值 $r(b_i)-r(b_j)$，而非绝对差 $|r(b_i)-r(b_j)|$。例如 Bradley–Terry 模型可写为 $P(b_i \\succ b_j)=\\sigma(r(b_i)-r(b_j))$。\n\n例句：该偏好概率仅由两个候选回答的**奖励差值**决定。"
+        },
+        "updatedAt": "2026-08-11T18:08:45.885Z"
+      },
+      "backflip": {
+        "term": "backflip",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "backflip",
+          "content": "词性：名词；亦可作不及物动词\n\n推荐译法：**后空翻**\n\n其他可能译法：**向后翻转**（机器人动作的宽泛表述）；不宜译为“后手翻”，因为后手翻通常包含手部支撑。\n\n领域备注：在 Christiano et al. (2017) 的人类偏好强化学习案例中，*backflip* 指智能体学习完成后空翻动作。“900 bits of feedback”是该具体实验中约 900 次二元偏好反馈的量级，不是适用于所有任务的普适样本复杂度结论。\n\n例句：智能体通过约 900 比特的人类偏好反馈逐步学会了后空翻。"
+        },
+        "updatedAt": "2026-08-12T12:18:39.239Z"
+      }
+    }
+  }
+}
