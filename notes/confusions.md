@@ -344,3 +344,21 @@
     讲义的交叉熵约定通常是 $\mu=1$ 表示第一项胜出、$\mu=0.5$ 表示平局、$\mu=0$ 表示第二项胜出。Assignment 3 的 preference dataset 则用 `label=0` 表示第一条序列胜出、`label=1` 表示第二条序列胜出、`label=0.5` 表示平局；`run_dpo.py:get_batch` 还会据此交换 winner/loser。
 
     **做题策略**：在实现 `RewardModel.update` 前先把 dataset label 映射到公式中的 $\mu$，不要把 `label=0` 直接当成“第一项概率为 0”的 cross-entropy target；在 DPO 中只使用 strict preference 数据，并确认 `actions_w` 始终是偏好序列。
+
+36. **Lecture 12 MBIE-EB 未访问 pair 的 bonus 约定**
+
+    MBIE-EB 伪代码把 $n_{sa}=0$ 的 optimistic $\widetilde Q(s,a)$ 初始化为 $1/(1-\gamma)$，但没有在 $\beta/\sqrt{n_{sa}}$ 处写出除零处理。
+
+    **做题策略**：理论解释沿用“未访问 pair 保持高 optimism”；实现时显式处理 $n_{sa}=0$（例如保留初始化值或使用上限），不要直接计算除零。
+
+37. **Lecture 12 中两个不同的 $\beta$**
+
+    MBIE-EB 的 $\beta$ 是 exploration-bonus 常数；simulation lemma 的 $\beta$ 是 transition distributions 的 $\ell_1$ 误差上界。它们只是课件在不同页面复用了同一字母。
+
+    **做题策略**：看到 $\beta$ 先看所在公式和小节，不要把 $\beta/\sqrt{n_{sa}}$ 当成 simulation lemma 的 dynamics error，或反过来。
+
+38. **Lecture 12 PSRL 的规划频率**
+
+    PSRL 伪代码在 episode 开始采样 MDP 并规划一次，但理解检查把“posterior 更新后可以重新规划”判为可行。前者是展示的算法粒度，后者是允许的计算设计选择，不是同一个复杂度结论。
+
+    **做题策略**：先记录 sampled model 的生命周期和 planner 调用频率，再比较 PSRL 与 Q-learning 的计算成本；不要笼统地说二者“每步相同”或“必须每步重规划”。

@@ -663,14 +663,18 @@ $s_0\xrightarrow{a_0}s_1\xrightarrow{a_1}s_2\xrightarrow{a_2}\cdots$
 
 prompt x→整个 response y​
 
-然后人类比较两个完整回答：
-​
-$y_w \succ y_l$
+然后人类比较两个完整回答：$y_w \succ y_l$
+
+DPO 最核心的作用就是：
+
+把 Reward Modeling + PPO 两阶段→压缩成一个直接的 preference optimization loss
+
+==上面的传统 RLHF 是 DPO 的出发点==
 
 
 ### 5.2 Bandit 形式的 DPO loss
 
-对 context/state $x$，偏好回答为 $y_w$（winning），另一个回答为 $y_l$（losing），训练 policy 为 $\pi_\theta$，reference policy 为 $\pi_{\mathrm{ref}}$。DPO 的目标写成
+对 context/state $x$，偏好回答为 $y_w$（winning），另一个回答为 $y_l$（losing），训练 policy 为 $\pi_\theta$，reference policy 为 $\pi_{\mathrm{ref}}$。DPO 的目标loss写成
 
 $$
 \mathcal L_{\mathrm{DPO}}(\pi_\theta;\pi_{\mathrm{ref}})
@@ -683,7 +687,7 @@ $$
 \right].
 $$
 
-它奖励一个相对 reference 更偏向 $y_w$、而不是 $y_l$ 的 policy。对文本，$\log\pi(y\mid x)$ 是 response 中各 token conditional log-probability 的和；对 Assignment 3，则是 action sequence distribution 对整个 action segment 的 log-probability。
+它奖励一个 相对 reference 更偏向 $y_w$、而不是 $y_l$ 的 policy。对文本，$\log\pi(y\mid x)$ 是 response 中各 token conditional log-probability 的和；对 Assignment 3，则是 action sequence distribution 对整个 action segment 的 log-probability。
 
 里面真正核心的只有两个量。
 
@@ -717,7 +721,7 @@ $\log\frac{\pi_\theta(y_w|x)}{\pi_{\rm ref}(y_w|x)}>0$
 
 这和前面 RLHF 的 KL regularization 是同一套思想
 
-下一节是这个loss的数学依据
+下面两节是这个loss的数学依据
 
 > [!example] 具体计算：一次 DPO loss
 > 假设 $\beta=0.5$，当前 policy 相对于 reference 的 log-ratio 为
@@ -747,11 +751,24 @@ $$
 $$
 这个就是之前讲过的：
 
-高 reward− β×偏离 reference 的代价​ 
+高 reward− β×偏离 reference 的代价​ ，它是 **KL-regularized RL 的目标函数**。
 
 并满足 $\sum_y\pi(y\mid x)=1$。
 
-对概率约束建立拉格朗日函数，用拉格朗日乘子求解，对每个 $\pi(y\mid x)$ 求导并令其为零，可得
+
+$\max_\pi\sum_y\pi(y\mid x)r(x,y)$
+
+意思就是：
+
+> 让 policy 尽量生成 reward 高的回答。
+
+用 KL divergence：
+$D_{\mathrm{KL}}\left(\pi(\cdot\mid x)\|\pi_{\mathrm{ref}}(\cdot\mid x)\right)$
+
+实现可以追求高 reward，但是不要离 πref​ 太远
+
+
+我们对概率约束建立拉格朗日函数，用拉格朗日乘子求解，对每个 $\pi(y\mid x)$ 求导并令其为零，可得
 
 $$
 \pi^*(y\mid x)
@@ -759,16 +776,17 @@ $$
 \pi_{\mathrm{ref}}(y\mid x)
 \exp\left(\frac{1}{\beta}r(x,y)\right),
 $$
+
+==直接就告诉你了最优policy 长什么样==
+
 拆成三部分：
 ​​$\pi^*(y|x)\propto\underbrace{\pi_{\rm ref}(y|x)}_{\text{原模型喜欢程度}}\underbrace{\exp(r(x,y)/\beta)}_{\text{reward 加权}}$
-
 
 这个公式就是 **closed-form optimal policy**。
 
 所谓 closed-form，就是：
 
 > 不用 PPO 一步一步猜最优 policy，数学上直接告诉你最优 policy 应该长什么样。
-
 
 其中归一化常数为
 
@@ -778,6 +796,7 @@ Z(x)=\sum_{y'}\pi_{\mathrm{ref}}(y'\mid x)
 $$
 
 这个结果的整体含义是：最优 policy 在 reference probability 上乘一个由 reward 决定的指数权重，再归一化；
+
 $\beta$ 控制 reward 偏好相对于 reference 的放大程度。$\beta$ 大时分布更接近 reference，$\beta$ 小时高 reward 回答更容易集中概率。
 
 > [!example] 具体计算：closed-form policy 的 reward/KL 折中
@@ -804,12 +823,13 @@ $$\frac{\pi^*(y|x)}{\pi_{\rm ref}(y|x)}=\frac1{Z(x)}\exp\left(\frac{r(x,y)}{\bet
 $$\log\frac{\pi^*(y|x)}{\pi_{\rm ref}(y|x)}=-\log Z(x)+\frac{r(x,y)}{\beta}$$
 
 整理得到最终式子：
-
 $$
 r(x,y)
 =\beta\log\frac{\pi^*(y\mid x)}{\pi_{\mathrm{ref}}(y\mid x)}
 +\beta\log Z(x).
 $$
+理论最优 policy π∗ 对应的 reward
+
 
 然后再 利用Bradley--Terry ，它使用了两个回答的 reward difference：
 $r(x,y_w)-r(x,y_l)$
@@ -827,7 +847,43 @@ $$
 
 因为同一个 $x$ 下的 $\beta\log Z(x)$ 相减后消失。将未知的 $\pi^*$ 换成待训练的 $\pi_\theta$，就得到 §5.2 的 DPO loss。
 
-推出了loss为什么长这个样子
+Bradley–Terry 是：
+$P(y_w\succ y_l|x)=\sigma\left(r(x,y_w)-r(x,y_l)\right)$
+
+把刚刚的 reward difference 代进去：
+
+$P(y_w\succ y_l|x)=\sigma\left(\beta\log\frac{\pi^*(y_w|x)}{\pi_{\rm ref}(y_w|x)}-\beta\log\frac{\pi^*(y_l|x)}{\pi_{\rm ref}(y_l|x)}\right)$
+
+但 π∗ 是我们不知道的“理想最优策略”。
+
+所以 DPO 用一个可训练的：​$\pi_\theta$
+
+去表示我们正在学习的 policy。于是定义模型预测的人类偏好概率：$$P_\theta(y_w\succ y_l\mid x)=\sigma\left(\beta\log\frac{\pi_\theta(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)}-\beta\log\frac{\pi_\theta(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}\right)$$
+
+> **当前 policy πθ​ 认为，人类会选择 yw​ 而不是 yl​ 的概率是多少？**
+
+
+这就是用 自己训练的 πθ​
+去不断拟合这个理想的最优 policy π∗。
+
+然后真实数据已经告诉我们：
+
+yw​≻yl​
+
+所以希望上面的概率接近 1。
+
+因此做 negative log likelihood：
+
+$$\mathcal L_{\mathrm{DPO}}=-\log P_\theta(y_w\succ y_l\mid x)$$
+
+代进去就是你看到的 DPO loss。​
+
+$\boxed{\mathcal L_{\rm DPO}=-\log\sigma\left(\beta\log\frac{\pi_\theta(y_w|x)}{\pi_{\rm ref}(y_w|x)}-\beta\log\frac{\pi_\theta(y_l|x)}{\pi_{\rm ref}(y_l|x)}\right)}$
+
+
+
+我们现在要做的就是最小化这个loss ， 这个过程中我们训练的πθ就会越来越接近最优 policy π∗
+
 
 ![[lec8-dpo-loss-p58.png|900]]
 

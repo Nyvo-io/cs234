@@ -136,3 +136,34 @@
 | kl-regularized-policy | KL 正则策略目标 | KL-regularized RL, reference policy, $\beta$ | Lecture 8 §4.3 | 在 reward 与 reference policy proximity 间折中 |
 | dpo | 直接偏好优化 | Direct Preference Optimization, DPO | Lecture 8 §5.2 | 由 reward-policy transformation 直接优化 policy |
 | receding-horizon-control | 滚动时域控制 | receding-horizon control, model predictive control, MPC | Lecture 8 §5.5 | 预测 action segment，只执行第一步后重新规划 |
+| multi-armed-bandit | 多臂 bandit（Multi-Armed Bandit） | bandit, K-armed bandit, $(\mathcal A,\mathcal R)$ | Lecture 9 §2.1 | 单步动作、未知奖励分布；可看成单状态 MDP |
+| bandit-regret | bandit regret（机会损失） | regret, total regret, $L_T$, gap--count decomposition | Lecture 9 §4.1 | 相对最优动作的期望累计机会损失 |
+| bandit-greedy | bandit greedy | greedy bandit, empirical action value, $\widehat Q_t(a)$ | Lecture 9 §3.1 | 只按当前均值估计选择，可能锁定次优臂 |
+| sublinear-regret | 次线性 regret | sublinear regret, problem-independent bound, problem-dependent bound | Lecture 9 §6.1 | 要求 $L_T/T\to0$；下界仍允许持续探索 |
+| optimism-under-uncertainty | 不确定性下的乐观原则 | optimism in the face of uncertainty, UCB | Lecture 9 §7.1 | 用可能的高价值上界驱动探索 |
+| subgaussian-concentration | Sub-Gaussian 集中界 | concentration inequality, confidence bound, union bound | Lecture 9 §8.1 | 把样本均值误差转成高概率置信半径 |
+| ucb-regret-proof | UCB regret proof | UCB1 proof, good event, pull-count bound | Lecture 10 §3.1 | 用 good event 控制次优臂抽样次数 |
+| value-alignment | 价值对齐 | value alignment, user intentions, revealed preferences, best interests | Lecture 10 §5.2 | 意图、显露偏好和最佳利益的三种解释 |
+| sycophancy | 迎合性 | sycophancy, agreeable AI behavior | Lecture 10 §6 | 可能由反馈信号过度奖励赞同而产生的案例 |
+| agentic-ai-alignment | Agentic AI 对齐问题 | agentic AI, autonomy, paternalism, third-party stakeholders | Lecture 10 §7.1 | 自动行动、询问、拒绝和外部受影响者之间的权衡 |
+| bayesian-bandit | Bayesian bandit | Bayesian bandits, prior, posterior, $p(\mathcal R_a\mid h_t)$ | Lecture 11 §2.2 | 用 prior/posterior 表达未知奖励分布的不确定性 |
+| bayes-rule | 贝叶斯更新 | Bayes rule, likelihood, posterior | Lecture 11 §2.3 | 用 likelihood 与 prior 更新未知参数的分布 |
+| conjugacy | 共轭先验 | conjugate prior, conjugate distribution | Lecture 11 §2.4 | posterior 保持在与 prior 相同的参数分布族 |
+| beta-bernoulli | Beta--Bernoulli 共轭 | Beta distribution, Bernoulli reward, posterior update | Lecture 11 §3.1 | 用成功/失败计数更新 Bernoulli 参数的 Beta posterior |
+| thompson-sampling | Thompson sampling | posterior sampling, TS | Lecture 11 §4.2 | 从 posterior 抽候选世界并选择其中的最优动作 |
+| probability-matching | 概率匹配 | probability matching, posterior probability of optimality | Lecture 11 §6.1 | 按动作成为 posterior 最优臂的概率选择 |
+| bayesian-regret | Bayesian regret | BayesRegret, prior-averaged regret | Lecture 11 §7.1 | 在 frequentist regret 外对环境参数 prior 取平均 |
+| gittins-index | Gittins index | index policy, Bayesian discounted bandit | Lecture 11 §9.2 | 特定 Bayesian discounted bandit 目标下的最优 index policy |
+| pac-within-epsilon | PAC 近似合格指标 | probably approximately correct, within-$\epsilon$ | Lecture 11 §10.3 | 判断当前动作是否距离最优动作不超过 $\epsilon$ |
+| pac-mdp | MDP 的 PAC 保证 | PAC for MDPs, probably approximately correct, $\epsilon$-optimal, $\delta$ | Lecture 12 §2.2 | 以高概率控制非 $\epsilon$-optimal 决策次数的多项式上界 |
+| mbie-eb | 基于模型区间估计与探索 bonus | Model-Based Interval Estimation with Exploration Bonus, MBIE-EB | Lecture 12 §2.3 | 经验模型、乐观 Q 与 $\beta/\sqrt{n_{sa}}$ bonus |
+| simulation-lemma | Simulation lemma | value error bound, model mismatch, $\alpha$, $\beta$, $V_{\max}$ | Lecture 12 §2.4 | 将 reward/transition 模型误差传递到固定策略 value 误差 |
+| bayesian-mdp | Bayesian MDP | Bayesian model-based RL, posterior over $(P,R)$ | Lecture 12 §3.2 | 对未知 dynamics 与 reward model 维护联合 posterior |
+| psrl | Posterior Sampling for RL | PSRL, posterior sampling, sampled MDP planning | Lecture 12 §3.2 | 抽样一个 MDP、规划、执行 episode 并更新 posterior |
+| contextual-bandit | Contextual bandit | contextual multi-armed bandit, $\mathcal R_{a,s}$ | Lecture 12 §4.1 | reward distribution 条件化于 context/state 与 action |
+| linear-contextual-bandit | 线性 contextual bandit | linear bandit, $\theta^\top\phi(s,a)$, LinUCB | Lecture 12 §4.2 | 用共享参数和 feature 表示大状态/动作空间中的 reward |
+| disjoint-linear-bandit | Disjoint linear contextual bandit | disjoint model, $\theta_a$ | Lecture 12 §4.3 | 每个 arm 拥有独立参数块，可用 one-hot feature 编码 |
+| exploration-bonus-vfa | 函数逼近探索 bonus | exploration bonus, intrinsic motivation, bonus-based Q-learning | Lecture 12 §5.2 | 将访问不确定性加入函数逼近控制的 TD target |
+| bootstrapped-dqn | Bootstrapped DQN | bootstrap heads, ensemble Q, Osband 2016 | Lecture 12 §5.4 | 用多个 bootstrap DQN 近似价值/模型不确定性 |
+| meta-rl-exploration | Meta-RL 探索 | meta-learning for RL exploration, multi-task exploration, DREAM | Lecture 12 §6.1 | 在任务分布上学习可迁移的探索规律 |
+| decision-pretrained-transformer | Decision-Pretrained Transformer | DPT, meta RL, predict $a^\star$ | Lecture 12 §6.2 | 用序列模型预测最优动作以隐式利用丰富 task priors |

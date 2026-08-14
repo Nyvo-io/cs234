@@ -1,6 +1,6 @@
 # CS234 Learning State
 
-Last updated: 2026-08-08
+Last updated: 2026-08-14
 
 ## Current Progress
 
@@ -12,6 +12,10 @@ Last updated: 2026-08-08
 - Coverage complete: Lecture 6, `lecture/lecture6post.pdf`
 - Coverage complete: Lecture 7, `lecture/lecture7post.pdf`
 - Coverage complete: Lecture 8, `lecture/lecture8post.pdf`
+- Coverage complete: Lecture 9, `lecture/lecture9post.pdf`
+- Coverage complete: Lecture 10, `lecture/lecture10post.pdf`
+- Coverage complete: Lecture 11, `lecture/lecture11post.pdf`
+- Coverage complete: Lecture 12, `lecture/lecture12post.pdf` and `lecture/lecture12pre.pdf`
 - Notes written:
   - `notes/lec_notes/lec1_notes.md`
   - `notes/lec_notes/lec2_notes.md`
@@ -21,6 +25,10 @@ Last updated: 2026-08-08
   - `notes/lec_notes/lec6_notes.md`
   - `notes/lec_notes/lec7_notes.md`
   - `notes/lec_notes/lec8_notes.md`
+  - `notes/lec_notes/lec9_notes.md`
+  - `notes/lec_notes/lec10_notes.md`
+  - `notes/lec_notes/lec11_notes.md`
+  - `notes/lec_notes/lec12_notes.md`
 - Concept registry: `notes/concept_index.md`
 - Lecture 1–2 received source-fidelity and content-critical corrections during the v2 skill migration; their full presentation style remains compatible with legacy sections.
 - Lecture 3 was fully restructured to the v2 note schema on 2026-07-19, with all 53 physical PDF pages covered, the Mars Rover source inconsistency recorded, and current LLM / embodied TD connections verified against primary sources.
@@ -29,8 +37,12 @@ Last updated: 2026-08-08
 - Lecture 6 was strictly restructured against the complete 48-page post deck on 2026-07-28. It teaches VPG and actor-critic narrative-first, limits the score-norm baseline optimum to a fixed-state single gradient term, derives performance difference and surrogate/KL reasoning, explains both PPO variants, and includes three source-verified visuals plus Assignment 2 mappings. N-step is separately labeled as a source supplement from Lecture 5 pre pages 72--75.
 - Lecture 7 was written against the complete 72-page post deck on 2026-08-03. It teaches N-step advantage and GAE with a shared numeric chain, gives the monotonic-improvement/KL bound and its feasibility proof, explains behavioral cloning, compounding errors, DAGGER, feature matching, MaxEnt IRL, and off-policy policy-gradient importance sampling narrative-first, and embeds four source-verified visuals. Mastery evidence remains none recorded.
 - Lecture 8 was written against all 68 physical pages of `lecture/lecture8post.pdf` on 2026-08-04 and restructured on 2026-08-08. It distinguishes the PDF's physical pages from its internal 44-slide numbering, adds chapter relations and short roadmaps, teaches pairwise preference learning, Bradley--Terry reward modeling, RLHF's KL-regularized objective, DPO's closed-form policy transformation, and the Assignment 3 action-sequence/receding-horizon adaptation. It embeds four source-verified visuals and records the Lecture/Assignment label convention mismatch. Mastery evidence remains none recorded.
+- Lecture 9 was written against all 53 physical pages of `lecture/lecture9post.pdf`. It covers multi-armed bandit modeling, greedy and epsilon-greedy exploration, regret and gap--count decomposition, sublinear-regret goals, Lai--Robbins lower-bound structure, optimism under uncertainty, sub-Gaussian confidence bounds, and the UCB1 proof handoff to Lecture 10. The source deck's unexpanded Bayesian-regret/Thompson-sampling agenda is explicitly marked as not covered.
+- Lecture 10 was written against all 41 physical pages of `lecture/lecture10post.pdf`. It explains the corrected UCB regret proof sketch using good events, contradiction, union bound, concentration, pull-count bounds, and regret bounds. It also records the complete Wanheng Hu value-alignment guest lecture, including user intentions, revealed preferences, best interests, autonomy, sycophancy, agentic AI, and people other than the user. The source deck's unexpanded PAC/Bayesian-bandit/Thompson-sampling agenda is explicitly marked as not covered.
+- Lecture 11 was written against all 50 physical pages of `lecture/lecture11post.pdf`. The PDF title is mislabeled Lecture 13 but explicitly says `Typo: Lecture 11`; the note covers Bayesian bandits, Bayes rule, conjugacy, Beta--Bernoulli updates, Thompson sampling, probability matching, Bayesian regret, contextual news recommendation, Gittins index, and the PAC/regret toy comparison. Mastery evidence remains none recorded.
 - Mastery evidence has not yet been recorded systematically; coverage completion does not imply mastery.
-- Next lecture: Lecture 9, `lecture/lecture9post.pdf`
+- Mastery evidence remains none recorded for Lectures 9--10; no independent derivation, implementation, regret experiment, or alignment case analysis has been observed.
+- Next lecture: inspect `lecture/lecture13post.pdf` and the course schedule before continuing.
 
 ## Lecture 7 Covered
 
@@ -63,6 +75,73 @@ Last updated: 2026-08-08
 - Assignment 3 theory and implementation prerequisites: covered. The note explicitly maps the Bradley--Terry gradient, label conventions, RLHF objective, DPO loss, and starter-code shapes.
 - Assignment 3 environment work: still required. Hopper reward terms, dataset-video judgments, three-seed PPO/RLHF/DPO runs, plots, and behavior comparisons have not been run or observed.
 - Mastery evidence: none recorded for Lecture 8; coverage completion does not imply independent derivation, implementation, or experimental mastery.
+
+## Lecture 9 Covered
+
+- Multi-armed bandit tuple, unknown per-arm reward distributions, Bernoulli treatment example, and bandit versus MDP distinction
+- Greedy Monte Carlo action-value estimates and lock-in after an unlucky sample
+- Single-step and total regret, maximum-reward equivalence, gap--count decomposition, and the unobservable true regret issue
+- Fixed-epsilon exploration, its selection probabilities, and why both fixed exploration and no exploration can have linear regret
+- Problem-independent versus problem-dependent bounds and the Lai--Robbins logarithmic lower-bound structure
+- Optimism under uncertainty, upper confidence bounds, sub-Gaussian concentration, union-bound supplement, and UCB1 structure
+
+## Lecture 9 Assignment Readiness
+
+- Bandit/regret/UCB theory prerequisites: covered.
+- Bayesian regret and Thompson sampling: listed in the source agenda but not expanded in this post deck; do not infer coverage from the checklist.
+- Mastery evidence: none recorded; no independent derivation, implementation, or regret experiment has been observed.
+
+## Lecture 10 Covered
+
+- UCB notation recap and problem-dependent regret target
+- Theorem 7.1 proof sketch: good event, pull-count decomposition, contradiction, union bound, sub-Gaussian concentration, threshold selection, and logarithmic regret bound
+- Boundary between stochastic K-armed bandit proof assumptions and contextual/nonstationary/delayed-feedback bandit examples
+- Value alignment guest lecture: paperclip thought experiment, user intention, revealed preference, best interests, autonomy, and paternalism
+- Sycophancy and agentic-AI case studies, including action/deference/refusal questions and people other than the user
+
+## Lecture 10 Assignment Readiness
+
+- UCB proof prerequisites: covered at the level of a source-faithful proof sketch; a full textbook proof still requires independent reconstruction.
+- PAC, Bayesian bandit, and Thompson sampling: not expanded in the source post deck.
+- Alignment/ethics: guest lecture content covered, but it does not replace assignment-specific ethics readings.
+- Mastery evidence: none recorded for Lecture 10; no independent proof, code, regret experiment, or case analysis observed.
+
+## Lecture 11 Covered
+
+- Bayesian bandit prior/posterior representation and Bayes rule
+- Conjugate priors and Beta--Bernoulli posterior updates
+- Thompson sampling algorithm and broken-toe posterior-sampling example
+- Probability matching interpretation and optimism under uncertainty
+- Frequentist regret, Bayesian regret, and the optimism upper-bound bridge
+- Contextual news recommendation, delayed feedback, misleading priors, and the course understanding check
+- Bayesian bandit optimal-policy difficulty and Gittins index
+- Bayesian regret summary and PAC within-$\epsilon$ versus regret toy comparison
+
+## Lecture 11 Assignment Readiness
+
+- Bernoulli Thompson sampling prerequisites: covered; implementation, interface mapping, and experiments remain to be done against actual starter code.
+- Not fully covered: PAC sample-complexity theorem, Bayesian UCB algorithm/proof, contextual Thompson sampling implementation, and Gittins index computation/proof.
+- Mastery evidence: none recorded for Lecture 11; no independent Bayes derivation, implementation, simulation, or Bayesian-regret proof observed.
+
+## Lecture 12 Covered
+
+- Regret versus PAC evaluation, including $\epsilon$-optimal actions, $1-\delta$ probability, and polynomially bounded non-optimal decision counts
+- MBIE-EB model-based optimistic planning, empirical reward/transition estimates, count-dependent exploration bonus, and unvisited-pair convention
+- Simulation lemma: reward/dynamics mismatch and the fixed-policy value error bound with the $1/(1-\gamma)$ amplification
+- Bayesian MDP posterior over transition and reward models, probability matching, and Posterior Sampling for Reinforcement Learning (PSRL)
+- PSRL planning/execution/posterior-update order, computational cost, the course understanding check, and Seed Sampling/Concurrent PSRL boundary
+- Contextual bandits, shared linear reward models, disjoint linear models, one-hot feature encoding, and vector uncertainty sets
+- Strategic exploration with function approximation, bonus-based Q-learning target, replay staleness, and the Montezuma's Revenge source visual
+- Representation/parameter Thompson sampling, Bootstrapped DQN, Bayesian last-layer Q-network, and course-level empirical-claim boundaries
+- Meta-learning for exploration, DREAM, Decision-Pretrained Transformer, cross-task priors, and the tabular/function-approximation theory boundary
+
+## Lecture 12 Assignment Readiness
+
+- Tabular PAC/MBIE-EB: prerequisites covered at the level of a source-faithful explanation; a complete sample-complexity proof and implementation still require separate work.
+- Bayesian MDP/PSRL: model posterior, sampled-MDP planning, episode loop, and update order covered; concrete conjugate MDP priors and planning code remain untested.
+- Linear contextual bandit: shared/disjoint representations and uncertainty-set motivation covered; LinUCB/linear Thompson sampling implementation and regret experiments remain to be done.
+- Large-scale and meta-RL exploration: conceptual coverage only; no deep-RL implementation or cross-task experiment has been observed.
+- Mastery evidence: none recorded for Lecture 12; coverage completion does not imply independent derivation, implementation, or experiment.
 
 ## Lecture 1 Covered
 
