@@ -38,7 +38,9 @@ tags:
 
 ## 1. 本讲主线
 
-与 Lecture 10 的关系：Lecture 10 在固定但未知的奖励分布上用 UCB 的置信上界驱动探索；本讲把“不确定的奖励”进一步表示成一个 posterior distribution，用先验知识和观察数据共同决定下一步行动。这样，探索不再只是一个确定的 bonus，而可以解释为“按照当前 posterior，某个动作成为最优的概率”。
+与 Lecture 10 的关系：Lecture 10 在固定但未知的奖励分布上用 UCB 的置信上界驱动探索；
+
+本讲把“不确定的奖励”进一步表示成一个 posterior distribution，用先验知识和观察数据共同决定下一步行动。这样，探索不再只是一个确定的 bonus，而可以解释为“按照当前 posterior，某个动作成为最优的概率”。
 
 **本讲路线图**
 
@@ -49,6 +51,36 @@ tags:
 5. 最后讨论 Bayesian regret、contextual recommendation、Gittins index 和 PAC/regret 的边界，不把课件中的结论扩展成未给条件的普遍定理。
 
 课程 survey 的反馈是希望有更清晰的高层结构、概念解释和具体例子；本笔记因此把公式放在问题动机和完整迭代之后解释。
+
+**UCB：给每个 arm 算一个“乐观上界”再选最大的。**  
+
+**Thompson Sampling：给每个 arm 的未知真实均值建立一个 posterior，然后从 posterior 里随机抽一个可能的均值，再选最大的**
+
+上一讲我们有 K 个 arms。
+
+每个 arm ai​ 有一个真实但未知的平均 reward：
+
+Q(ai​)，$Q(a_i)=\mathbb E[r\mid a_i]$ 
+反复做动作 a，平均能得到多少 reward
+
+我们通过不断采样，然后得到经验均值：$\hat Q_t(a_i)$
+
+再加一个 confidence bonus：​
+
+$U_t(a_i)=\hat Q_t(a_i)+\sqrt{\frac{2\log t}{N_t(a_i)}}$
+
+这一讲不满足于说：
+
+> “Q(ai​) 我不知道，但它是一个固定常数。”
+
+而是说：
+
+> “既然我不知道 Q(ai​)，那我就用一个**概率分布**描述我目前对它的认识。”
+
+
+把前两讲里“固定但未知的真实奖励均值 Q(a)”重新写成“由未知环境参数 θ 决定的 Qθ​(a)”；然后开始对这个未知参数 θ 做 Bayesian inference。
+
+
 
 ## 2. 从未知分布到 Bayesian bandit
 
@@ -64,13 +96,17 @@ tags:
 
 *首次完整讲解：Lecture 9 §2.1「形式化定义」与 §4.1「单步 regret 与总 regret」。本节只补充：Bayesian regret 如何在固定参数的 frequentist regret 外再取 prior 平均。*
 
+之前是 $Q(a_i)=\mathbb E[r\mid a_i]$ 
+
 多臂 bandit 仍然由动作集合 $\mathcal A$ 和每个动作的奖励分布 $\mathcal R_a$ 组成。第 $t$ 轮选择 $a_t\in\mathcal A$，然后观察
 
 $$
 r_t\sim\mathcal R_{a_t}.
 $$
 
-这里 $Q_\theta(a)=\mathbb E[r\mid a,\theta]$ 是固定环境参数 $\theta$ 下动作 $a$ 的真实期望奖励，$a^*_\theta$ 是该环境中的最优动作。前 $T$ 轮的 frequentist regret 仍然是
+这里 $Q_\theta(a)=\mathbb E[r\mid a,\theta]$ 是 固定环境参数 $\theta$ 下动作 $a$ 的真实期望奖励 （把之前被省略掉的物理环境状态显式的用参数表达了出来）
+
+$a^*_\theta$ 是该环境中的最优动作。前 $T$ 轮的 [frequentist regret](academic-term-lookup:frequentist%20regret) 仍然是(还不是后面的Bayesian regret)
 
 $$
 \operatorname{Regret}(A,T;\theta)
@@ -82,22 +118,104 @@ $$
 \middle|\theta
 \right],
 $$
+>	它假设真实 θ 固定，算法在这个固定环境里的 regret 是多少？
 
-其中 $\theta$ 表示固定但未知的环境参数，$\mathbb E_\tau$ 只对算法产生的 action--reward history 取期望。Bayesian 方法不改变这个单次环境中的 regret 定义，而是在此之外再对 $\theta$ 的 prior 取平均。
+其中 $\theta$ 表示固定但未知的环境参数，$\mathbb E_\tau$ 只对算法产生的 action--reward history 取期望。
+
+$\mathbb E_\tau[\cdots\mid\theta]$
+
+意思是：
+
+> **固定环境 θ 以后，对运行算法时可能产生的随机 trajectory/history 取平均。**
+
+为什么 trajectory 还随机？
+
+因为 reward 本身是随机的。
+
+例如：
+
+$r_t\sim\operatorname{Bernoulli}(0.8)$
+
+真实成功率明明是 0.8，但一次具体结果可以是： 1,1,0,1,0,…
+
+算法看到不同 reward，也可能导致后面选择不同的 actions。
+
+所以整个：
+$(a_1,r_1,a_2,r_2,\dots)$
+
+是随机的。
+
+因此要取 expectation。
+
+
+
+Bayesian 方法不改变这个单次环境中的 regret 定义，而是在此之外再对 $\theta$ 的 prior 取平均。
+
+这个是：
+> 固定 θ，算法运行结果有随机性。
+
+Bayesian 方法是：
+
+> Bayesian 意义下，我们还不知道究竟是哪一个 θ，于是对 prior 再平均一次。
+
 
 ### 2.2 Bayesian inference 的对象
 
-Bayesian bandit 给每个未知奖励参数一个 prior。例如，若 arm $i$ 的奖励分布由参数 $\phi_i$ 决定，则初始不确定性写成 $p(\phi_i)$。观察数据后，更新为 $p(\phi_i\mid h_t)$，其中 history 可写成
+
+Bayesian bandit 给每个未知奖励参数 一个 prior。例如，若 arm $i$ 的奖励分布 reward distribution 由参数 $\phi_i$ 决定，$\phi_i$它就是 arm i 的成功概率，它未知。 则初始不确定性写成 $p(\phi_i)$，它可能是多少。观察数据后，更新为 $p(\phi_i\mid h_t)$，它是 posterior，其中 history 可写成
 
 $$
 h_t=(a_1,r_1,\ldots,a_{t-1},r_{t-1}).
 $$
 
-prior 不是“算法认为某个参数一定正确”，而是把已有知识或建模假设编码成参数的概率分布。若 prior 与真实环境严重不匹配，posterior 可能在很长时间内被错误信念牵引；后面的新闻推荐复习题专门检查这个边界。
+prior 不是“算法认为某个参数一定正确”，而是把已有知识或建模假设编码成 参数的概率分布。若 prior 与真实环境严重不匹配，posterior 可能在很长时间内被错误信念牵引；后面的新闻推荐复习题专门检查这个边界。
+
+
+prior：
+
+>	在看数据之前，我对未知参数有哪些可能性的概率描述
+
+比如有一个二臂老虎机，两个 arm 的成功概率分别是 ： θ1​,θ2​
+
+但我们不知道它们是多少。
+
+在普通 frequentist bandit 里，你可能只是说：
+
+> θ1​,θ2​ 是未知参数，我通过采样估计它们。
+
+而 Bayesian bandit 会更进一步，先写：
+
+$\theta_1 \sim \mathrm{Beta}(1,1)$
+
+$\theta_2 \sim \mathrm{Beta}(1,1)$
+
+这里的意思不是说“真实的 θ1​ 每次都会随机变化”，而是：
+
+> 在还没有观察数据之前，我用 Beta(1,1) 这个分布表示自己对 θ1​ 的不确定性
+
+我认为 θ 可能是 0∼1 之间的任何值，而且目前每个值都差不多一样可信
+
+
+posterior:
+
+>	观察数据之后，就变成了posterior
+
+
+$\boxed{\text{prior}\xrightarrow{\text{观察 }r_i}\text{posterior}}$
+
+
+$\theta=(\phi_1,\phi_2,\dots,\phi_K)$
+也就是说：
+
+> θ 是整个环境参数；  
+> ϕi​ 是其中第 i 个 arm 的参数。
+
+
 
 ### 2.3 Bayes rule
 
-对 arm $i$ 第一次观察到奖励 $r_{i1}$ 时，Bayes rule 为
+
+对 arm $i$  第一次观察到奖励 $r_{i1}$ 时，Bayes rule 为
 
 $$
 p(\phi_i\mid r_{i1})
@@ -108,7 +226,101 @@ p(\phi_i\mid r_{i1})
 {\displaystyle\int p(r_{i1}\mid\phi_i)p(\phi_i)\,d\phi_i}.
 $$
 
-整个公式的含义是：posterior 与 likelihood 乘 prior 成正比，再用分母把它归一化为一个概率分布。它把“观察到的数据”转化成对未知奖励参数的新信念；分母只是归一化常数，不需要逐个参数手工比较。这里写的是连续参数的积分形式；若参数只有有限个可能值，分母应改为对这些可能值求和。
+整个公式的含义是：posterior 与 likelihood 乘 prior 成正比，再用分母把它归一化为一个概率分布
+
+$\boxed{p(\phi_i)\quad\xrightarrow{\;r_i,\;p(r_i\mid\phi_i)\;}\quad p(\phi_i\mid r_i)}$
+
+
+$\phi_i$
+是 arm i 的**真实 reward 参数**。但不知道真实的它是多少，所以Bayesian 方法不给它直接猜一个确定值，而是给它一个概率分布
+
+
+$p(\phi_i)$
+表示：
+
+>  先验分布，还没有看到这次 reward 以前，我多相信这个参数。
+>  
+>  比如   $P(\phi_i=0.2)=0.5$
+>  有一半几率，\phi_i = 0.2
+
+
+$p(r_{i1}\mid\phi_i)$ 是likelihood
+表示：
+
+> **假如真实参数就是 ϕi​，那我刚刚看到这个 reward r 的概率有多大？**
+
+设这里规定 reward 是 Bernoulli：
+
+$p(r\mid\phi)=\phi^r(1-\phi)^{1-r}$
+
+$\phi_i=0.8$，就是arm i 每拉一次，得到 reward 1 的概率是 0.8，为0的概率是0.2 。
+所以：
+$P(r_{i1}=1\mid \phi_i=0.8)=0.8$
+
+---
+
+为什么叫做likelihood：
+
+现在 r=1 被观测到了已经：
+
+既然我已经看到了一次成功 r=1，那么不同的 ϕ 对这次观察的解释能力怎么样？”
+
+比如： ϕ=0.1
+
+那么：
+$L(0.1)=p(r=1\mid\phi=0.1)=0.1$
+
+说明：
+> 如果这个 arm 的真实成功率只有 10%，那么刚刚出现成功不是特别容易发生。
+
+如果：ϕ=0.9
+
+那么：
+$L(0.9)=p(r=1\mid\phi=0.9)=0.9$
+
+说明：
+> 如果真实成功率是 90%，那刚才看到一次成功就非常合理。
+
+所以观测到一次成功以后：
+
+ϕ=0.9 比 ϕ=0.1 **更能解释我们看到的数据。**
+
+**似然函数（likelihood function）**”这个名字，核心就是：
+
+> **数据已经发生了以后，我们拿这个数据去衡量：不同的参数值 哪个更容易 产生了这份数据。**
+
+
+
+$p(\phi_i\mid r_i)$
+就是：
+
+> posterior，后验分布。我已经看到 ri​ 了，现在我觉得 ϕi​ 是多少？调整他的分布概率
+
+
+
+$\boxed{\text{posterior}\propto\text{likelihood}\times\text{prior}}$
+含义是：
+
+> 以前我有一个看法 prior；  
+> 新数据告诉我哪些参数更能解释数据 likelihood；  
+> 两者结合得到新的看法 posterior。
+
+
+
+$p(\phi_i\mid r)=\frac{p(r\mid\phi_i)p(\phi_i)}{p(r)}$
+
+其中：
+
+$p(r)=\int p(r\mid\phi_i)p(\phi_i)\,d\phi_i$
+
+这个分母主要作用就是：
+
+> **把 numerator 归一化，让最终 posterior 的总概率等于 1。**
+
+
+
+它把“观察到的数据”转化成对未知奖励参数的新信念；分母只是归一化常数，不需要逐个参数手工比较。这里写的是连续参数的积分形式；若参数只有有限个可能值，分母应改为对这些可能值求和
+
 
 > [!example] 具体计算：一次二元观测如何改变信念
 > 设参数 $\phi$ 只有两个可能值 $\{0.2,0.8\}$，先验分别为 $p(\phi=0.2)=p(\phi=0.8)=0.5$。若观察到成功 $r=1$，且 $p(r=1\mid\phi)=\phi$，则
@@ -122,13 +334,45 @@ $$
 >
 > 一次成功把高成功率参数的 posterior 从 $0.5$ 提高到 $0.8$，但没有把它变成确定事实。若之后继续观察，posterior 会继续由 likelihood 和原有 posterior 共同更新。
 
+
+==而且 posterior 会成为下一轮的 prior==
+
+这是 Bayesian updating 的连续过程：
+
+第一次之前：
+$p(\phi)$
+
+看到 r1​：
+
+$p(\phi\mid r_1)$
+
+第二次之前，就把这个当成新的 prior。
+
+看到 r2​ 后：
+
+$p(\phi\mid r_1,r_2)$
+
+继续：
+
+$p(\phi\mid r_1,r_2,r_3,\dots)$
+
+因此整体过程就是：
+
+$\boxed{\text{prior}\rightarrow\text{data}\rightarrow\text{posterior}\rightarrow\text{new data}\rightarrow\text{new posterior}}$
+
+
+
 ### 2.4 Conjugate prior
 
 一般情况下，Bayes rule 的积分和归一化可能没有容易计算的闭式解。如果 prior 与 likelihood 组合后，posterior 仍属于同一个参数分布族，就称它们是 **共轭（conjugate）** 的。共轭性是计算上的便利，不是说这个 prior 一定更符合真实世界；指数族通常具有常用的共轭先验。
 
+
+
 ## 3. Bernoulli--Beta 共轭更新
 
-与第 2 节的关系：第 2 节给出了任意参数的 Bayes update；本节选择 bandit 课件反复使用的二元 reward，把一般积分更新化成可直接计数的 Beta posterior。
+与第 2 节的关系：第 2 节给出了任意参数的 Bayes update（但第二节我为了有助于理解，直接选定了beta分布和伯努利分布。它本质是描述 抽象关系式，也可以套用进其他的概率分布）；
+
+本节选择 bandit 课件反复使用的二元 reward，把一般积分更新化成可直接计数的 Beta posterior。
 
 **本节路线图**
 
@@ -148,8 +392,12 @@ r\mid\theta\sim\operatorname{Bernoulli}(\theta),
 \theta\in[0,1].
 $$
 
-$\theta$ 是该 arm 获得奖励 $1$ 的真实概率，也是 Bernoulli reward 的期望。对它使用 Beta$(\alpha,\beta)$ prior：
+> **如果这个 arm 的真实成功率是 θ，那么每次 reward 按 Bernoulli(θ) 产生。**
 
+
+$\theta$ 是该 arm 获得奖励 $1$ 的真实概率，也是 Bernoulli reward 的期望。我们刚开始并不知道它，给这个未知的 θ 一个概率分布。对它使用 Beta$(\alpha,\beta)$ prior： 它是连续性概率分布，很适合描述成功率，比例
+$\theta\sim\mathrm{Beta}(\alpha,\beta)$
+我们对未知成功率 θ 的概率密度：
 $$
 p(\theta\mid\alpha,\beta)
 =
@@ -160,7 +408,70 @@ $$
 
 其中 $\alpha,\beta>0$，$\Gamma(\cdot)$ 是 Gamma function。这个密度描述的是“参数 $\theta$ 的不确定性”，不是一次 reward 的概率质量函数；不要把 Beta distribution 和 Bernoulli distribution 当成同一个对象。
 
-Beta$(1,1)$ 是 $[0,1]$ 上的均匀分布，表示在这个教学例子中没有偏向任何成功率区间。
+$\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}$
+
+它是为了 把整条曲线调整到总面积等于 1
+
+因为一个合法的概率密度必须满足：
+
+$\int_0^1p(\theta)d\theta=1$​
+
+
+α 相对大：认为成功率偏高。≈成功证据
+β 相对大：认为成功率偏低。≈失败证据
+
+$\boxed{\alpha+\beta\text{ 越大}\Rightarrow\text{分布通常越集中，越确定}}$
+因为：
+
+$\theta\sim\mathrm{Beta}(\alpha,\beta)$
+
+它的均值是：
+
+$\mu=\mathbb E[\theta]=\frac{\alpha}{\alpha+\beta}$
+
+而方差是：
+
+$$
+\operatorname{Var}(\theta)=\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}
+$$
+
+把均值代入：
+$\boxed{\operatorname{Var}(\theta)=\frac{\mu(1-\mu)}{\alpha+\beta+1}}$
+
+方差越小，就是分布越集中
+
+
+在 Bernoulli bandit 中 理解更直观：
+
+$\alpha$可以看成和“成功信息”有关，
+$\beta$可以看成和“失败信息”有关。
+
+例如先验：$\mathrm{Beta}(1,1)$
+
+然后观察了 10 次，其中：
+
+5 次成功,5 次失败
+
+$\mathrm{Beta}(6,6)$
+
+如果继续观察，100 次里大约一半成功一半失败，那么可能得到：
+$\mathrm{Beta}(51,51)$
+
+两个分布都认为成功率大约是：0.5
+
+但是区别在于：
+
+> Beta(6,6)：我根据十来个数据认为大概是 0.5。
+
+> Beta(51,51)：我根据一百多个数据认为大概是 0.5。
+
+显然第二种情况下我们更有把握。
+
+
+Beta$(1,1)$ 是 $[0,1]$ 上的均匀分布，这个时候无论sita等于多少，$\theta^{1-1}(1-\theta)^{1-1}$都等于1
+
+表示在这个教学例子中没有偏向任何成功率区间。
+
 
 ### 3.2 Posterior update
 
@@ -171,6 +482,58 @@ p(\theta\mid r)
 =
 \operatorname{Beta}(\alpha+r,\,\beta+1-r).
 $$
+其实它就是把 **Bernoulli 的 likelihood** 和 **Beta 的 prior** 代进 第二节的Bayes rule，然后整理指数。
+
+Bayes rule：
+$p(\theta\mid r)=\frac{p(r\mid\theta)p(\theta)}{p(r)}$
+reward 是 Bernoulli：
+
+$r\mid\theta\sim\operatorname{Bernoulli}(\theta)$
+
+而 Bernoulli 的概率质量函数可以统一写成：
+
+$p(r\mid\theta)=\theta^r(1-\theta)^{1-r}$
+
+θ 的 Beta prior：
+
+θ∼Beta(α,β)
+
+那么：
+
+$p(\theta)=\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}\theta^{\alpha-1}(1-\theta)^{\beta-1}$
+
+代入：
+$p(r)$
+
+对于已经观察到的 r 来说，是一个**不依赖 θ 的常数**。
+
+所以研究 posterior 关于 θ 的形状时可以写：
+$p(\theta\mid r)\propto p(r\mid\theta)p(\theta)$
+
+现在把刚才两个东西放进去：
+
+$p(\theta\mid r)\propto\underbrace{\theta^r(1-\theta)^{1-r}}_{\text{likelihood}}\underbrace{\theta^{\alpha-1}(1-\theta)^{\beta-1}}_{\text{prior}}$
+
+同底数相乘，指数相加：
+$\theta^r\theta^{\alpha-1}=\theta^{\alpha+r-1}$
+
+另一边：
+$(1-\theta)^{1-r}(1-\theta)^{\beta-1}=(1-\theta)^{\beta-r}$
+
+所以：
+$p(\theta\mid r)\propto\theta^{\alpha+r-1}(1-\theta)^{\beta-r}$
+
+再和 Beta 分布的标准形式比较：
+
+$\operatorname{Beta}(a,b)\quad\Longrightarrow\quad p(\theta)\propto\theta^{a-1}(1-\theta)^{b-1}$
+
+令
+$a=\alpha+r$
+$b=\beta+1-r$
+
+就能得出上面的式子
+
+
 
 一次成功 $r=1$ 只把 $\alpha$ 加一；一次失败 $r=0$ 只把 $\beta$ 加一。观察 $s$ 次成功和 $f$ 次失败后，更新为
 
@@ -201,9 +564,59 @@ $$
 >
 > 这里 $0.6$ 是 posterior mean，不是说该 arm 的真实成功率已经被证明等于 $0.6$。后续 Thompson iteration 仍可能从 Beta$(3,2)$ 采到高于或低于 $0.6$ 的候选参数。
 
+
 ### 3.3 Bayesian inference 如何服务决策
 
 Bayesian bandit 的决策链可以压缩成：维护每个 arm 的 reward-parameter posterior，使用 posterior 产生动作选择，观察新 reward，再只更新受到影响的 posterior。若 prior 知识较准确，posterior 能更快集中；若 prior 很误导，过强的先验也会延迟纠正。
+
+
+---
+
+第 2 节不管 reward 到底是什么分布，它先讲一个**通用框架**：
+
+有一个未知参数：$\phi$
+
+先给它一个 prior：$p(\phi)$
+
+观察数据 r 后，通过 Bayes rule：​
+
+$p(\phi\mid r)=\frac{p(r\mid\phi)p(\phi)}{p(r)}$
+
+得到 posterior： $p(\phi\mid r)$
+
+这个时候它还没有限定：
+
+- reward 是 Bernoulli 还是 Gaussian；
+- prior 是 Beta 还是 Gaussian；
+- 参数到底代表成功率还是均值。
+
+我之前在第二节写的那些参数分布，都是为了有助于理解，直接设定的。它通常是是 Bayesian 建模时人为选择来表示不确定性
+
+第 3 节说：
+
+> 好，现在我们不要抽象讲了，直接来看 bandit 最常见的情况：reward 只有 0/1。
+
+也就是：
+
+r∈{0,1}
+
+那么 reward 使用 Bernoulli：
+$r\mid\theta\sim\operatorname{Bernoulli}(\theta)$
+
+然后专门选择 Beta 作为 prior：
+
+$\theta\sim\operatorname{Beta}(\alpha,\beta)$
+
+于是把第 2 节的一般 Bayes rule：
+
+$p(\theta\mid r)\propto p(r\mid\theta)p(\theta)$
+
+具体算出来以后，发现：
+
+$p(\theta\mid r)=\operatorname{Beta}(\alpha+r,\beta+1-r)$
+
+
+
 
 ## 4. Bayesian bandits 与 Thompson sampling
 
@@ -224,6 +637,7 @@ p(\mathcal R_a\mid h_t)
 $$
 
 或其参数化表示，而不是只保留一个点估计。posterior 可以用于 Bayesian UCB，也可以用于 probability matching；本讲主要展开后者。它带来的优点是能利用已有 prior，代价是结果依赖 prior 的合理性和 posterior 计算的可行性。
+
 
 ### 4.2 Thompson sampling 的算法
 

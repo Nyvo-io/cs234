@@ -44,6 +44,13 @@ tags:
 4. 再把技术问题放回 alignment 场景：目标可以解释为用户意图、用户偏好或用户最佳利益，而三者并不总是一致。
 5. 用 sycophancy 和 agentic AI 讨论 reward 设计的外部影响、用户自主性与何时需要系统增加摩擦。
 
+
+**count decomposition = 把问题拆开算**  
+**contradiction = 用矛盾证明 good event 下不会继续选错**  
+**union bound = 把很多坏事件的概率加起来**  
+**concentration = 证明经验均值严重偏离真实均值的概率很小
+
+
 ## 2. Bandit 与 UCB proof 的问题设置
 
 与 Lecture 9 的关系：这里沿用上一讲已经建立的 bandit、regret 和 UCB 记号，把它们整理成 Lecture 10 证明所需的统一设置。
@@ -72,11 +79,14 @@ V^*=\max_{a\in\mathcal A}Q(a),
 a^*\in\arg\max_{a\in\mathcal A}Q(a).
 $$
 
-第 $t$ 轮的期望机会损失和前 $T$ 轮总 regret 分别为
+每一轮都是在那几个动作里选
+第 $t$ 轮的期望机会损失和 前 $T$ 轮总 regret 分别为
 
 $$
 \ell_t=\mathbb E\left[V^*-Q(a_t)\right],
 $$
+这里取期望是因为 动作可能是随机的
+
 
 $$
 L_T
@@ -94,12 +104,14 @@ $$
 
 这条分解告诉我们，UCB proof 不需要直接证明“每一步都选到最优动作”；它只需证明每个 gap 为正的次优动作不会被拉太多次。
 
+
 ### 2.2 UCB1
 
 *首次完整讲解：Lecture 9 §7.1「乐观原则」与 §8.2「UCB1 形式」。本节只补充：Lecture 10 proof 采用的统一记号和后续抽样次数分析。*
 
 Lecture 9 的 UCB 结构是经验均值加置信 bonus。Lecture 10 复习页给出的形式可统一写成
 
+第t轮选择哪个臂：
 $$
 a_t
 =
@@ -114,15 +126,19 @@ $$
 
 这里使用 $1$-sub-Gaussian 奖励约定；$\delta$ 是置信失败概率，具体 proof 中会取为随 horizon 变化的值。未访问动作仍需先初始化，否则 bonus 的分母为零。
 
+
 ### 2.3 Covid testing：复杂 bandit setting 的预览
 
-课件展示 Bastani et al. 在 Covid testing 中的例子：系统根据旅客提交的信息，把是否检测、检测地点和资源分配结合起来，并在实验室结果延迟 $24$--$48$ 小时后更新数据。课件将其概括为 **nonstationary, contextual, batched bandit with delayed feedback and constraints**；它不是本讲证明所用的简单 stochastic K-armed bandit，而是说明真实决策通常同时包含上下文、批处理、延迟反馈、非平稳性和约束。
+课件展示 Bastani et al. 在 Covid testing 中的例子：系统根据旅客提交的信息，把是否检测、检测地点和资源分配结合起来，并在实验室结果延迟 $24$--$48$ 小时后更新数据。课件将其概括为 **nonstationary, contextual, batched bandit with delayed feedback and constraints**；
+
+它不是本讲证明所用的简单 stochastic K-armed bandit，而是说明真实决策通常同时包含上下文、批处理、延迟反馈、非平稳性和约束。
 
 ![[lec10-covid-bandit-p6.png|900]]
 
 *图：Lecture 10 物理 PDF 第 6 页的 Covid testing 流程图；来源：`lecture/lecture10post.pdf` 第 6 页。图中展示了 contextual 输入、检测/不检测分支、延迟实验室结果和集中数据库回流；这是课件原图，不是本笔记重绘。*
 
 这张图的作用是提醒：UCB 的清晰理论假设是一个起点，不是对所有现实实验设计的完整描述。
+
 
 ## 3. UCB regret proof sketch
 
@@ -133,6 +149,7 @@ $$
 1. 先把 regret 转化为每个次优臂的 pull-count 上界。
 2. 用 good event 和 contradiction 说明，充分采样后次优臂不能继续胜过最优臂。
 3. 用 union bound 和 concentration 控制 good event 失败的概率，再选择阈值得到最终 bound。
+
 
 ### 3.1 定理、假设与目标
 
@@ -153,7 +170,19 @@ $$
 \frac{16\log n}{\Delta_i}.
 $$
 
-常数取决于 UCB bonus 和 concentration convention；本讲重点是 $O(\log n/\Delta_i)$ 的每臂抽样次数，以及把它乘以 $\Delta_i$ 后得到的对数级 regret。课件页中有一个索引笔误，下面统一用 $\Delta_i$ 表示 gap，用 $N_n(a_i)$ 表示 horizon 内的拉取次数。
+根据这个公式，可以得到量级：
+$\mathrm{Regret}_n = O\left(\sum_{i:\Delta_i>0}\frac{\log n}{\Delta_i}\right)$
+
+
+常数取决于 UCB bonus 和 concentration convention；
+
+本讲重点是 $O(\log n/\Delta_i)$ 的 每臂抽样次数，以及把它乘以 $\Delta_i$ 后得到的对数级 regret。课件页中有一个索引笔误，下面统一用 $\Delta_i$ 表示 gap，用 $N_n(a_i)$ 表示 horizon 内的拉取次数。
+
+意思是：
+
+- regret 随时间 n 只增长成对数级
+- 对每个次优臂，贡献大约和 logn/Δi​ 成正比
+
 
 ### 3.2 先把 regret 问题改成 pull-count 问题
 
@@ -173,14 +202,23 @@ $$
 3+\frac{16\log n}{\Delta_i^2}.
 $$
 
-乘回 $\Delta_i$ 后，就得到该臂对 regret 的贡献不超过 $3\Delta_i+16\log n/\Delta_i$。这一步是 proof 的主线：不是逐轮分析 regret，而是控制“一个次优臂还能被相信多久”。
+乘回 $\Delta_i$ 后，就得到 该臂对 regret 的贡献不超过 $3\Delta_i+16\log n/\Delta_i$。
+
+这一步是 proof 的主线：不是逐轮分析 regret，而是控制“一个次优臂还能被相信多久”。
+
+在ucb算法眼里，这个选项当前的估计值不是最优的，但因为置信区间，我还是可能选你。还能被相信多久，指的是 还能有多少轮看起来“有可能是最优的”，从而继续被选择
+
+因为随着N(ai​) 越大，我们对这个臂越了解，bonus也就越小
+
 
 ### 3.3 Good event：两种置信失败
 
+这里真正开始证明：
+
 选择一个暂时未知的阈值 $u_i$，表示我们希望次优臂 $a_i$ 至少被充分采样到的次数。定义一个 good event $G_i$，它要求两件事同时成立：
 
-1. 最优臂 $a_1$ 的 UCB 在整个 horizon 内没有跌到真实均值 $Q(a_1)$ 以下；
-2. 次优臂 $a_i$ 在被采样 $u_i$ 次后，其经验均值加 bonus 已经低于 $Q(a_1)$。
+1. 最优臂 $a_1$ 的 UCB 在整个 horizon 内没有跌到真实均值 $Q(a_1)$ 以下（最优臂别掉下去）；
+2. 次优臂 $a_i$ 在被采样 $u_i$ 次后，其 经验均值加 bonus 已经低于 $Q(a_1)$ （次优臂别太乐观）。
 
 用符号表达为
 
@@ -201,9 +239,12 @@ $$
 
 在 $G_i$ 发生时，$a_i$ 在第 $u_i$ 次以后不应再被 UCB 选中：若它在某一步仍被选中，则它的 UCB 至多低于 $Q(a_1)$，而最优臂的 UCB 高于 $Q(a_1)$，与“选择最大 UCB”矛盾。
 
+
 ### 3.4 Count decomposition 与 contradiction
 
-把 $G_i$ 是否发生作为指示变量，可以分解期望拉取次数：
+把 $G_i$ (good event )是否发生 作为指示变量，可以分解期望拉取次数：
+
+把“第 i 个次优臂总共会被拉多少次”分成两种情况来分析
 
 $$
 \mathbb E[N_n(a_i)]
@@ -215,14 +256,66 @@ $$
 u_i+nP(G_i^c).
 $$
 
-第一项不超过 $u_i$ 的理由是 contradiction：如果在 $G_i$ 成立时拉取 $a_i$ 超过 $u_i$ 次，那么存在某一轮，$a_i$ 已经有 $u_i$ 个样本却仍被选中；由 good event 的两条不等式，它的 UCB 小于最优臂的 UCB，不可能成为 argmax。
+第一项不超过 $u_i$ 的理由是 contradiction：如果在 $G_i$ 成立时拉取 $a_i$ 超过 $u_i$ 次，那么存在某一轮，$a_i$ 已经有 $u_i$ 个样本却仍被选中 （因为good event 的定义决定了 ai​ 一旦拉到 ui​ 次以后，就不该再被选中）；由 good event 的两条不等式，它的 UCB 小于最优臂的 UCB，不可能成为 argmax。
 
-因此剩下的工作是控制 $P(G_i^c)$。它最多来自两个事件：
+$G_i^c$就是：
+
+> Gi​ 没有发生。有一个次优臂在ui次之后，他仍有可能被选中
+
+也就是 **bad event**。
+
+$\mathbf 1(G_i^c)$， 带个1，就是指示函数
+
+它的定义：
+$\mathbf 1(G_i^c)=\begin{cases}1,&G_i^c\text{ 发生}\\0,&G_i^c\text{ 不发生}\end{cases}$
+
+
+所以上面的式子进行拆解：
+
+$\mathbf 1(G_i)N_n(a_i)\le u_i$
+
+第二部分：
+因为：$N_n(a_i)\le n$
+所以：
+
+$\mathbf 1(G_i^c)N_n(a_i)\le n\,\mathbf 1(G_i^c)$
+
+取期望：
+
+$\mathbb E[\mathbf 1(G_i^c)N_n(a_i)]\le n\mathbb E[\mathbf 1(G_i^c)]$
+
+而指示变量有一个非常重要的性质：
+
+$\mathbb E[\mathbf 1(G_i^c)]=P(G_i^c)$
+
+所以：
+
+$\mathbb E[\mathbf 1(G_i^c)N_n(a_i)]\le nP(G_i^c)$
+
+
+$P(G_i^c)$
+意思是：
+
+> **事件 Gic​ (bad event) 发生的概率。**
+
+所以不等式的意思就是：
+>	**正常情况下**，次优臂在 ui​ 次以后就被识别出来了；
+>	
+>	**极少数倒霉情况下**，置信区间失效，那它最多可能被拉 n 次，但这种事情发生概率只有 P(Gic​)。
+
+
+因此剩下的工作就是控制 $P(G_i^c)$， 要把它压的很小 。它最多来自两个事件：
 
 - 最优臂某一轮的 UCB 低于真实均值；
 - 次优臂采样 $u_i$ 次后仍然显得过于乐观。
 
-### 3.5 Union bound 控制最优臂事件
+$$
+\boxed{G_i^c\subseteq\underbrace{\{\exists t\le n:Q(a_1)>U_t(a_1)\}}_{\text{最优臂被低估}}\;\cup\;\underbrace{\{\text{次优臂拉 }u_i\text{ 次后仍然过于乐观}\}}_{\text{次优臂被高估}}}
+$$
+
+### 3.5 Union bound 控制 最优臂事件
+
+控制第一个坏事件：最优臂在某一轮被低估了
 
 对每一轮的最优臂 UCB 失败事件使用 union bound：
 
@@ -236,17 +329,137 @@ Q(a_1)>U_t(a_1)
 P\left(Q(a_1)>U_t(a_1)\right).
 $$
 
-如果每个时间点的置信失败概率被安排为足够小的量 $\delta$，则整体失败概率至多为 $n\delta$。这正是 Lecture 9 最后一页提示的
+理解：
 
+假设第 t 轮，最优臂 a1​ 的 UCB 出错了，定义这个事件为：
+$E_t=\{Q(a_1)>U_t(a_1)\}$
+
+但我们不止跑一轮，而是跑n轮：
+
+我们现在关心：
+
+> **这 n 轮里面，只要有任何一轮 UCB 失败，概率是多少？**
+
+“至少有一次失败”写成：
+$E_1\cup E_2\cup\cdots\cup E_n$
+也就是图里的：
+
+$\exists t\le n:Q(a_1)>U_t(a_1)$
+
+其中 ∃ 的意思是：
+
+> **存在至少一个**
+
+
+Union bound ：
+
+$P(E_1\cup E_2\cup\cdots\cup E_n)\le P(E_1)+P(E_2)+\cdots+P(E_n)$
+
+->
 $$
 P\left(\bigcup_i E_i\right)\le\sum_iP(E_i)
 $$
 
+如果每个时间点的置信失败概率被安排为足够小的量 $\delta$，则整体失败概率至多为 $n\delta$。这正是 
+
+$$
+P\left(\bigcup_{t=1}^nE_t\right)\le\sum_{t=1}^nP(E_t)\le n\delta
+$$
+
 的应用：同时要求很多置信界成立时，必须为多事件总失败概率留出预算。
+
+---
+
+所以本节最开始的那个不等式：
+
+左边：
+
+> **整个 n 轮中，至少有一轮最优臂的 UCB 失效。**
+
+右边：
+
+> **把第 1、2、……、n 轮各自的失效概率全部加起来。**
+
+如果每一轮都保证：
+
+$P(Q(a_1)>U_t(a_1))\le\delta$
+
+那么：
+
+$P(\text{整个 }n\text{ 轮至少失败一次})\le n\delta$
+
+我们通过它得知了， 把每一轮失败概率设计得到底要多小，才能使得它们全部加起来仍然很小
+
+比如可以设计让每轮失败概率变成 1/$n^2$
+
+==接回你前面学的 concentration bound==
+
+我们原来有：
+
+$P\left(Q(a_1)>U_t(a_1)\right)\le\exp\left(-\frac{N_t(a_1)\eta_t^2}{2\sigma^2}\right)$
+**sub-Gaussian concentration inequality**（集中不等式）
+
+现在我们**主动要求**右边足够小，比如：
+
+$\exp\left(-\frac{N_t(a_1)\eta_t^2}{2\sigma^2}\right)=\frac{1}{n^2}$
+
+然后反过来解 ηt​。
+
+得到一个足够大的 confidence bonus：​
+
+$\eta_t=\sigma\sqrt{\frac{4\log n}{N_t(a_1)}}$
+
+然后设置：
+
+$U_t(a_1)=\hat Q_t(a_1)+\eta_t$
+
+
+---
+
+所以现在你应该能看到整条逻辑了：
+
+想让整个 n 轮失败概率小​
+
+↓
+
+先决定每轮允许：
+$\delta\approx\frac{1}{n^2}$
+
+↓
+
+通过 concentration inequality 反解：​
+$\eta_t$
+
+↓
+
+这个 ηt​ 就成为 UCB 的 bonus：
+
+$U_t(a)=\hat Q_t(a)+\mathrm{bonus}_t(a)$
+
+↓
+
+于是每一轮：
+
+P($E_t$)≤ 1/ $n^2$
+
+↓
+
+最后 union bound：
+
+$P\left(\bigcup_{t=1}^nE_t\right)\le\sum_{t=1}^nP(E_t)\le\frac1n$
+
+
 
 ### 3.6 Concentration 控制次优臂事件
 
-对第二个事件，令 $u_i$ 足够大，使 bonus 小于 gap 的一部分。沿用课件的参数化，取任意 $c\in(0,1)$，要求
+控制第二个坏事件：次优臂在被采样 ui​ 次之后，居然还看起来像最优
+
+因为 bonus 会随着采样次数增加而下降，所以我们可以通过把 ui​ 取得足够大，从而控制这个坏事件
+
+
+
+
+对第二个事件，通过令 $u_i$ 足够大，使 bonus 小于 gap 的一部分, 也就是 $(1-c)\Delta_i$。沿用课件的参数化，取任意 $c\in(0,1)$，要求
 
 $$
 \Delta_i-
@@ -258,17 +471,107 @@ c\Delta_i,
 \le
 (1-c)\Delta_i.
 $$
+怎么得到的：
 
-那么“次优臂的经验均值加 bonus 仍高于最优均值”会蕴含
+$\operatorname{bonus}(u_i)=\sqrt{\frac{2\log(1/\delta)}{u_i}}$
+
+$\Delta_i=V^*-Q(a_i)$
+
+正常来说，随着 ai​ 被采样越来越多，它的 UCB 应该慢慢降下来，我们最终应该发现：
+
+> “哦，ai​ 确实比最优臂差。”
+
+但是坏情况是：
+
+> **ai​ 已经采样 ui​ 次了，它的 UCB 居然还高到可以和最优臂竞争。**
+
+也就是类似：
+$U_{u_i}(a_i)\ge V^*$
+
+UCB 是：
+$U_{u_i}(a_i)=\hat Q_{u_i}(a_i)+\sqrt{\frac{2\log(1/\delta)}{u_i}}$
+
+为了简洁，把 bonus 写成：
+​
+$b_i=\sqrt{\frac{2\log(1/\delta)}{u_i}}$
+
+如果次优臂还能够“看起来和最优臂一样好”：
+
+$\hat Q_{u_i}(a_i)+b_i\ge V^*$
+
+而：
+$V^*=Q(a_i)+\Delta_i$
+
+所以：
+$\hat Q_{u_i}(a_i)+b_i\ge Q(a_i)+\Delta_i$
+
+移项：
+
+$\hat Q_{u_i}(a_i)-Q(a_i)\ge\Delta_i-b_i$
+
+现在我们想降低 它 的概率
+
+---
+
+
+我们想用 concentration inequality， 但集中不等式擅长控制这种事件：
+
+P(Q^​ui​​(ai​)−Q(ai​)≥ 某个正数 )
+
+我们通过设 Δi​−bi​≥cΔi ，
+
+$\boxed{P\left(\hat Q_{u_i}(a_i)-Q(a_i)\ge\Delta_i-b_i\right)\le P\left(\hat Q_{u_i}(a_i)-Q(a_i)\ge c\Delta_i\right)}$​
+
+所以我们通过处理右边这个概率，去利用集中不等式处理它，从而达到缩小左边这个概率的目的
+
+为了让这个“某个正数”足够明显，我们人为选一个：$c\in(0,1)$
+
+然后希望：
+
+$\Delta_i-b_i\ge c\Delta_i$
+
+这样一来，刚才那个坏事件就必然导致：
+
+$\hat Q_{u_i}(a_i)-Q(a_i)\ge c\Delta_i$
+
+而这个事件的概率就可以用 concentration inequality 压下去。
+
+---
+
+那么得到 “次优臂的经验均值 加 bonus 仍 高于最优均值”会蕴含
 
 $$
 \widehat Q_{u_i}(a_i)-Q(a_i)
 \ge
 c\Delta_i.
 $$
+理解：
+
+如果在采样 ui​ 次后，次优臂仍然满足：
+
+$\hat Q_{u_i}(a_i)+\sqrt{\frac{2\log(1/\delta)}{u_i}}\ge Q(a_1)$
+
+又因为：​$Q(a_1)=Q(a_i)+\Delta_i$
+
+以及 bonus 已经满足
+
+$\sqrt{\frac{2\log(1/\delta)}{u_i}}\le (1-c)\Delta_i$
+
+那么就能推出：
+
+$\hat Q_{u_i}(a_i)-Q(a_i)\ge c\Delta_i$
+
+它表示：
+
+> 次优臂要想在 ui​ 次后还“看起来很好”，
+>   
+> 那它的经验均值必须被高估至少 cΔi​。
+
+而这正是 concentration inequality 擅长控制的事情。
+
+
 
 利用 sub-Gaussian concentration，可得
-
 $$
 P\left(
 \widehat Q_{u_i}(a_i)-Q(a_i)
@@ -281,11 +584,31 @@ c\Delta_i
 \right)
 $$
 
-在课件的 $\sigma^2=1$ 约定下成立。这里的含义很具体：样本数越多，次优臂的经验均值仍然高到足以超过最优臂的概率指数下降。
+在课件的 $\sigma^2=1$ 约定下成立。这里的含义很具体：
+样本数越多，次优臂的经验均值仍然高到足以超过最优臂的概率指数下降。
+
+所以只要 ui​ 够大，这个概率就会非常小。
+
+---
+
+之前我们学sub-Gaussian concentration inequality： 
+
+对于 σ-sub-Gaussian reward，采样 u 次后的经验均值满足：
+
+$P\left(\hat Q_u(a)-Q(a)\ge\eta\right)\le\exp\left(-\frac{u\eta^2}{2\sigma^2}\right)$
+
+把这两个代进去：​
+$u=u_i$  $\eta=c\Delta_i$
+
+就可以得到上面的不等式
+
 
 ### 3.7 选择阈值并得到最终 bound
 
-由 bonus 条件
+到底把 ui​ 设成多大，才能保证这个次优臂被探索 ui​ 次以后，它的 UCB 已经不可能压过最优臂？
+
+
+上一小节要求
 
 $$
 \sqrt{\frac{2\log(1/\delta)}{u_i}}
@@ -302,13 +625,87 @@ u_i
 {(1-c)^2\Delta_i^2}.
 $$
 
-把这个阈值代回 count decomposition。按课件的记号取 $c=1/2$、$\delta=1/n^2$，并计入整数取整与失败项的常数，可得到
+把这个阈值代回 [count decomposition](academic-term-lookup:count%20decomposition)。按课件的记号取 $c=1/2$、$\delta=1/n^2$，并计入 整数取整与失败项的常数，可得到
 
 $$
 \mathbb E[N_n(a_i)]
 \le
 3+\frac{16\log n}{\Delta_i^2}.
 $$
+
+因为：
+$\boxed{u_i\ge\frac{16\log n}{\Delta_i^2}}$
+
+>	对次优臂 ai​，大概采样这么多次以后，统计证据已经足够强，可以把它和最优臂区分开
+
+前面我们有：
+$\mathbb E[N_n(a_i)]\le u_i+nP(G_i^c)$
+
+ui​ 是“拉取次数”，必须是整数，所以实际取：
+
+$u_i=\left\lceil\frac{16\log n}{\Delta_i^2}\right\rceil$
+
+$\lceil x\rceil\le x+1$
+
+所以：
+
+$u_i\le\frac{16\log n}{\Delta_i^2}+1$
+
+这里就已经出来了第一个：+1
+
+再看 bad event：P(Gic​)
+
+Gi​ 要求两个好事件同时成立，所以 Gic​ 意味着至少有一个坏事件：
+
+1. 最优臂的 UCB 在某个时间点失败；
+2. 次优臂采了 ui​ 次以后仍然过于乐观。
+
+用 union bound：
+
+$P(G_i^c)\le P(\text{最优臂失败})+P(\text{次优臂失败})$
+
+
+最优臂失败概率
+
+每个时刻失败概率至多 δ，一共有 n 个时刻：
+
+$P(\text{最优臂某时刻失败})\le n\delta$
+
+取：
+$\delta=\frac1{n^2}$
+
+得到：
+$n\delta=\frac1n$
+
+ 次优臂失败概率
+
+concentration 又可以把它控制到大约：
+
+$P(\text{次优臂失败})\le\delta=\frac1{n^2}$
+
+所以：
+​$P(G_i^c)\le\frac1n+\frac1{n^2}$
+
+---
+
+记得原式里不是单纯的 P(Gic​)，而是：
+
+$nP(G_i^c)$
+
+因此：
+$nP(G_i^c)\le n\left(\frac1n+\frac1{n^2}\right)$
+
+得到：
+
+$nP(G_i^c)\le1+\frac1n\le2$
+
+所以 bad event 贡献最多：
+
++2
+​
+所以合成了+3
+
+---
 
 于是
 
@@ -320,6 +717,26 @@ $$
 16\log n\sum_{i:\Delta_i>0}\frac1{\Delta_i}.
 $$
 
+因为：
+
+3.2 已经知道：
+
+$\mathrm{Regret}_n=\sum_i\Delta_i\mathbb E[N_n(a_i)]$
+
+现在把刚刚的 bound 塞进去：
+
+Regretn​≤i∑​Δi​(3+Δi2​16logn​)
+
+$\mathrm{Regret}_n\le\sum_i\Delta_i\left(3+\frac{16\log n}{\Delta_i^2}\right)$
+
+展开：​
+
+$\mathrm{Regret}_n\le3\sum_i\Delta_i+16\log n\sum_{i:\Delta_i>0}\frac1{\Delta_i}$
+
+这就正好回到了 3.1 一开始说我们要证明的定理。
+
+
+
 > [!example] 结果解释：gap 如何改变探索成本
 > 若两个次优臂的 gap 分别为 $\Delta_1=0.5$ 和 $\Delta_2=0.1$，忽略常数项时，抽样次数上界中的主项分别与 $1/0.5^2=4$ 和 $1/0.1^2=100$ 成正比；乘回 gap 后，它们对 regret 的主项分别与 $1/0.5=2$ 和 $1/0.1=10$ 成正比。
 >
@@ -328,6 +745,8 @@ $$
 ### 3.8 Proof 的边界
 
 这份 proof sketch 依赖 stochastic bandit、独立奖励、集中界和 UCB 的具体 bonus。它不直接证明 contextual、nonstationary、batched、delayed-feedback bandit 都有同样的 bound；Covid testing 图正好说明了这些额外结构会改变分析问题。Lecture 10 也没有在 post deck 中展开 PAC 或 Bayesian regret 的完整理论。
+
+
 
 ## 4. 复习题与技术检查
 

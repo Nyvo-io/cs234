@@ -338,6 +338,38 @@
         },
         "updatedAt": "2026-08-12T12:18:39.239Z"
       }
+    },
+    "notes/lec_notes/lec8_notes.md": {
+      "bernoulli": {
+        "term": "Bernoulli",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "Bernoulli",
+          "content": "词性：名词／形容词\n\n推荐译法：伯努利（分布）\n\n其他可能译法：伯努利随机变量、伯努利型（作定语时）\n\n领域备注：在该强化学习/统计学语境中，`Bernoulli` 指**伯努利分布**。由于奖励只有愈合 $1$ 和未愈合 $0$ 两种结果，每个动作 $a_i$ 的奖励可建模为参数未知的伯努利随机变量：\n$$\nR_i \\sim \\operatorname{Bernoulli}(p_i),\n$$\n其中 $p_i$ 表示采取动作 $a_i$ 后骨折在六周内愈合的概率。这里不宜译为“二项分布”；二项分布描述多次独立伯努利试验中成功的次数。\n\n例句：每种治疗动作产生的奖励服从参数未知的伯努利分布，其中 $1$ 表示愈合，$0$ 表示未愈合。"
+        },
+        "updatedAt": "2026-08-13T07:01:39.441Z"
+      },
+      "count decomposition": {
+        "term": "count decomposition",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "count decomposition",
+          "content": "词性：名词短语\n\n推荐译法：计数分解\n\n其他可能译法：计数式分解；次数分解（若 count 特指某动作、臂或事件的出现次数）\n\n领域备注：在强化学习与多臂老虎机分析中，通常指将累计次数（如某臂被选择的次数）按事件、时间段或置信事件进行拆分，并分别估计各部分贡献的证明技巧。此处结合阈值、$\\delta=1/n^2$ 与失败项，宜译为“计数分解”。\n\n例句：将该阈值代入计数分解后，可分别界定置信事件成立时与失败时的计数贡献。"
+        },
+        "updatedAt": "2026-08-15T07:22:52.307Z"
+      },
+      "frequentist regret": {
+        "term": "frequentist regret",
+        "result": {
+          "kind": "ai",
+          "source": "AI 学术术语翻译",
+          "term": "frequentist regret",
+          "content": "词性：名词短语\n\n推荐译法：频率主义遗憾\n\n其他可能译法：频率学派遗憾；频率主义累积遗憾（强调前 $T$ 轮的累积量时）\n\n领域备注：在多臂老虎机和强化学习中，**frequentist regret** 通常将环境参数 $\\theta$ 视为固定的，仅对算法随机性和观测随机性取期望；区别于还会对环境先验分布取期望的“贝叶斯遗憾”（Bayesian regret）。\n\n例句：前 $T$ 轮的频率主义遗憾定义为相对于固定环境 $\\theta$ 下最优动作 $a_\\theta^*$ 的期望累积损失。"
+        },
+        "updatedAt": "2026-08-16T06:00:55.101Z"
+      }
     }
   }
 }

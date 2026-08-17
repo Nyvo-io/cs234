@@ -60,6 +60,54 @@
         },
         "updatedAt": 1785394180807
       }
+    },
+    "notes/lec_notes/lec8_notes.md": {
+      "source": {
+        "top": 29835,
+        "left": 0,
+        "anchor": {
+          "line": 982,
+          "ch": 5,
+          "viewportOffset": -48.1796875
+        },
+        "updatedAt": 1786603373708
+      }
+    },
+    "notes/lec_notes/lec9_notes.md": {
+      "source": {
+        "top": 16681,
+        "left": 0,
+        "anchor": {
+          "line": 631,
+          "ch": 0,
+          "viewportOffset": -3.5859375
+        },
+        "updatedAt": 1786693030041
+      }
+    },
+    "notes/lec_notes/lec10_notes.md": {
+      "source": {
+        "top": 6645.5,
+        "left": 0,
+        "anchor": {
+          "line": 239,
+          "ch": 48,
+          "viewportOffset": -13.9296875
+        },
+        "updatedAt": 1786779111499
+      }
+    },
+    "notes/lec_notes/lec11_notes.md": {
+      "source": {
+        "top": 16632.5,
+        "left": 0,
+        "anchor": {
+          "line": 626,
+          "ch": 0,
+          "viewportOffset": 0.671875
+        },
+        "updatedAt": 1786949160970
+      }
     }
   }
 }
