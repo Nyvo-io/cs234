@@ -87,26 +87,62 @@
     },
     "notes/lec_notes/lec10_notes.md": {
       "source": {
-        "top": 6645.5,
+        "top": 1815.5,
         "left": 0,
         "anchor": {
-          "line": 239,
-          "ch": 48,
-          "viewportOffset": -13.9296875
+          "line": 42,
+          "ch": 80,
+          "viewportOffset": 2.09375
         },
-        "updatedAt": 1786779111499
+        "updatedAt": 1786955546286
       }
     },
     "notes/lec_notes/lec11_notes.md": {
       "source": {
-        "top": 16632.5,
+        "top": 31719.5,
         "left": 0,
         "anchor": {
-          "line": 626,
+          "line": 1214,
           "ch": 0,
-          "viewportOffset": 0.671875
+          "viewportOffset": -1.296875
         },
-        "updatedAt": 1786949160970
+        "updatedAt": 1787032793392
+      }
+    },
+    "notes/lec_notes/lec12_notes.md": {
+      "source": {
+        "top": 43941,
+        "left": 0,
+        "anchor": {
+          "line": 1636,
+          "ch": 0,
+          "viewportOffset": -12.8828125
+        },
+        "updatedAt": 1787150635381
+      }
+    },
+    "notes/lec_notes/lec13_notes.md": {
+      "source": {
+        "top": 2332.5,
+        "left": 0,
+        "anchor": {
+          "line": 59,
+          "ch": 0,
+          "viewportOffset": -13.7421875
+        },
+        "updatedAt": 1787159767175
+      }
+    },
+    "notes/lec_notes/lec14_notes.md": {
+      "source": {
+        "top": 2034,
+        "left": 0,
+        "anchor": {
+          "line": 47,
+          "ch": 0,
+          "viewportOffset": -8.0234375
+        },
+        "updatedAt": 1787159567458
       }
     }
   }

@@ -132,11 +132,12 @@ $\mathbb E_\tau[\cdots\mid\theta]$
 
 因为 reward 本身是随机的。
 
-例如：
+例如，设r符合伯努利分布
 
 $r_t\sim\operatorname{Bernoulli}(0.8)$
 
 真实成功率明明是 0.8，但一次具体结果可以是： 1,1,0,1,0,…
+r 成功为1的概率是0.8 ， 失败为0的概率是 0.2
 
 算法看到不同 reward，也可能导致后面选择不同的 actions。
 
@@ -183,7 +184,7 @@ prior：
 
 > θ1​,θ2​ 是未知参数，我通过采样估计它们。
 
-而 Bayesian bandit 会更进一步，先写：
+而 Bayesian bandit 会更进一步，认为sita符合某种概率分布，比如假设是符合beta分布：
 
 $\theta_1 \sim \mathrm{Beta}(1,1)$
 
@@ -194,6 +195,8 @@ $\theta_2 \sim \mathrm{Beta}(1,1)$
 > 在还没有观察数据之前，我用 Beta(1,1) 这个分布表示自己对 θ1​ 的不确定性
 
 我认为 θ 可能是 0∼1 之间的任何值，而且目前每个值都差不多一样可信
+
+==第三节就是==
 
 
 posterior:
@@ -380,6 +383,7 @@ $\boxed{\text{prior}\rightarrow\text{data}\rightarrow\text{posterior}\rightarrow
 2. 推出单次 reward 以及多次观察后的 posterior 参数更新。
 3. 用一个成功/失败序列算出 posterior mean，并说明它如何参与动作选择。
 
+
 ### 3.1 Bernoulli reward 与 Beta prior
 
 *Lecture 9 §2.1「形式化定义」已介绍 Bernoulli bandit 的建模；本节只补充：把成功率当作 Bayesian 参数并用 Beta prior 更新。*
@@ -395,9 +399,29 @@ $$
 > **如果这个 arm 的真实成功率是 θ，那么每次 reward 按 Bernoulli(θ) 产生。**
 
 
-$\theta$ 是该 arm 获得奖励 $1$ 的真实概率，也是 Bernoulli reward 的期望。我们刚开始并不知道它，给这个未知的 θ 一个概率分布。对它使用 Beta$(\alpha,\beta)$ prior： 它是连续性概率分布，很适合描述成功率，比例
+$\theta$ 是该 arm 获得奖励 $1$ 的真实概率，也是 Bernoulli reward 的期望。我们刚开始并不知道它，给这个未知的 θ 一个概率分布。对它使用 Beta$(\alpha,\beta)$ prior： 它是连续性概率分布，很适合描述成功率，比例。Bernoulli 分布研究的是“结果”，离散型。 假如r就两个结果，1和0. 那么0.8概率是1，0.2的概率就是0. 
+
 $\theta\sim\mathrm{Beta}(\alpha,\beta)$
-我们对未知成功率 θ 的概率密度：
+
+比如这里，它很适合：
+>	我不知道一个动作的真实成功率 θ 是多少，我怎样去写概率分布
+>	
+>	这里的 ϕ 本身是一个 **0 到 1 之间的未知概率**。现实中我们不知道 ϕ 是多少，可能是0.1，0.3，0.65.... 我们对他的不确定性建立一个分布
+
+> **Bernoulli 的随机变量是 r∈{0,1}**  
+> **Beta 的随机变量是 ϕ∈[0,1]**
+
+现在学的 Beta-Bernoulli / Bandit 语境里，可以先非常直观地记：
+
+$\alpha\leftrightarrow\text{成功},\qquad\beta\leftrightarrow\text{失败}$
+
+所以：
+Beta(8,4)
+说明“成功这一侧”的证据比“失败这一侧”更多。
+
+
+它对未知成功率 θ 的概率密度函数：
+$$p(\phi)=\frac{1}{B(\alpha,\beta)}\phi^{\alpha-1}(1-\phi)^{\beta-1},\qquad 0\leq\phi\leq1$$
 $$
 p(\theta\mid\alpha,\beta)
 =
@@ -407,6 +431,19 @@ p(\theta\mid\alpha,\beta)
 $$
 
 其中 $\alpha,\beta>0$，$\Gamma(\cdot)$ 是 Gamma function。这个密度描述的是“参数 $\theta$ 的不确定性”，不是一次 reward 的概率质量函数；不要把 Beta distribution 和 Bernoulli distribution 当成同一个对象。
+
+比如
+$\phi_i\sim\operatorname{Beta}(1,1)$：
+
+把 α=1,β=1 代进去：
+$p(\phi)\propto\phi^0(1-\phi)^0=1$
+
+也就是说：
+> 从 0 到 1，所有的 ϕ 密度完全相同。
+它的图像就是一条水平直线。
+
+ϕ完全有可能是[0,1]的任何一个值，而且都等概率
+
 
 $\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}$
 
@@ -421,6 +458,7 @@ $\int_0^1p(\theta)d\theta=1$​
 β 相对大：认为成功率偏低。≈失败证据
 
 $\boxed{\alpha+\beta\text{ 越大}\Rightarrow\text{分布通常越集中，越确定}}$
+
 因为：
 
 $\theta\sim\mathrm{Beta}(\alpha,\beta)$
@@ -438,8 +476,7 @@ $$
 把均值代入：
 $\boxed{\operatorname{Var}(\theta)=\frac{\mu(1-\mu)}{\alpha+\beta+1}}$
 
-方差越小，就是分布越集中
-
+所以方差越小，就是分布越集中，我们越确定
 
 在 Bernoulli bandit 中 理解更直观：
 
@@ -467,6 +504,20 @@ $\mathrm{Beta}(51,51)$
 
 显然第二种情况下我们更有把握。
 
+---
+
+而 $\theta\sim\operatorname{Beta}(8,4)$
+
+那么theta的均值是0.667：
+
+$\mathbb E[\theta]=\frac8{8+4}=\frac23\approx0.667$
+
+所以我们可以说：
+
+> 当前对成功率的平均判断大约是 66.7%。
+
+因为theta在这个语境下，就是成功取到1的概率
+
 
 Beta$(1,1)$ 是 $[0,1]$ 上的均匀分布，这个时候无论sita等于多少，$\theta^{1-1}(1-\theta)^{1-1}$都等于1
 
@@ -476,12 +527,12 @@ Beta$(1,1)$ 是 $[0,1]$ 上的均匀分布，这个时候无论sita等于多少�
 ### 3.2 Posterior update
 
 如果 prior 是 Beta$(\alpha,\beta)$，观察一个 reward $r\in\{0,1\}$ 后，posterior 仍是 Beta 分布：
-
 $$
 p(\theta\mid r)
 =
 \operatorname{Beta}(\alpha+r,\,\beta+1-r).
 $$
+
 其实它就是把 **Bernoulli 的 likelihood** 和 **Beta 的 prior** 代进 第二节的Bayes rule，然后整理指数。
 
 Bayes rule：
@@ -494,16 +545,13 @@ $r\mid\theta\sim\operatorname{Bernoulli}(\theta)$
 
 $p(r\mid\theta)=\theta^r(1-\theta)^{1-r}$
 
-θ 的 Beta prior：
-
-θ∼Beta(α,β)
+θ 的 Beta prior： θ∼Beta(α,β)
 
 那么：
 
 $p(\theta)=\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}\theta^{\alpha-1}(1-\theta)^{\beta-1}$
 
-代入：
-$p(r)$
+代入： $p(r)$
 
 对于已经观察到的 r 来说，是一个**不依赖 θ 的常数**。
 
@@ -622,6 +670,8 @@ $p(\theta\mid r)=\operatorname{Beta}(\alpha+r,\beta+1-r)$
 
 与第 3 节的关系：Beta--Bernoulli 只解决“如何更新一个 arm 的 posterior”；本节把所有 arm 的 posterior 放进一个探索循环，得到 Thompson sampling。
 
+怎么利用这些 posterior 来选 arm
+
 **本节路线图**
 
 1. 说明 Bayesian bandit 相对于 UCB 新增的输入是 prior/posterior。
@@ -636,18 +686,113 @@ $$
 p(\mathcal R_a\mid h_t)
 $$
 
-或其参数化表示，而不是只保留一个点估计。posterior 可以用于 Bayesian UCB，也可以用于 probability matching；本讲主要展开后者。它带来的优点是能利用已有 prior，代价是结果依赖 prior 的合理性和 posterior 计算的可行性。
+或其参数化表示，保存的是一个完整的概率分布，而不是只保留一个点估计。posterior 可以用于 Bayesian UCB，也可以用于 probability matching；本讲主要展开后者。它带来的优点是能利用已有 prior，代价是结果依赖 prior 的合理性和 posterior 计算的可行性。
 
+上面一节主要是讨论他的参数化表示$p(\theta_a\mid h_t)$，因为我们已经规定$\mathcal R_a=\operatorname{Bernoulli}(\theta_a)$
+
+那么整个 reward distribution 其实只由一个参数：sita。所以不用再维护整个$p(\mathcal R_a\mid h_t)$，知道他的参数化形式，也就知道了对应的R
+
+
+$$\boxed{p(\mathcal R_a\mid h_t)\quad\xrightarrow{\text{Bernoulli 参数化}}\quad p(\theta_a\mid h_t)}$$
+例如： θa​=0.8
+
+那么立刻知道：
+
+$\mathcal R_a=\operatorname{Bernoulli}(0.8)$
+
+也就是：
+$P(r=1)=0.8,\qquad P(r=0)=0.2$
+
+
+而有了 posterior 以后，就可以设计不同的选 arm 方法。
+
+例如 Bayesian UCB 
+
+之前的UCB 是 估计值Q 再加上bonus 置信值，它是经典的 frequentist UCB。
+
+但这个 Bayesian  posterior 已经直接告诉你：
+
+> θa​ 可能是多少，以及我有多不确定
+
+所以可以直接从 posterior 里面取一个“比较乐观的值”
+
+假设 arm a 当前：
+
+$\theta_a\mid h_t\sim\operatorname{Beta}(\alpha_a,\beta_a)$
+
+我们不只是看它的平均值，还可以看 posterior 的一个较高分位点。
+
+例如：
+
+> “根据我的 posterior，θa​ 有 95% 概率 低于多少？”
+
+得到一个类似： $U_t(a)$ 的 upper confidence / credible bound。
+
+例如 posterior 可能中心在：
+
+0.65
+
+但它的 95% 分位点可能是：
+
+q=0.83
+
+那么 Bayesian UCB 就可能把：
+
+UtBayes​(a)=0.83
+
+作为这个 arm 的 optimistic value。
+
+然后选择：
+
+$a_t=\arg\max_a U_t(a)$
+
+这和之前学的 UCB 思想很像：
+
+> **奖励高的 arm 值得选，不确定性大的 arm 也值得探索。**
+
+只不过之前 UCB 的 uncertainty 来自 concentration bound，而 Bayesian UCB 的 uncertainty 来自 **posterior**。
+
+
+而另一种 Probability matching 的想法是：
+
+> **一个 arm 有多大概率是真正最优的，我就大约以多大概率选它。**
+
+例如根据当前 posterior：
+
+$P(a_1\text{ 是最优 arm}\mid h_t)=0.7$
+
+$P(a_2\text{ 是最优 arm}\mid h_t)=0.2$
+
+$P(a_3\text{ 是最优 arm}\mid h_t)=0.1$
+
+那么 probability matching 就希望大约：
+
+- 70% 时间选 a1​
+- 20% 时间选 a2​
+- 10% 时间选 a3​
+
+**Thompson Sampling 就是在实现这个思想。**
+
+它会从每个 arm 的 posterior 里随机抽一个：
+$\tilde\theta_a\sim p(\theta_a\mid h_t)$
+
+然后选抽出来最大的：
+
+$a_t=\arg\max_a\tilde\theta_a$
+
+
+---
 
 ### 4.2 Thompson sampling 的算法
 
-Thompson sampling（也叫 posterior sampling）把“动作可能是最优的概率”变成一次随机抽样。每一轮的输入是各 arm 的 posterior，输出是一个动作和新 reward 后的 posterior。
+Thompson sampling（也叫 posterior sampling）把“动作可能是最优的概率” 变成一次随机抽样。 每一轮的输入是各 arm 的 posterior，输出是一个动作和新 reward 后的 posterior。
 
 算法流程如下：
 
 1. **初始化**：为每个 arm $a$ 设定 prior $p(\mathcal R_a)$。
-2. **独立抽样**：对每个 arm，从当前 posterior 抽取一个可能的奖励分布 $\widetilde{\mathcal R}_a$。
-3. **计算候选价值**：令 $\widetilde Q(a)=\mathbb E[\widetilde{\mathcal R}_a]$；Bernoulli 场景中它就是抽到的候选成功率 $\widetilde\theta_a$。
+2. **独立抽样**：对每个 arm，从当前 posterior 抽取一个可能的奖励分布 $\widetilde{\mathcal R}_a$ （对每个 arm，从它自己的 posterior 里各抽一个候选参数 ，在 Bernoulli bandit 里：$\widetilde\theta_a\sim p(\theta_a\mid h_t)$，比如 arm a 抽到：$\widetilde\theta_a=0.7$，这就等价于说我们抽到了一个候选奖励分布：$\widetilde{\mathcal R}_a=\operatorname{Bernoulli}(0.7)$。） 但这里是一般形式的Thompson Sampling，一般情况下 reward 不一定是 Bernoulli
+
+3. **计算候选价值**：令 $\widetilde Q(a)=\mathbb E[\widetilde{\mathcal R}_a]$，对刚才抽出来的那个分布算他的均值。Bernoulli 场景中它就是抽到的候选成功率 $\widetilde\theta_a$。
 4. **利用候选世界**：选择 $a_t\in\arg\max_a\widetilde Q(a)$。
 5. **观察与更新**：观察 $r_t$，只用该 arm 的新数据按 Bayes rule 更新 posterior。
 6. **重复**：下一轮重新从更新后的 posterior 抽样，而不是沿用上一轮的候选参数。
@@ -672,6 +817,10 @@ $$
 
 课件第 20 页的简短算法写作 $Q(a)=\mathbb E[R_a]$；这里加波浪号是为了区分从 posterior 抽到的候选分布和真实未知分布。
 
+
+
+
+
 ## 5. Broken-toe 例子：一次完整 Thompson iteration
 
 与第 4 节的关系：算法流程已经说明“抽样--选择--观测--更新”；本节沿用 Lecture 9 的 broken-toe 教学例子，完整走一轮并与 optimism 的选择序列对比。
@@ -687,7 +836,7 @@ $$
 
 *Lecture 9 §2.1「形式化定义」已介绍 bandit 的动作与奖励分布；本节沿用 §2.2 的 broken-toe 说明例子，只补充：同一教学数据在 Thompson sampling 下如何更新 posterior。*
 
-课件使用三个说明性动作：手术 $a_1$、buddy taping $a_2$、不处理 $a_3$，真实但未知的成功率设为
+课件使用三个说明性动作：手术 $a_1$、buddy taping $a_2$、不处理 $a_3$，真实但**未知**的成功率设为
 
 $$
 \theta_1=0.95,
@@ -701,7 +850,7 @@ $$
 
 ### 5.2 一轮抽样与更新
 
-从三个 prior 分别抽到候选参数
+从三个 prior 分别抽到候选参数（随便抽的一个）
 
 $$
 \widetilde\theta_1=0.3,
@@ -711,7 +860,7 @@ $$
 \widetilde\theta_3=0.6.
 $$
 
-最大候选值是 $\widetilde\theta_3$，所以选择 $a_3$。若观察到结果 $r_t=0$，则只有 $a_3$ 的 posterior 更新：
+最大候选值是 $\widetilde\theta_3$，所以选择 $a_3$。若观察到结果 $r_t=0$，则 对 $a_3$ 的 posterior 更新：
 
 $$
 \operatorname{Beta}(1,1)
@@ -720,6 +869,18 @@ $$
 \qquad
 \mathbb E[\theta_3\mid D]=\frac13.
 $$
+因为 Beta 的均值是：
+$\mathbb E[\theta]=\frac{\alpha}{\alpha+\beta}$
+所以变成了1/3
+
+之前Beta(1,1)，他的theta 均值是1/2，并且在0,1之间的任何数值都等概率
+现在Beta(1,2)，均值是1/3
+
+![[Pasted image 20260817170712.png|450]]
+
+theta越小，密度越高，比重越高，更有可能取到。所以均值往左偏。
+
+到下一轮，继续抽值，$\tilde\theta_3$ 抽到小值的概率会变大
 
 这一步体现了 Thompson sampling 的核心：选择依据的是一个可能的世界，更新依据的是真实观察到的 reward。候选参数 $0.6$ 不会被直接当成观测值写入 posterior；真正写入的是失败证据 $r_t=0$。
 
@@ -732,24 +893,29 @@ $$
 
 课件 toy table 给出的前五次选择序列是：
 
-| 方法 | 前五次选择 |
-|---|---|
-| Optimism | $a_1,a_2,a_3,a_1,a_2$ |
+| 方法                | 前五次选择                 |
+| ----------------- | --------------------- |
+|  UCB Optimism     | $a_1,a_2,a_3,a_1,a_2$ |
 | Thompson sampling | $a_3,a_1,a_1,a_1,a_1$ |
 
 这不是两个算法在所有随机运行中的固定序列，而是课件展示的一次 toy run。它说明 optimism 会按照置信上界的确定性规则安排探索，而 Thompson sampling 会因为每轮 posterior 抽样而产生不同的探索顺序。
+
+
 
 ## 6. Probability matching：Thompson sampling 在做什么
 
 与第 5 节的关系：前一节从一个候选参数样本出发描述算法；本节把这个随机步骤改写成策略概率，解释为什么它不是无目的随机探索。
 
 **本节路线图**
-
 1. 定义动作成为当前最优动作的 posterior probability。
 2. 证明从每个 arm 的 posterior 抽样并取最大值，正好实现这个概率。
 3. 说明不确定性大的动作可能拥有更高的“成为最优”概率，但不保证每次都被选。
 
 ### 6.1 Probability matching 定义
+
+它的核心思想：
+> **一个 arm 当前有多大概率是真正最优的，Thompson Sampling 就以多大概率选择它。**
+
 
 给定 history $h_t$，probability matching 按动作是最优的 posterior probability 选择动作：
 
@@ -763,7 +929,36 @@ Q(a)>Q(a')\ \text{for all }a'\ne a
 \right].
 $$
 
-它的整体含义是：如果当前 posterior 认为 $a$ 在可能的真实环境中成为最优臂的概率为 $0.3$，那么策略就以 $0.3$ 的概率选择它。这个定义直接把“探索”与当前不确定性联系起来；posterior 越分散，动作成为最大值的概率可能越高。
+它的整体含义是：如果当前 posterior 认为 $a$ 在可能的真实环境中成为最优臂的概率为 $0.3$，那么策略就以 $0.3$ 的概率选择它
+这个定义直接把“探索”与当前不确定性联系起来；posterior 越分散，动作成为最大值的概率可能越高。
+
+我们先前直接维护的posterior 是 参数 theta，对于三个 Bernoulli arms：
+
+$\theta_1\mid h_t\sim p(\theta_1\mid h_t)$
+
+$\theta_2\mid h_t\sim p(\theta_2\mid h_t)$
+
+$\theta_3\mid h_t\sim p(\theta_3\mid h_t)$
+
+再进一步：
+比如对于 Bernoulli bandit：
+$Q(a_i)=\theta_i$
+
+所以 a1​ 是最优 arm 的条件就是：
+$\theta_1>\theta_2\quad\text{并且}\quad\theta_1>\theta_3$
+
+因此：
+$P(a_1\text{ 是最优}\mid h_t)=P(\theta_1>\theta_2,\theta_1>\theta_3\mid h_t)$
+
+所以上面才可以通过posterior ，找到最优臂
+
+
+Probability matching 要求：
+
+$\pi(a_1\mid h_t)$  =  $P(a_1\text{ 是最优 arm}\mid h_t)$
+
+策略选择臂 ai的概率 和  a1是最优arm的概率一样大
+
 
 ### 6.2 Thompson sampling 的等价性
 
@@ -780,13 +975,138 @@ $$
 \end{aligned}
 $$
 
-右侧只是“抽样后 $a$ 获胜”的指示变量期望，也就是 $a$ 获胜概率。因此 Thompson sampling 不是先显式计算一个复杂的多维概率再采样，而是用一次 posterior draw 获得一个服从该概率的 action。
+$\pi(a\mid h_t)=\mathbb P\left[Q(a)>Q(a')\;\forall a'\neq a\mid h_t\right]$
+
+这就是 **6.1 probability matching 的定义**。
+
+再后面的那个等式：
+$=\mathbb E_{R\mid h_t}\left[\mathbf 1\left(a=\arg\max_{a'}Q_R(a')\right)\right]$
+
+意思是：
+
+> **“a 是最优的概率” = “从 posterior 不断抽候选时，a 在其中获胜的长期比例”。**
+
+
+右侧只是“抽样后 $a$ 获胜”的指示变量期望，也就是 $a$ 获胜概率。
+因此 Thompson sampling 不是先显式计算一个复杂的多维概率(跑 TS 的时候，你根本不用先计算：$P(a\text{ 最优}\mid h_t)$)再采样，而是用一次 posterior draw 获得一个服从该概率的 action：
+
+TS 直接从每个 posterior 里面抽一个值。
+
+例如这一次抽出来：
+
+$\tilde\theta_1=0.83,\qquad \tilde\theta_2=0.61,\qquad \tilde\theta_3=0.72$
+
+然后比较：$0.83>0.72>0.61$
+
+所以：$a_t=a_1$
+
+它完全没有算： $P(a_1\text{ 最优})=?$
+
+也没有算：$P(a_2\text{ 最优})=?$
+
+它就只是：
+
+**posterior 抽样 → 看谁最大 → 选谁。**
+
+
+神奇的地方：
+
+虽然 TS 没有显式计算：$P(a_1\text{ 最优}\mid h_t)$
+
+但是如果 posterior 本身意味着：
+$P(a_1\text{ 最优}\mid h_t)=0.7$
+
+那么你反复进行：
+
+> 从 posterior 抽 θ1​,θ2​,θ3​ → 看谁最大
+
+最后会发现，大约 **70% 的抽样中 a1​ 最大**。
+
+运行 Thompson Sampling 时，每一轮决策确实只做“一次 posterior draw ，而不是多次抽样 → 统计谁赢得最多 → 选概率最高的 arm 。 draw 就是 直接从概率分布中随机抽一个数
+
+假设现在三个 arm 的 posterior 是：
+$\theta_1\mid h_t\sim \operatorname{Beta}(8,2)$
+
+$\theta_2\mid h_t\sim \operatorname{Beta}(5,3)$
+
+$\theta_3\mid h_t\sim \operatorname{Beta}(3,4)$
+
+所谓“一次 posterior draw”，就是这一轮从每个 posterior **各抽一个值**，例如：
+
+$\tilde\theta_1=0.74,\qquad \tilde\theta_2=0.81,\qquad \tilde\theta_3=0.39$
+
+然后直接选最大的：
+
+$a_t=\arg\max_i\tilde\theta_i=a_2$​
+
+就选一次就够了， 就算$\theta_2$ 取的值 是 0.2，然后 $\theta_2$ 真实值 是 0.8，选错了最优臂选到了 a1，那也可以。这个是允许的，这就是 exploration。 就算 $P(a_1\text{ 最优}\mid h_t)$ 上面的这个式子，也只不过是a1最优的概率罢了，如果它高，自然选到arm1 的概率也高，再看完ht的状态后，做出选择a1决定的概率也高。
+
+而且这种 exploration 很自然：
+
+假设这一轮 TS 恰好选择了 a1​，然后观察到：$r_t$
+
+这个新数据又会进入历史：$h_{t+1}=(h_t,a_t,r_t)$
+
+posterior 也随之更新：
+
+如果不断发现 a1​ 表现不好，那么以后： $P(a_1\text{ 最优}\mid h_t)$ 就会越来越低。
+
+于是 TS 抽样时 a1​ 赢的概率也越来越低，自然越来越少选 a1
+​
+
+
+
+1(⋅) ：是 indicator function (指示函数)：
+​
+$\mathbf 1(E)=\begin{cases}1,&E\text{ 发生}\\0,&E\text{ 不发生}\end{cases}$
+
+这里的事件是：
+$a=\arg\max_{a'}Q_R(a')$
+
+意思是：
+
+> 在这次抽出来的候选世界 R 中，arm a 是最优的。
+
+那么 indicator：
+$\mathbf 1\left(a=\arg\max_{a'}Q_R(a')\right)$
+
+就是：
+
+- 抽出来最优的→ 1
+- a不是最优的 → 0
+
+
+为什么对 indicator 取期望就是概率？
+
+假设重复从 posterior 抽 1000 个可能世界。
+arm a1​ 在其中：
+- 700 次是最优
+- 300 次不是最优
+
+那么 indicator 序列大概：
+
+1,1,0,1,0,1,…
+
+其中有 700 个 1。
+
+平均值就是：
+
+$\frac{700}{1000}=0.7$
+
+这也就是：
+$P(a_1\text{ 最优}\mid h_t)=0.7$
+
 
 课件还指出，probability matching 常表现出 optimism under uncertainty：不确定动作的 posterior 仍有一部分质量落在很高的 reward 区域，所以它们可能有较高的成为最大值概率。这是“可能有利”的探索机制，不是对未知动作高回报的保证。
+
+
+
 
 ## 7. Frequentist regret 与 Bayesian regret
 
 与第 6 节的关系：probability matching 描述动作如何产生；本节回到评价问题，区分“固定真实参数下评估算法”和“从 prior 平均多个可能环境”。
+
+我们怎么评价一个 bandit 算法到底好不好？
 
 **本节路线图**
 
@@ -810,8 +1130,37 @@ $$
 \middle|\theta
 \right].
 $$
+θ 是真实环境：
 
-Bayesian regret 则再对参数 prior 取平均：
+比如两个 Bernoulli arms：$\theta=(0.8,0.5)$
+
+就是说真实环境中：
+
+$Q_\theta(a_1)=0.8$
+$Q_\theta(a_2)=0.5$
+
+所以最优动作：$a_\theta^*=a_1$
+
+如果第 t 轮算法选：at​
+
+那么这一轮损失： $Q_\theta(a_\theta^*)-Q_\theta(a_t)$
+
+意思就是：
+
+> **如果我选最优 arm，本来平均能拿多少 reward − 我实际选择的 arm 平均能拿多少 reward**
+
+因为是概率分布，reward 可以是0或者1，所以trajectory 是随机的，所以外面取期望
+表示：
+
+> **真实环境 θ 固定以后，对算法可能经历的所有随机运行结果取平均**
+
+Frequentist regret 的核心：
+
+>  先把真实环境 θ 固定，再问这个算法平均会损失多少
+
+
+Bayesian regret 则再对参数 prior 取平均
+Bayesian 外面又多了一层： $\mathbb E_{\theta\sim p(\theta)}$
 
 $$
 \operatorname{BayesRegret}(A,T)
@@ -824,7 +1173,23 @@ $$
 \right].
 $$
 
-第一个公式问“在这个固定环境中算法损失多少”；第二个公式问“按先验平均后，算法损失多少”。Bayesian regret 不是把每轮的 reward 随便再平均一次，而是把环境参数的不确定性也纳入期望。
+因为在Bayesian 观点下：  我连究竟处在哪个真实环境 θ 都不知道
+
+于是 prior： $p(\theta)$
+描述各种环境有多可能。
+
+> **如果真实环境按照我的 prior 来看可能是各种情况，那么总体平均下来，这个算法 regret 多大？**
+
+如果 Θ 是连续的，比如 Beta 分布，那么更直观地写就是：
+
+$\operatorname{BayesRegret}(A,T)=\int_0^1\operatorname{Regret}(A,T;\theta)p(\theta)\,d\theta$
+
+> 对每一个可能的**固定 θ**，先算一次 frequentist regret；  
+> 然后按照 prior p(θ) 给这些环境加权平均。
+
+
+第一个公式问“在这个固定环境中算法损失多少”；
+第二个公式问“按先验平均后，算法损失多少”。Bayesian regret 不是把每轮的 reward 随便再平均一次，而是把环境参数的不确定性也纳入期望。
 
 > [!example] 具体计算：同一动作序列下的两种 regret
 > 设两臂的真实均值为 $Q_\theta(a_1)=0.8$、$Q_\theta(a_2)=0.5$，算法两轮都选择 $a_2$，因此固定环境下的 regret 是
@@ -842,9 +1207,10 @@ $$
 >
 > 前者固定环境参数后评价 history 随机性，后者还把“哪个环境是真的”按 prior 加权。
 
+
 ### 7.2 Optimism upper bound 的桥梁
 
-若某个事件上每轮的上置信界满足 $U_t(a^*)\ge Q(a^*)$，且算法选择 $a_t$ 最大化 $U_t$，则
+若某个事件上每轮的上置信界满足 $U_t(a^*)\ge Q(a^*)$：最优 arm 的 upper confidence bound 没有低于它真正的 Q。 且算法选择 $a_t$ 的 他是 $U_t$里面最大的，而a*，他是Q里面最大的，则
 
 $$
 Q(a^*)-Q(a_t)
@@ -865,15 +1231,46 @@ $$
 \right]
 $$
 
+$\sum_{t=1}^{T}\left(Q(a^*)-Q(a_t)\right)\le\sum_{t=1}^{T}\left(U_t(a_t)-Q(a_t)\right)$
+
+再取 expectation：
+
+$\operatorname{Regret}(A,T;\theta)\le\mathbb E_\tau\left[\sum_{t=1}^{T}\left(U_t(a_t)-Q(a_t)\right)\mid\theta\right]$
+
+他把regret 有多大 转换成了 upper confidence bound 比真实值高多少？
+
 在该 upper-bound 事件上成立。它解释了 Lecture 10 的 proof 为什么关注 bonus，但这页课件没有给出 Thompson sampling 的完整 regret theorem；不要把这个不等式本身当作 TS 的最终 bound。
+
 
 ### 7.3 课件对 Thompson sampling 理论状态的表述
 
-课件明确提醒：截至课件制作时，标准 Thompson sampling 的 frequentist bounds 不匹配 frequentist algorithms 的最佳 bounds；另一方面，经验上它尤其适用于 contextual multi-armed bandit。这里的“经验上有效”不是一个适用于所有 prior、模型和数据分布的定理。
+课件明确提醒：截至课件制作时，标准 Thompson sampling 的 frequentist bounds 不匹配 frequentist algorithms 的最佳 bounds；
+
+因为刚才的推导依赖：
+$a_t=\arg\max_aU_t(a)$
+
+这是典型的 **optimism/UCB 决策规则**。
+
+而 Thompson Sampling 做的是：
+
+$\tilde\theta_a\sim p(\theta_a\mid h_t)$
+
+然后： $a_t=\arg\max_a\tilde\theta_a$
+
+并不是直接：
+argmaxUt​(a)
+
+所以 7.2 更像是在说：
+
+> “这是我们分析 optimistic algorithms 时常用的一座桥；它也帮助你理解 regret proof 的结构”
+
+
+另一方面，经验上它尤其适用于 contextual multi-armed bandit。这里的“经验上有效”不是一个适用于所有 prior、模型和数据分布的定理。
+
 
 ## 8. Contextual bandit：新闻推荐例子
 
-与第 7 节的关系：前面的 regret 记号把 $Q(a)$ 写成不随上下文变化的动作均值；contextual bandit 在每轮先看到 context，context 会改变各 arm 的 reward，因此更接近新闻推荐等实际问题。
+与第 7 节的关系：前面的 regret 记号把 $Q(a)$ 写成不随上下文变化的动作均值；[contextual bandit](academic-term-lookup:contextual%20bandit) 在每轮先看到 context，context 会改变各 arm 的 reward，因此更接近新闻推荐等实际问题。
 
 **本节路线图**
 
@@ -907,6 +1304,7 @@ $$
 2. 说明直接把 history 映射到下一动作会带来计算困难。
 3. 介绍 index policy 和 Gittins index 的课程级定义，但不展开其动态规划推导。
 
+
 ### 9.1 最优策略的计算困难
 
 给定 prior 和已知 horizon，理论上可以寻找最大化可用 horizon 内期望累计 reward 的决策 policy。然而，朴素表示会让 policy 依赖完整 history：已经拉过哪些 arm、观察到哪些 reward、当前各 arm 的 posterior 是什么。history 空间随时间快速增长，因此直接枚举 policy 通常不可行。
@@ -916,6 +1314,7 @@ $$
 课件把 **index policy** 定义为：为每个 arm 计算一个实值 index，只使用该 arm 的统计量和 horizon，然后选择 index 最大的 arm。对 Bayesian multi-armed bandit，**Gittins index** 是在折扣累计 reward 目标下的最优策略 index。这个结论有明确的目标条件：课件说的是 Bayesian bandit 的 expected discounted reward，不是任意 finite-horizon 或任意 contextual bandit 的通用最优性。
 
 本讲只需要知道它解决的结构性问题：把依赖全局 history 的决策压缩成每个 arm 一个 index。Gittins index 的具体计算和证明不在本 post deck 中展开。
+
 
 ## 10. 课程检查、PAC 与本讲边界
 

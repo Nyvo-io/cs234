@@ -1,6 +1,6 @@
 # CS234 Learning State
 
-Last updated: 2026-08-14
+Last updated: 2026-08-17
 
 ## Current Progress
 
@@ -16,6 +16,8 @@ Last updated: 2026-08-14
 - Coverage complete: Lecture 10, `lecture/lecture10post.pdf`
 - Coverage complete: Lecture 11, `lecture/lecture11post.pdf`
 - Coverage complete: Lecture 12, `lecture/lecture12post.pdf` and `lecture/lecture12pre.pdf`
+- Coverage complete: Lecture 13, `lecture/lecture13post.pdf` and `lecture/lecture13pre.pdf`
+- Coverage complete: Lecture 14, `lecture/lecture14post.pdf` and `lecture/lecture14pre.pdf`
 - Notes written:
   - `notes/lec_notes/lec1_notes.md`
   - `notes/lec_notes/lec2_notes.md`
@@ -29,6 +31,8 @@ Last updated: 2026-08-14
   - `notes/lec_notes/lec10_notes.md`
   - `notes/lec_notes/lec11_notes.md`
   - `notes/lec_notes/lec12_notes.md`
+  - `notes/lec_notes/lec13_notes.md`
+  - `notes/lec_notes/lec14_notes.md`
 - Concept registry: `notes/concept_index.md`
 - Lecture 1–2 received source-fidelity and content-critical corrections during the v2 skill migration; their full presentation style remains compatible with legacy sections.
 - Lecture 3 was fully restructured to the v2 note schema on 2026-07-19, with all 53 physical PDF pages covered, the Mars Rover source inconsistency recorded, and current LLM / embodied TD connections verified against primary sources.
@@ -42,7 +46,41 @@ Last updated: 2026-08-14
 - Lecture 11 was written against all 50 physical pages of `lecture/lecture11post.pdf`. The PDF title is mislabeled Lecture 13 but explicitly says `Typo: Lecture 11`; the note covers Bayesian bandits, Bayes rule, conjugacy, Beta--Bernoulli updates, Thompson sampling, probability matching, Bayesian regret, contextual news recommendation, Gittins index, and the PAC/regret toy comparison. Mastery evidence remains none recorded.
 - Mastery evidence has not yet been recorded systematically; coverage completion does not imply mastery.
 - Mastery evidence remains none recorded for Lectures 9--10; no independent derivation, implementation, regret experiment, or alignment case analysis has been observed.
-- Next lecture: inspect `lecture/lecture13post.pdf` and the course schedule before continuing.
+- Next lecture: inspect the course schedule after Lecture 14; the next scheduled item in the deck is a quiz.
+
+## Lecture 13 Covered
+
+- Local computation from the current state versus solving a policy for the whole state space
+- Simple Monte-Carlo Search: fixed first action, finite-horizon sample returns, action-value averaging, and one-step policy improvement
+- Forward-search expectimax, model-based local sub-MDP, and the $(|\mathcal S||\mathcal A|)^H$ tree-growth limitation
+- MCTS selection, expansion/evaluation, simulation, backup, root action choice, and one complete statistics update
+- UCT as a bandit-style tree-selection score, visit counts, return averages, exploration bonus, unvisited-edge convention, and search-layer exploration boundary
+- MCTS advantages: selective best-first, dynamic evaluation, sampling, black-box model compatibility, anytime and parallel computation
+- Go case study, known rules versus difficult long-horizon search, and AlphaZero's PUCT/network-guided MCTS loop
+- Root visit-count policy with temperature, self-play, matched opponents, reward-density/curriculum interpretation, and policy/value network targets
+- AlphaGo/AlphaZero ingredients, architecture/MCTS/human-data evaluation questions, source figures, and AlphaTensor/AlphaDev extension
+
+## Lecture 13 Assignment Readiness
+
+- MCTS/UCT prerequisites: covered at the level of a source-faithful explanation; a small-tree trace and implementation still require practice.
+- AlphaZero/PUCT prerequisites: network prior/value, root visit policy, self-play and backup perspective are covered; Go environment or neural-network implementation has not been run.
+- Mastery evidence: none recorded for Lecture 13; coverage completion does not imply independent derivation, implementation, or experiment.
+
+## Lecture 14 Covered
+
+- MCTS advantages and Go motivation as a bridge from Lecture 13 to AlphaZero
+- PUCT-guided move selection: root, selection, expansion, policy/value prediction, backup, opponent perspective, and root visit-count policy
+- Self-play resource argument, matched opponent, curriculum-style training signal, and network training targets
+- AlphaGo/AlphaZero feature summary and cautious reading of architecture, MCTS, overall-performance, and human-data figures
+- AlphaZero extension to chess, shogi, AlphaTensor and AlphaDev as the course's search-formulation insight
+- UCT review: UCB versus UCT, computation-layer exploration versus environment exploration, and known reward/dynamics boundary
+- Lecture 14 source deck contains no expanded new Ethics and Society content beyond its opening course-structure label
+
+## Lecture 14 Assignment Readiness
+
+- AlphaZero/MCTS prerequisites: covered; PUCT implementation, Go training, and reproduction of Elo curves remain untested.
+- UCT/UCB conceptual boundary: covered through source-faithful review questions; independent explanation and numerical trace have not been observed.
+- Mastery evidence: none recorded for Lecture 14; coverage completion does not imply independent derivation, implementation, or experiment.
 
 ## Lecture 7 Covered
 
@@ -293,7 +331,7 @@ If Assignment 1 is unfinished, start it, preferably Q4 RiverSwim coding first:
 - implement `value_iteration`
 - run the provided sanity check for weak current and `gamma = 0.99`
 
-If continuing lectures, start Lecture 7 with `lecture/lecture7post.pdf` and backreference Lecture 6 for policy performance, KL, and PPO foundations.
+If continuing lectures, review Lectures 13--14 and prepare for the quiz shown as the next course item; coverage is complete through Lecture 14, but mastery evidence is still none recorded.
 
 If starting Assignment 2, implement in this order:
 

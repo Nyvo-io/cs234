@@ -167,3 +167,14 @@
 | bootstrapped-dqn | Bootstrapped DQN | bootstrap heads, ensemble Q, Osband 2016 | Lecture 12 §5.4 | 用多个 bootstrap DQN 近似价值/模型不确定性 |
 | meta-rl-exploration | Meta-RL 探索 | meta-learning for RL exploration, multi-task exploration, DREAM | Lecture 12 §6.1 | 在任务分布上学习可迁移的探索规律 |
 | decision-pretrained-transformer | Decision-Pretrained Transformer | DPT, meta RL, predict $a^\star$ | Lecture 12 §6.2 | 用序列模型预测最优动作以隐式利用丰富 task priors |
+| local-computation-search | 当前状态局部计算 | local computation, local search, sub-MDP search | Lecture 13 §2.1 | 只为当前状态构造局部搜索问题 |
+| monte-carlo-search | 简单蒙特卡洛搜索 | Simple Monte-Carlo Search, simulation-based search | Lecture 13 §2.2 | 固定根动作后用模拟回报平均做一步 policy improvement |
+| forward-search-expectimax | 前向搜索期望极大树 | forward-search expectimax, expectimax tree | Lecture 13 §2.3 | 用模型向前展开动作 max 与随机转移 expectation |
+| mcts | 蒙特卡洛树搜索 | Monte-Carlo Tree Search, MCTS, simulation-based tree search | Lecture 13 §3.1 | 选择、扩展/评估、模拟、backup 的增量树搜索 |
+| uct | 上置信树搜索 | Upper Confidence Tree, UCT, tree policy, MAB tree selection | Lecture 13 §3.2 | 在树内用均值与 exploration bonus 选择下一笔 simulation |
+| alphazero | AlphaZero | AlphaGo Zero, network-guided MCTS, strategic computation | Lecture 13 §4.2 | 用 policy/value network 和局部 MCTS 选择当前动作 |
+| puct | 先验引导的上置信树搜索 | PUCT, predictor + UCT, $P_\theta(a\mid s)$ prior | Lecture 13 §4.2 | 用网络 action prior 调整 UCT 风格的 tree selection |
+| root-visit-policy | 根节点访问策略 | root visit-count policy, $\pi_\tau$, temperature | Lecture 13 §4.3 | 将根访问次数经温度变换得到执行/训练 policy |
+| self-play | 自博弈 | self-play, matched opponent, curriculum learning | Lecture 13 §4.3 | 用相近水平的对手生成 policy/value 训练数据 |
+| policy-value-network | 策略价值网络 | policy/value network, network prior, leaf value | Lecture 13 §4.4 | 为 MCTS 提供动作先验与叶节点价值估计 |
+| strategic-computation | 战略计算 | strategic computation, selective best-first search | Lecture 13 §4.5 | 把额外计算集中在当前决策的有希望分支 |

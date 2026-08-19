@@ -362,3 +362,11 @@
     PSRL 伪代码在 episode 开始采样 MDP 并规划一次，但理解检查把“posterior 更新后可以重新规划”判为可行。前者是展示的算法粒度，后者是允许的计算设计选择，不是同一个复杂度结论。
 
     **做题策略**：先记录 sampled model 的生命周期和 planner 调用频率，再比较 PSRL 与 Q-learning 的计算成本；不要笼统地说二者“每步相同”或“必须每步重规划”。
+
+39. **Lecture 13 post/pre deck 的物理页范围**
+
+    `lecture13post.pdf` 只有 13 个物理页面，主要覆盖 Simulation-Based Search；AlphaZero、评估图和末尾理解检查继续出现在 `lecture13pre.pdf` 的后半段。两者不是两讲不同内容，写笔记或引用图片时要同时标明来源文件和物理页码。
+
+40. **UCT 的 bonus 与真实 bandit regret**
+
+    课件把每个树节点的动作选择类比为 MAB，并使用 upper-confidence bonus；但 UCT 的动作是在模拟树内选择下一笔计算，目标是分配 search budget，不等同于在线 bandit 为真实环境交互最小化 regret。Lecture 14 的复习题沿用这一边界。
