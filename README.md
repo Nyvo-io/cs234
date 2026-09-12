@@ -77,7 +77,7 @@
 
 - **Lecture coverage：** Lecture 1–14 已完成材料覆盖，相关讲义和笔记均已建立。
 - **Mastery evidence：** 正在单独积累；覆盖完成不代表已经能够独立推导、实现或完成实验。
-- **Assignment 2：** 已完成本地 policy-gradient、baseline、PPO 实现，并保存 seed-1 的 no-baseline、baseline、PPO CartPole 日志、分数数组和曲线；多 seed 与正式提交检查仍待补充。
+- **Assignment 2：** 已完成本地 policy-gradient、baseline、PPO 实现；`assignment/` 中保留题目、模板、starter code、实现代码，以及 seed-1 的 no-baseline、baseline、PPO CartPole 日志、分数数组和曲线。多 seed 与正式提交检查仍待补充。
 - **下一检查点：** 回顾 Lectures 13–14，并准备课程安排中的 quiz；Assignment 3 的环境实验和伦理阅读仍按 [学习状态](notes/learning_state.md) 继续。
 - **恢复学习：** 先看 [学习状态](notes/learning_state.md) 的末尾，再进入对应 lecture note 或 assignment。
 
@@ -179,7 +179,7 @@ The assignment folders keep the original questions together with templates and s
 
 - **Lecture coverage:** Lectures 1–14 have source-based notes and slide coverage.
 - **Mastery evidence:** tracked separately and still being accumulated; coverage does not imply independent mastery.
-- **Assignment 2:** local policy-gradient, baseline, and PPO implementations are complete, with seed-1 no-baseline, baseline, and PPO CartPole logs, score arrays, and plots saved in the repository. Multi-seed and official-submission checks remain open.
+- **Assignment 2:** the local policy-gradient, baseline, and PPO implementations are complete. The `assignment/` tree keeps the questions, templates, starter code, implementations, and seed-1 no-baseline, baseline, and PPO CartPole logs, score arrays, and plots. Multi-seed and official-submission checks remain open.
 - **Next checkpoint:** review Lectures 13–14 and prepare for the next scheduled quiz. Assignment 3 environment work and ethics reading remain open; details are in the learning state.
 - **Resume point:** start with the end of [learning_state.md](notes/learning_state.md), then open the relevant lecture note or assignment.
 

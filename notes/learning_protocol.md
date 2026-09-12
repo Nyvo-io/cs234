@@ -1,5 +1,9 @@
 # CS234 Learning Protocol
 
+> Last revised: 2026-09-12
+
+This protocol is for a course archive, not a textbook translation project: `lecture/` preserves source materials, `notes/` preserves the learning record, and `assignment/` preserves questions, starter code, implementations, and experiment artifacts.
+
 这个文件只记录稳定的学习偏好和课程约定；详细教学规则与 QA 流程由 `cs234-rl-tutor` skill 管理。
 
 ## Core Goal

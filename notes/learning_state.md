@@ -1,6 +1,13 @@
 # CS234 Learning State
 
-Last updated: 2026-08-25
+Last updated: 2026-09-12
+
+## Latest Checkpoint
+
+- **Repository archive:** The local `lecture/` and `assignment/` materials are tracked in the root Git repository and synchronized to `origin/main`.
+- **Assignment 2:** The local implementation is complete for the policy-gradient, value-baseline, and PPO code paths. Seed-1 CartPole runs, logs, score arrays, and plots are preserved under `assignment/ass2/assignment2_starter_code/code/results/`.
+- **Scope of the evidence:** This is a personal implementation record. It does not claim an official course submission, multi-seed evaluation, or completion of the Assignment 2 ethics reading.
+- **Single source of truth:** Keep this file as the current learning checkpoint; historical lecture sections below preserve the coverage and readiness details for each topic.
 
 ## Current Progress
 
