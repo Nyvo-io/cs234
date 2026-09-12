@@ -7,24 +7,33 @@ from baseline_network import BaselineNetwork
 from network_utils import build_mlp, device, np2torch
 from policy import CategoricalPolicy, GaussianPolicy
 
+#batch_size是指总共有几个timestep
+#假如paths里有5个path，第一个path有200个step，第二个有100个
+#加起来如果有1000个path，那么这里的batch_size就是1000
+#把所有都平铺开
 
+#实现策略梯度算法
+#策略梯度训练器
 class PolicyGradient(object):
     """
     Class for implementing a policy gradient algorithm
     """
-
+    #对PolicyGradient训练器 进行初始化
+    #config是超参数，env是环境，seed是随机种子
     def __init__(self, env, config, seed, logger=None):
         """
         Initialize Policy Gradient Class
 
         Args:
-                env: an OpenAI Gym environment
+                env: an OpenAI Gym environment,虚拟环境
                 config: class with hyperparameters
                 logger: logger instance from the logging module
 
         You do not need to implement anything in this function. However,
-        you will need to use self.discrete, self.observation_dim,
+        you will need to use 
+        self.discrete, self.observation_dim,
         self.action_dim, and self.lr in other methods.
+
         """
         # directory for training outputs
         if not os.path.exists(config.output_path):
@@ -41,7 +50,11 @@ class PolicyGradient(object):
         self.env.seed(self.seed)
 
         # discrete vs continuous action space
+        #创建discreet 对象
+        # 判断运动空间是离散还是连续，
+        #利用instance()函数判断env.action_space是否是gym.spaces.Discrete的实例
         self.discrete = isinstance(env.action_space, gym.spaces.Discrete)
+        
         self.observation_dim = self.env.observation_space.shape[0]
         self.action_dim = (
             self.env.action_space.n if self.discrete else self.env.action_space.shape[0]
@@ -54,6 +67,7 @@ class PolicyGradient(object):
         if config.use_baseline:
             self.baseline_network = BaselineNetwork(env, config)
 
+    #初始化策略
     def init_policy(self):
         """
         Please do the following:
@@ -70,12 +84,43 @@ class PolicyGradient(object):
            Note that the policy is an instance of (a subclass of) nn.Module, so
            you can call the parameters() method to get its parameters.
         """
+        #创建神经网络（MLP）
+        #根据动作空间选择 CategoricalPolicy 或 GaussianPolicy
+        #创建 optimizer
+
+        #创建神经网络
+        self.network = build_mlp(
+            input_size=self.observation_dim,
+            output_size=self.action_dim,
+            n_layers=self.config.n_layers,
+            size=self.config.layer_size,
+        )
+
+        #根据当前动作空间选择policy，是离散型还是连续型高斯分布
+        if self.discrete:
+            self.policy = CategoricalPolicy(self.network)
+        else:
+            self.policy = GaussianPolicy(self.network, self.action_dim)
+        
+        
+        #创建optimizer
+        #adam是优化算法
+        #根据梯度更新网络参数
+        self.optimizer = torch.optim.Adam(
+            self.policy.parameters(), 
+            lr=self.lr
+        )
         #######################################################
         #########   YOUR CODE HERE - 8-12 lines.   ############
 
         #######################################################
         #########          END YOUR CODE.          ############
 
+
+    #属于训练过程中的统计记录：logging
+    #记录训练过程中 reward 的变化
+    #方便画曲线
+    #判断训练有没有变好
     def init_averages(self):
         """
         You don't have to change or use anything here.
@@ -84,7 +129,7 @@ class PolicyGradient(object):
         self.max_reward = 0.0
         self.std_reward = 0.0
         self.eval_reward = 0.0
-
+    #每训练一轮，更新统计量
     def update_averages(self, rewards, scores_eval):
         """
         Update the averages.
@@ -104,6 +149,10 @@ class PolicyGradient(object):
     def record_summary(self, t):
         pass
 
+    #收集训练数据
+    #使用当前策略在环境中跑若干个 episode，采集多条轨迹，都存入paths
+    #然后之后会把多条轨迹组合成一个batch，也就是一整条轨迹，一起投入训练
+    #不然单条轨迹取期望，方差太大
     def sample_path(self, env, num_episodes=None):
         """
         Sample paths (trajectories) from the environment.
@@ -161,6 +210,12 @@ class PolicyGradient(object):
 
         return paths, episode_rewards
 
+    
+
+    #已经完成πθ​(a∣s)，并且采集到了(st,at,rt)
+    #现在需要用r，计算每一条轨迹的G，从后往前算
+    #这个Gt计算出来，之后用来进行策略更新
+    #用Gt ​≈ Qπ(st​,at​)
     def get_returns(self, paths):
         """
         Calculate the returns G_t for each timestep
@@ -186,18 +241,33 @@ class PolicyGradient(object):
         """
 
         all_returns = []
+        #读取每一条轨迹
         for path in paths:
             rewards = path["reward"]
+
+            #保存[G0​,G1​,G2​,...]，一条轨迹的每个时间步的G
+            returns = []
+            #最后一步之后：GT+1​=0
+            G = 0
+
+            for r in reversed(rewards):
+                G = r + self.config.gamma * G
+                #list.insert(index, value)：在index位置插入元素
+                returns.insert(0,G)
             #######################################################
             #########   YOUR CODE HERE - 5-10 lines.   ############
 
             #######################################################
             #########          END YOUR CODE.          ############
+
             all_returns.append(returns)
+            #all_returns存paths里面所以轨迹的returns，是二维列表
+        #concatenate可以把他们前后拼接在一起，形成一个batch，方便后续训练策略取值
         returns = np.concatenate(all_returns)
 
         return returns
 
+    #归一化是对整个batch的advantage做
     def normalize_advantage(self, advantages):
         """
         Args:
@@ -213,13 +283,20 @@ class PolicyGradient(object):
         Note:
         This function is called only if self.config.normalize_advantage is True.
         """
+
+        #policy gradient: ∇θ​J=E[∇θ​logπθ​(at​∣st​)At​]
+        #如果advantage 很大，梯度会比较大，训练会不稳定，所以进行标准化
+        #这里是一个batch的多条轨迹的advantage，他们形成一个数组，不再是单个值
+        normalized_advantages = (
+            (advantages - np.mean(advantages)) / np.std(advantages)
+        )
         #######################################################
         #########   YOUR CODE HERE - 1-2 lines.    ############
 
         #######################################################
         #########          END YOUR CODE.          ############
         return normalized_advantages
-
+   
     def calculate_advantage(self, returns, observations):
         """
         Calculates the advantage for each of the observations
@@ -229,6 +306,9 @@ class PolicyGradient(object):
         Returns:
             advantages: np.array of shape [batch size]
         """
+        #使用baseline的话就是用At，不使用baseline的话At就等于Gt
+        #config里有要求采用baseline方法降低方差的话
+        #就采用baseline_network里的方式计算A，init里有初始化
         if self.config.use_baseline:
             # override the behavior of advantage by subtracting baseline
             advantages = self.baseline_network.calculate_advantage(
@@ -237,11 +317,16 @@ class PolicyGradient(object):
         else:
             advantages = returns
 
+        #如果配置打开，就进行标准化操作
         if self.config.normalize_advantage:
             advantages = self.normalize_advantage(advantages)
 
         return advantages
 
+
+
+    #根据数据更新策略
+    #θ ← θ+α∇θ​J(θ)
     def update_policy(self, observations, actions, advantages):
         """
         Args:
@@ -266,12 +351,33 @@ class PolicyGradient(object):
         observations = np2torch(observations)
         actions = np2torch(actions)
         advantages = np2torch(advantages)
+
+        #根据动作空间是连续还是离散，输出对应的 π(·|s)
+        distribution = self.policy.action_distribution(observations)
+
+        #输入batch里的动作序列，然后根据对应策略，输出并转成log形式
+        log_probs = distribution.log_prob(actions)
+
+        #构造loss，也就是把J取负。这个乘法是tensor运算
+        #logπθ​(at​∣st​) * At​
+        loss = -(log_probs * advantages).mean()
+        #清除之前保留的梯度
+        self.optimizer.zero_grad()
+        #对参数求导
+        loss.backward()
+        #优化器默认做最小化
+        self.optimizer.step()
         #######################################################
         #########   YOUR CODE HERE - 5-7 lines.    ############
 
         #######################################################
         #########          END YOUR CODE.          ############
 
+
+    #安排训练流程
+    #train loop
+    #for t in range(self.config.num_batches)，更新几次策略
+    #当前策略 -> 采集轨迹 -> 计算G -> 计算A -> 更新神经网络参数 -> 新策略
     def train(self):
         """
         Performs training
@@ -372,3 +478,7 @@ class PolicyGradient(object):
         # record one game at the end
         if self.config.record:
             self.record()
+
+
+#3:接下来写baseline_network.py，因为上面PolicyGradient.calculate_advantage()会调用这个类
+#它目的是建立价值网络V(s)，从而得到A

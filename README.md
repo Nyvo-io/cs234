@@ -1,4 +1,6 @@
-![Stanford CS234: Reinforcement Learning](attachments/lec6-ppo-clipped-objective-p48.png)
+<p align="center">
+  <img src="attachments/lec6-ppo-clipped-objective-p48.png" alt="PPO clipped objective from Lecture 6" width="760">
+</p>
 
 # Stanford CS234: Reinforcement Learning
 
@@ -65,7 +67,7 @@
 | 作业 | 内容 | 入口 |
 | :--- | :--- | :--- |
 | Assignment 1 | Value Iteration、Policy Iteration、RiverSwim 等基础 MDP 实现 | [assignment1](assignment/assignment1/) |
-| Assignment 2 | REINFORCE、value baseline、PPO 与 policy-induced distribution | [ass2](assignment/ass2/) · [starter README](assignment/ass2/assignment2_starter_code/README.md) |
+| Assignment 2 | REINFORCE、value baseline、PPO 与 policy-induced distribution | [ass2](assignment/ass2/) · [starter README](assignment/ass2/assignment2_starter_code/README.md) · [实验结果](assignment/ass2/assignment2_starter_code/code/results/) |
 | Assignment 3 | Preference learning、DPO、RLHF 与 Hopper 实验 | [ass3](assignment/ass3/) · [starter README](assignment/ass3/assignment3_starter_code/README.md) |
 | 作业复习 | 按题目整理的前置知识、检查项与复习路线 | [Assignments Review Guide](assignment/ASSIGNMENTS_REVIEW_GUIDE.md) |
 
@@ -75,7 +77,8 @@
 
 - **Lecture coverage：** Lecture 1–14 已完成材料覆盖，相关讲义和笔记均已建立。
 - **Mastery evidence：** 正在单独积累；覆盖完成不代表已经能够独立推导、实现或完成实验。
-- **下一检查点：** 回顾 Lectures 13–14，并准备课程安排中的 quiz；Assignment 1、Assignment 2 的 readiness 也已记录在学习状态中。
+- **Assignment 2：** 已完成本地 policy-gradient、baseline、PPO 实现，并保存 seed-1 的 no-baseline、baseline、PPO CartPole 日志、分数数组和曲线；多 seed 与正式提交检查仍待补充。
+- **下一检查点：** 回顾 Lectures 13–14，并准备课程安排中的 quiz；Assignment 3 的环境实验和伦理阅读仍按 [学习状态](notes/learning_state.md) 继续。
 - **恢复学习：** 先看 [学习状态](notes/learning_state.md) 的末尾，再进入对应 lecture note 或 assignment。
 
 ## 课程材料
@@ -176,7 +179,8 @@ The assignment folders keep the original questions together with templates and s
 
 - **Lecture coverage:** Lectures 1–14 have source-based notes and slide coverage.
 - **Mastery evidence:** tracked separately and still being accumulated; coverage does not imply independent mastery.
-- **Next checkpoint:** review Lectures 13–14 and prepare for the next scheduled quiz. Assignment readiness is recorded in the learning state.
+- **Assignment 2:** local policy-gradient, baseline, and PPO implementations are complete, with seed-1 no-baseline, baseline, and PPO CartPole logs, score arrays, and plots saved in the repository. Multi-seed and official-submission checks remain open.
+- **Next checkpoint:** review Lectures 13–14 and prepare for the next scheduled quiz. Assignment 3 environment work and ethics reading remain open; details are in the learning state.
 - **Resume point:** start with the end of [learning_state.md](notes/learning_state.md), then open the relevant lecture note or assignment.
 
 <a id="english-course-materials"></a>

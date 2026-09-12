@@ -84,6 +84,8 @@ tags:
 
 ### 2.2 Simple Monte-Carlo Search：一步 policy improvement
 
+对于当前每个候选动作 a，先假设现在选它；然后用模型往后模拟很多次，看平均回报哪个大。
+
 课件设定一个模型 $M_v$ 和用于模拟后续动作的 simulation policy $\pi$。本节采用如下有限时域约定：从当前时刻 $t$ 开始，$G_t$ 是一次模拟轨迹从 $R_{t+1}$ 开始的折扣回报；如果模拟还剩 $h$ 步，则
 
 $$
@@ -102,6 +104,9 @@ $$
 Q_h^{\pi}(s_t,a)
 \quad (K\text{ 增大时的估计目标}).
 $$
+$Q_h^\pi(s_t,a)$
+表示：
+> **先在 st​ 执行动作 a，然后之后都按照 π 走，在 h-step horizon 下的真实期望回报**
 
 这个平均值是有限样本估计量，不是一次具体轨迹的 realized return；箭头表示在合适条件下样本平均趋近于 simulation policy 的真实有限时域 action-value。最后只在真实环境执行
 
@@ -122,13 +127,106 @@ $$
 >
 > 两个动作打平；实际实现需要规定 tie-breaking（例如固定顺序或随机打破平局）。这个例子只说明样本平均可能不产生唯一动作，并不说明两个动作的真实价值相等。
 
+普通 MC policy evaluation：
+$V^\pi(s)=\mathbb E_{\tau\sim\pi}\left[\sum_{k=0}^{\infty}\gamma^k r_{t+k}\mid s_t=s\right]$
+
+它关注$V^\pi(s)\quad\text{or}\quad Q^\pi(s,a)$，它是在建立一张**关于整个 policy 的价值地图**，V(s1),V(s2),V(s3)....
+
+Simple MC Search：
+我现在就在 st​，到底选哪个 a
+
+我根本不关心把整个：
+
+$Q^\pi(s,a)$ 全部学出来。
+
+我只想知道： 在当前这个 st​ 下，a1​,a2​,a3​ 谁最好？
+
+所以：对每个候选动作都模拟几次。
+
+比如对于 a1​：
+
+先强制
+$s_t\xrightarrow{a_1}s_{t+1}$
+
+然后从下一步开始按照某个 rollout policy π 往后跑。
+
+比如跑 h=3 步：
+
+$s_t\xrightarrow{a_1}s_{t+1}\xrightarrow{\pi}s_{t+2}\xrightarrow{\pi}s_{t+3}$
+
+得到一次 return：
+
+$G^{(1)}(s_t,a_1)$
+
+重复 K 次：$G^{(1)},G^{(2)},\ldots,G^{(K)}$
+
+再取平均
+
 ### 2.3 Forward-search expectimax：更深的局部求解
 
-如果 $M_v$ 已知，可以把当前状态作为根，交替展开动作节点和模型产生的后继状态：动作节点取最大值，随机转移节点按 $P(s'\mid s,a)$ 做期望。这就是 **forward-search expectimax tree**。它不求整个 MDP 的 policy，只求“从现在开始的局部 sub-MDP”中的根动作。
+如果 $M_v$ 已知，可以把当前状态作为根，交替展开动作节点和模型产生的后继状态：动作节点取最大值，随机转移节点按 $P(s'\mid s,a)$ 做期望。这就是 **forward-search expectimax tree**。
+它不求整个 MDP 的 policy，只求“从现在开始的局部 sub-MDP”中的根动作。
+
+环境根据模型随机转移，所以做：
+
+$\mathbb E_{s'\sim P(\cdot\mid s,a)}[\cdot]$
+
+所以整个树是：
+
+- 状态节点 → 选动作；
+- 动作之后 → 环境随机转移到下一个状态；
+- 再在新状态选动作；
+- 再随机转移；
+- 不断交替。
+
+这里同时有两种运算：
+
+决策者选动作时
+
+取最大值：$\max$
+
+环境随机转移时
+
+取期望：$\mathbb E$
+
+所以叫 **expecti-max**：
+
+- expect：对随机后继 求期望；
+- max：对动作选择取最大。
+
+
+可以把它理解成：
+
+$\boxed{V(s)=\max_a\left[R(s,a)+\gamma\mathbb E_{s'\sim P(\cdot|s,a)}V(s')\right]}$
+
+而其中 expectation 展开就是：
+
+$V(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'|s,a)V(s')\right]$
+
+做了动作a1，但可能到达不同的状态，所以是取期望：
+
+$Q(s_t,a_1)=R(s_t,a_1)+\gamma\left[0.7V(s_1)+0.3V(s_2)\right]$
+
+
+Expectimax 搜索树的计算，本质上就是在“当前状态附近临时做一小段有限深度的动态规划，也就是深度搜索”
+算法可以理解为：
+
+1. **Forward：展开**。从当前 s0​ 出发，把所有 action 展开；利用模型 P(s′∣s,a) 得到可能的 next state；然后继续展开 next state 的 action，一直到深度 h。
+2. **Evaluate leaves：给叶子赋值**。比如搜到最底层后得到 V(s3​)=5, V(s4​)=10,…。
+3. **Backup：从下往上计算**。遇到状态节点就对 action 取 max；遇到环境随机节点就按照 P(s′∣s,a) 做期望；一直算回根节点。
+4. **最终只执行根节点的最佳动作**：
+$$a_t^*=\arg\max_a Q_h(s_t,a)$$
+
+之前出现
 
 ![[lec13-post-08.png|900]]
 
 *图：来源 `lecture/lecture13post.pdf` 物理 PDF 第 8 页；原图中的 $s_t$ 是根，动作节点取 max，随机后继按模型概率展开。*
+
+一步 policy improvement：只优化当前第一步，后面的动作全部交给固定策略 π
+
+Expectimax 搜索树：不仅优化第一步，未来搜索到的每一个状态，也重新选择最好的动作。
+
 
 有限时域 $H$ 下，最坏情况下树的规模随
 
@@ -136,11 +234,22 @@ $$
 \mathcal O\left((|\mathcal S||\mathcal A|)^H\right)
 $$
 
-增长。这里的数量级是搜索树上可能的 state-action 分支数，不是说每个 MDP 的实际树一定达到这个上界；状态合并、确定性转移或剪枝都可能减少实际规模。MCTS 的动机正是：不平均地展开整棵树，而是用采样把预算花在更有希望的局部。
+增长。
+>如果 horizon 是 H，那么最坏情况下，搜索树规模会随着深度指数增长
+
+这里的数量级是搜索树上可能的 state-action 分支数，不是说每个 MDP 的实际树一定达到这个上界；状态合并、确定性转移或剪枝都可能减少实际规模。
+
+
+MCTS 的动机正是：不平均地展开整棵树，而是用采样把预算花在更有希望的局部。完整的搜索树会指数爆炸
+
+
 
 ## 3. MCTS：把模拟预算集中到有希望的分支
 
 本节把上一节的“完整 forward tree”改造成可增量更新的搜索树。MCTS 仍从根状态出发，也仍依赖模型或模型采样器；新增的是选择规则、树统计量和反复 simulation 的组合。
+
+**Expectimax：一次性把未来尽量全部展开。**  
+**MCTS：一次只沿着树走一条路径，只新增一点点，然后把这一次得到的结果传回来；重复很多次后，树自己慢慢长出来**
 
 **本节路线图**
 
@@ -150,15 +259,16 @@ $$
 
 ### 3.1 MCTS 的数据流与一次完整迭代
 
-给定模型 $M_v$，在当前真实状态 $s_t$ 建立根节点。每次 simulation 从根开始，在树中选择动作、按模型采样后继状态；遇到尚未展开的节点就扩展或评估，并把本次回报沿路径 backup 到祖先。重复 $K$ 次后，读取根节点动作统计量，选择真实动作。
+给定模型 $M_v$，在当前真实状态 $s_t$ 建立根节点。每次 [simulation](academic-term-lookup:simulation) 从根开始，在树中选择动作、按模型采样后继状态；遇到尚未展开的节点就扩展或评估，并把本次回报沿路径 backup 到祖先。重复 $K$ 次后，读取根节点动作统计量，选择真实动作。
 
-**概览**
+simulation 流程：
 
 1. **Selection**：从根沿当前 tree policy 选择动作，直到到达未充分展开的边界。
-2. **Expansion / evaluation**：加入一个或多个新节点；对叶节点得到回报估计。
+2. **Expansion / evaluation**：到达边界后扩展一个或多个新节点；对叶节点得到回报估计。
 3. **Simulation**：若没有直接 value estimate，就按 rollout policy 继续采样到终止或 horizon。
 4. **Backup**：把沿路径得到的 return 更新到每条边的访问次数和价值统计量。
 5. **Root action**：搜索停止后，按根的估计价值或 visit count 选当前真实动作。
+
 
 数据流可以压缩为：
 
@@ -174,6 +284,239 @@ $$
 
 其中 $N$ 是访问次数，$W$ 是累计回报，$Q=W/N$ 是边或节点的样本均值；这些是 search estimate，不应与环境的真实 $Q^*$ 混为一谈。
 
+
+Selection：从根往下选边
+
+从根节点开始，按照当前的 **tree policy** 一路往下走，直到遇到：
+
+- 一个还没充分展开的节点；
+- 或者一个还没访问过的边；
+- 或者到达终止状态。
+
+这一步的核心问题是：
+
+> **在树里的每个节点，我该选哪条动作边继续往下？**
+
+这一点后面由 **UCT** 来解决。
+
+在标准 MCTS 里，一个节点“fully expanded（充分展开）”通常只表示：
+
+> **这个状态下所有可选动作，都已经至少被尝试过一次，并且对应的 action edge / child 已经加入搜索树**
+
+只要当前节点已经 fully expanded，就用 UCT 选一条已经存在的边继续往下；一旦碰到一个还有动作没试过的节点，就停止 Selection
+
+
+Expansion / Evaluation：扩展或评估：
+
+当 selection 到达一个边界节点时，有两种做法：
+
+做法 A：Expansion
+
+把这个边界节点的一个或多个子节点加入树里。
+
+做法 B：Evaluation
+
+如果不再往下展开，可以直接给这个叶子一个 value estimate。
+
+在经典 MCTS 里，常常是：
+
+- 先扩一个新节点；
+- 然后从它继续 rollout。
+
+在 AlphaZero 那种方法里，更常见是：
+
+- 扩展新节点；
+- 直接用 value network 评估叶子值。
+
+
+Simulation / Rollout：继续模拟
+如果叶子节点还没有直接的 value estimate，就继续按一个 rollout policy 往后模拟，直到终止或到某个 horizon。
+
+最终得到这次 simulation 的 return：$G$
+
+**Expansion 是把后面的状态正式加入搜索树。**  
+**Rollout 是临时往后模拟，用来估计这个新节点到底好不好，但通常不把这些状态加入搜索树。**
+
+
+Backup：沿路径回传
+
+然后把这次得到的 return G 沿着刚才走过的路径往回更新。
+
+课件这里用了三个统计量：
+
+访问次数：N
+
+累计回报：W
+
+平均值：$Q=\frac{W}{N}$
+
+更具体一点，若在节点 i 选择动作 a，通常会维护：
+​
+$N(i,a),\qquad W(i,a),\qquad Q(i,a)=\frac{W(i,a)}{N(i,a)}$
+
+这里：
+
+- N(i,a)：从节点 i 走动作 a 这条边被选中过多少次；
+- W(i,a)：这条边上累计得到的 return 总和；
+- Q(i,a)：这条边目前的样本平均回报。
+
+注意，这里的 Q(i,a) 是 **search estimate**，不是环境真实的最优 action-value。
+
+
+Root action：最后怎么选真实动作？
+常见有两种方式：
+
+方法 1：按估计均值选
+
+$a_t\in\arg\max_a Q(\text{root},a)$
+
+方法 2：按访问次数选
+
+$a_t\in\arg\max_a N(\text{root},a)$
+
+很多现代方法（比如 AlphaZero）更偏向用 **visit count**
+
+
+
+一次 MCTS iteration，只做一条路径！
+
+对于搜索树里的每条 action edge，通常存：这条边的访问次数，累计return：以前经过这条边的所有 simulation，一共获得多少 return ， 平均价值
+
+假设从根节点s0开始，后面都没有被探索过：
+
+所以到s0，selection就结束了。 后面进行expansion：
+
+按照某种规则，选择一个没试过，比如a1
+
+调用 MDP model：$s_1\sim P(\cdot|s_0,a_1)$
+
+进入状态s1 （但Expectimax 会把 a1​ 所有可能的 s′ 全部展开，mcts 会 sample 一个 s）
+
+现在到了新节点：
+​
+$s_1$
+
+但我们不想继续认真建树了。
+
+随便找一个 rollout policy，比如随机策略：$\pi_{\text{rollout}}$
+
+s1
+ ↓
+random action
+ ↓
+s2
+ ↓
+random action
+ ↓
+.....
+ ↓
+terminal
+
+得到本次 simulation return：
+$G=1+\gamma 2+\gamma^2 5$
+
+这相当于：
+
+> 我刚刚抽样了一种“如果选 a1​，未来可能发生什么”的情况。
+
+再进行backup，把7传回来：
+
+更新：
+
+$N(s_0,a_1)\leftarrow N(s_0,a_1)+1$
+
+$W(s_0,a_1)\leftarrow W(s_0,a_1)+7$
+
+所以：
+​
+$Q(s_0,a_1)=\frac{W(s_0,a_1)}{N(s_0,a_1)}$
+
+再第二次simulation：
+
+重新s0开始，这次expansion a2动作...
+
+现在s0的动作都访问过了，它是fully expanded，
+
+那么 Selection 不再随便挑，而是算 UCT
+
+UCT选择了一个动作，再次到达状态s1. 假设 s1​ 有三个动作：
+
+b1​,b2​,b3​ ，一个都还没试
+
+于是开始expansion
+
+搜索树变成：
+          s0
+        /    \
+       a1    a2
+       |      |
+      s1      s2
+     /
+    b1
+    |
+   s3   ← new
+
+再从s3 rollout 得到 G=9
+
+更新路径上**所有边**：
+
+$N(s_1,b_1)\leftarrow N(s_1,b_1)+1$
+
+同时：
+
+$N(s_0,a_1)\leftarrow N(s_0,a_1)+1$
+
+并更新它们的 return / Q。
+
+进行不断的重复：最后可能形成
+
+                  root
+               /        \
+              A          B
+            / | \         \
+           /  |  \         \
+          ●   ●   ●         ●
+         /        \
+        ●          ●
+       /
+      ●
+     /
+    ●
+
+为什么 A 那边特别深？
+
+因为 MCTS 发现：
+
+> A 看起来更有希望。
+
+所以 UCT 会把更多 simulation budget 花在 A 上
+
+
+假如搜索树最终样子：
+
+                         s0
+                  N=100, V=0.42
+                   /           \
+                a1               a2
+              /                    \
+            s1                      s2
+        N=70,Q=0.55             N=30,Q=0.18
+          /    \                   |
+        a3      a4                 a5
+        |        |                  |
+       s3       s4                 s5
+     N=50      N=20              N=30
+
+> “站在 s0​，我已经花了 100 次模拟预算去思考未来；其中 a1​ 这个方向被考察了 70 次，而且平均结果不错；a2​ 被考察 30 次，结果较差。”
+
+
+搜索树最终目的其实非常简单：
+
+> **帮助当前状态 s0​ 选择一个动作。**
+
+经典 MCTS 可以根据 Q 或访问次数决定；AlphaZero 中尤其常见的是根据访问次数：
+$\pi(a\mid s_0)\propto N(s_0,a)^{1/\tau}$
+
 > [!example] 具体计算：一次 MCTS simulation 如何改变根统计量
 > 根节点有动作 $L,R$，初始 $(N,W)=(L:4,2.0;\ R:2,0.6)$。本次 selection 选择 $R$，模型采样到 $s'$，从叶节点得到本次折扣 return $G=1.4$。backup 只沿本次路径更新：
 >
@@ -184,10 +527,12 @@ $$
 >
 > 根的总访问数也增加 1；下一次 selection 会用更新后的 $N$ 和 $Q$ 重新比较。这个过程展示了“采样一次，局部更新一次”，而不是每次 simulation 都重算整棵树。
 
+
 ### 3.2 UCT：用 bandit-style 上置信界选树内动作
 
-MCTS 的关键问题是：模拟 episode 在树内该走哪条边？课件的 UCT（Upper Confidence Tree）把每个可以选动作的树节点看作一个多臂 bandit 节点，并为每条边维护“平均回报 + 探索 bonus”。课件公式写作
+MCTS 的关键问题是：模拟 episode 在树内该走哪条边？
 
+课件的 UCT（Upper Confidence Tree）把每个可以选动作的树节点看作一个多臂 bandit 节点，并为每条边维护“平均回报 + 探索 bonus”。课件公式写作
 $$
 Q(s,a,i)
 =
@@ -196,13 +541,18 @@ Q(s,a,i)
 +c\sqrt{\frac{O(\log N(i))}{N(i,a)}}.
 $$
 
-整体上，第一项利用当前边的平均 return，第二项偏向访问次数较少的边；选择分数最高的动作继续 simulation 和 expansion。$N(i,a)$ 是节点 $i$ 选择动作 $a$ 的次数，$G_k(i,a)$ 是第 $k$ 次从该边出发得到的 discounted return，$N(i)$ 是节点访问总数，$c$ 控制探索强度，$O(\cdot)$ 表示课件没有展开的常数/数量级项。为避免与真实 action-value 混淆，本文把这个带 bonus 的量称为 UCT score；若只写均值，则 $W(i,a)/N(i,a)$ 才是 search estimate。
+
+整体上，第一项利用当前边的平均 return，第二项偏向访问次数较少的边；选择分数最高的动作继续 simulation 和 expansion。$N(i,a)$ 是节点 $i$ 选择动作 $a$ 的次数，$G_k(i,a)$ 是第 $k$ 次从该边出发得到的 discounted return，$N(i)$ 是节点访问总数，$c$ 控制探索强度，$O(\cdot)$ 表示课件没有展开的常数/数量级项。
+
+为避免与真实 action-value 混淆，本文把这个带 bonus 的量称为 UCT score；若只写均值，则 $W(i,a)/N(i,a)$ 才是 search estimate。
 
 首次访问的边没有可计算的均值。实际实现通常先强制每个未访问动作至少扩展一次，或把其 UCT score 设为 $+\infty$；这是实现约定，不是课件公式额外给出的定理。
 
 ![[lec13-post-12.png|900]]
 
 *图：来源 `lecture/lecture13post.pdf` 物理 PDF 第 12 页；原图明确把节点动作选择类比为 MAB，并说明每次 simulation 的 tree policy 可以变化。*
+i是第i次模拟，随着模拟次数的增加，上面的数据以及从数据推断出要选哪个动作 都是不固定的。 一次模拟就是一条路线
+
 
 > [!example] 具体计算：bonus 让低访问动作获得机会
 > 为便于展示，令 $c=1$ 且把课件的数量级常数取为 1。节点总访问数 $N(i)=16$；动作 $a_1$ 的均值为 $0.60$、$N(i,a_1)=8$，动作 $a_2$ 的均值为 $0.40$、$N(i,a_2)=2$。使用标准化的
@@ -214,6 +564,7 @@ $$
 > 得到 $U(i,a_1)\approx0.60+0.589=1.189$，$U(i,a_2)\approx0.40+1.177=1.577$。虽然 $a_2$ 的当前均值较低，它仍会因信息不足而被优先探索。数值是说明用数据，非课件原例；课件本身用 $O(\log N(i))$ 保留了常数选择。
 
 UCT 的“探索”发生在 **搜索计算层**：动作是在模拟 episode 中被选择的，目的是决定下一笔计算花在哪里，而不是直接向真实环境试错。因此 UCT 与 Lecture 9 的在线 bandit regret 优化不能直接画等号；Lecture 14 的理解检查会再次强调这一点。
+
 
 ### 3.3 MCTS 的优点与边界
 
@@ -227,6 +578,8 @@ UCT 的“探索”发生在 **搜索计算层**：动作是在模拟 episode �
 
 这些优点不等于“任意任务都适合 MCTS”。长 horizon、大 branching factor、低质量 value/rollout、昂贵模型调用或严重的状态表示问题都可能使有限 simulation 不足以找到好动作；课程理解检查把“短 horizon/小空间”和“长 horizon/大空间”的组合留给学习者判断，而不是宣称一个无条件的适用范围。
 
+
+
 ## 4. AlphaZero：学习启发式，再做局部战略计算
 
 本节是 pre deck 对 post deck 的续接，也是从通用 MCTS 到 AlphaZero 的关键转折：树搜索不再只依赖固定 rollout policy，而是让神经网络提供 action prior 与 leaf value。Lecture 14 会重复这个流程并补充 PUCT 的课程定位，因此这里只保留第一次完整讲解。
@@ -238,11 +591,98 @@ UCT 的“探索”发生在 **搜索计算层**：动作是在模拟 episode �
 3. 用 root visit counts 形成决策 policy，再通过 self-play 获得训练数据。
 4. 讨论架构、MCTS 和 human data 的评估问题，以及向其他搜索问题的延伸。
 
+MCTS 原来靠 rollout 自己慢慢搜；AlphaZero 让神经网络先告诉 MCTS“哪里可能值得搜、这个局面大概有多好”，然后 MCTS 再做局部精细计算。
+
 ### 4.1 Go case study：已知规则不等于容易规划
 
 课件把 Go 描述为有约 2500 年历史的经典棋类和长期 AI 挑战；传统 game-tree search 在 Go 上难以直接成功。这里的理解问题是：下 Go 是否一定是在“dynamics 和 reward model 都 unknown 的世界”中学习？
 
-更准确的回答是：在正式棋局中，规则、合法动作和胜负定义是已知的，因而它不是因为环境模型完全未知才成为 RL 问题；困难主要来自极大的搜索空间、长期战略后果和有效 heuristic 的学习。AlphaZero 通过 self-play 学习 policy/value heuristic，再用局部 MCTS 计算当前落子。
+更准确的回答是：在正式棋局中，规则、合法动作和胜负定义是已知的，因而它不是因为环境模型完全未知才成为 RL 问题；困难主要来自极大的搜索空间、长期战略后果和有效 heuristic 的学习。
+AlphaZero 通过 self-play 学习 policy/value heuristic，再用局部 MCTS 计算当前落子。
+
+AlphaZero 要学习的主要不是棋盘物理规则，而是两个非常关键的 heuristic：
+
+policy heuristic 和 value heuristic
+
+也就是：
+
+> 哪些动作看起来值得搜？
+
+以及：
+
+> 这个局面看起来谁更有可能赢？
+
+神经网络输出：
+
+s 网络会同时输出两个东西： $(P_\theta(\cdot\mid s),v_\theta(s))$
+
+$P_\theta(a\mid s)$
+它表示：
+> 神经网络认为在状态 s 下，动作 a 有多值得考虑
+
+称他为 action prior
+
+$v_\theta(s)$
+表示：
+> 神经网络预测，从状态 s 开始，对于当前玩家而言，这局最终结果大概有多好。
+
+MCTS：
+leaf
+ ↓
+rollout
+ ↓
+rollout
+ ↓
+rollout
+ ↓
+terminal
+ ↓
+G
+
+AlphoZero：
+leaf
+ ↓
+value network
+ ↓
+vθ(s)
+
+>	不用每次都走到最后，我可以帮你估一下这里大概多少分。
+
+$$\text{Selection}\to\text{Expansion}\to\text{Neural Network Evaluation}\to\text{Backup}$$
+
+上一节学的是：
+
+$$\text{Selection}\to\text{Expansion}\to\text{Simulation}\to\text{Backup}$$
+
+假如到s2，发现这个节点没有被展开
+
+于是把 s2​ 输入神经网络：
+$s_2\longrightarrow f_\theta(s_2)$
+
+得到：
+$(P_\theta(\cdot\mid s_2),v_\theta(s_2))$
+
+然后：
+- Pθ​ 保存下来，用于将来决定从 s2​ 往哪搜；
+- vθ​(s2​) 沿着刚才路径 backup。
+
+比如：$W(s,a)=v_1+v_2+v_3=1.4$
+
+$Q(s,a)=\frac{W(s,a)}{N(s,a)}=\frac{v_1+v_2+v_3}{3}$
+
+
+之后的selection：
+
+前面的普通 MCTS 用 UCT：
+​
+$Q(s,a)+c\sqrt{\frac{\log N(s)}{N(s,a)}}$
+
+AlphaZero 风格里加入了 neural-network prior，常用 **PUCT**：
+$$U(s,a)=c_{\mathrm{puct}}P_\theta(a\mid s)\frac{\sqrt{\sum_b N(s,b)}}{1+N(s,a)}$$
+然后选择：
+
+$$a=\arg\max_a\left[Q(s,a)+U(s,a)\right]$$
+
 
 ### 4.2 单局 move selection：从根到 backup
 
@@ -270,7 +710,16 @@ a
 \arg\max_a\bigl(Q(s,a)+U(s,a)\bigr).
 $$
 
-整体含义是：$Q(s,a)$ 利用已经搜索到的结果，$P_\theta(a\mid s)$ 把网络认为有希望但尚未充分访问的动作推到前面，访问次数越少，分母越小，探索项越大。$c_{\mathrm{puct}}$ 是探索强度，$N(s,a)$ 是边访问次数；$Q$、$N$ 是树统计量，$P_\theta$ 和 $v_\theta$ 是网络输出。这个写法是 AlphaZero 论文的标准补充，不应误读为 post deck 已经给出的 UCT 公式。
+整体含义是：$Q(s,a)$ 利用已经搜索到的结果，$P_\theta(a\mid s)$ 把网络认为有希望但尚未充分访问的动作推到前面，访问次数越少，分母越小，探索项越大。$c_{\mathrm{puct}}$ 是探索强度，$N(s,a)$ 是边访问次数；
+
+$Q(s,a)=\text{MCTS 已经搜出来的结果}$
+
+$P_\theta(a\mid s)=\text{network 事先给的 prior}$
+
+
+$Q$、$N$ 是树统计量，$P_\theta$ 和 $v_\theta$ 是网络输出。这个写法是 AlphaZero 论文的标准补充，不应误读为 post deck 已经给出的 UCT 公式。
+
+
 
 ![[lec13-pre-21.png|900]]
 
@@ -289,6 +738,8 @@ $$
 >
 > 所以两者的 selection score 约为 $0.57$ 和 $1.08$，本轮会选择 $a_2$。这不是说 $a_2$ 的真实价值已经更高，而是网络先验与低访问次数共同提高了它获得后续计算的机会；真实 AlphaZero 还会使用具体的 value backup、噪声和超参数。
 
+
+
 ### 4.3 根 policy、self-play 与 reward density
 
 重复 search 后，课件用根节点访问次数构造 policy：
@@ -299,8 +750,23 @@ $$
 \frac{N(s,a)^{1/\tau}}
 {\sum_{b\in\mathcal A}N(s,b)^{1/\tau}}.
 $$
+> **network 的 Pθ​ 是搜索前的 policy；MCTS visit count 得到的 π 是搜索后的、更强的 policy。**
+
 
 整体上，访问更多的动作概率更大；温度 $\tau>0$ 控制分布尖锐程度。$\tau\to0$ 时接近只选访问最多的动作，较大的 $\tau$ 保留更多随机性。课件只给出比例形式 $\pi(s)\propto N(s,a)^{1/\tau}$，上式补上了归一化常数。
+
+τ 是 temperature。
+
+如果：τ→0
+
+那么 policy 越来越接近：
+
+> 只选 visit count 最大的动作。
+
+也就是越来越 greedy。
+
+如果 τ 较大，则分布更平滑，保留更多随机性。
+
 
 > [!example] 具体计算：visit count 到根 policy
 > 若根动作访问数为 $N(s,a_1)=100$、$N(s,a_2)=25$，取 $\tau=1$，则
@@ -315,6 +781,13 @@ $$
 
 Self-play 过程是：按根 policy 采样动作，执行一步，再以新局面为根重新搜索；持续到终局并记录胜负。对手和己方交替行动，所以 backup 时必须把 value 转换到相应玩家视角，不能把所有节点都当成同一个 max 玩家。
 
+一个 move 内
+做很多次 MCTS simulation。
+
+一整个 game 内
+每走一步，都重新以当前棋盘为 root 做 MCTS
+
+
 课件强调 self-play 的三个好处：
 
 - 不需要人工对手，主要瓶颈变成计算资源；
@@ -323,12 +796,22 @@ Self-play 过程是：按根 policy 采样动作，执行一步，再以新局�
 
 “更 dense”是课件对训练信号的教学性概括，不表示每个时间步都有非零环境 reward；围棋仍通常在终局给出胜负结果，dense 指相对于固定不匹配对手而言，学习过程中可获得更有区分度的反馈。
 
+
+
 ### 4.4 训练 policy/value network
 
-每个 self-play 局面可以留下三类信息：局面 $s$、搜索得到的根 visit-count policy $\pi_\tau(\cdot\mid s)$、最终从当前玩家视角得到的胜负结果 $z$。网络训练的目标是让 policy head 逼近搜索 policy，让 value head 预测最终结果；网络随后又作为下一批 MCTS simulation 的 heuristic。
+每个 self-play 局面可以留下三类信息：局面 $s$、搜索得到的根 visit-count policy $\pi_\tau(\cdot\mid s)$、最终从当前玩家视角得到的胜负结果 $z$。 一个训练样本就是：$(s_t,\pi_t,z)$
+
+网络训练的目标是让 policy head 逼近搜索 policy，让 value head 预测最终结果；网络随后又作为下一批 MCTS simulation 的 heuristic。
+神经网络输出的是：$(P_\theta(\cdot\mid s),v_\theta(s))$
+
+policy head 模仿 MCTS
+$P_\theta(\cdot\mid s)\approx\pi_{\text{MCTS}}(\cdot\mid s)$
+
+value head 预测最终比赛结果
+$v_\theta(s)\approx z$
 
 这一闭环的顺序很重要：
-
 $$
 \text{network}
 \rightarrow
@@ -340,6 +823,73 @@ $$
 \rightarrow
 \text{better heuristic}.
 $$
+
+神经网络指导 MCTS，那神经网络是谁训练的？
+
+>	MCTS 反过来训练神经网络
+
+Network → MCTS
+network 给：Pθ​,vθ​
+帮助 MCTS 更高效地搜索。
+
+MCTS → Network
+MCTS 得到更好的：π​
+作为 network policy head 的训练目标
+
+最终真实胜负：z
+作为 value head 的训练目标。
+
+也就是说：
+                  神经网络
+              Pθ(a|s), vθ(s)
+                    ↓
+              指导 MCTS 搜索
+                    ↓
+             得到更强的 πMCTS
+                    ↓
+                self-play
+                    ↓
+              得到最终胜负 z
+                    ↓
+          训练样本 (s, πMCTS, z)
+                    ↓
+              更新神经网络
+                    ↓
+              更好的 Pθ, vθ
+                    ↓
+                   ...
+
+
+==可以把 Network 和 MCTS 的角色理解成“快思考”和“慢思考”==
+
+
+比如说下了一把棋：
+s0
+ ↓ MCTS
+a0
+ ↓
+s1
+ ↓ MCTS
+a1
+ ↓
+s2
+ ↓
+...
+ ↓
+terminal
+
+每一步，都有一个经过 MCTS 后得到的策略。
+每一步它都会保存：$(s_t,\pi_t)$这个训练数据
+
+最后最终赢了z = 1，输了z = -1，补充在后面
+
+所以一局棋产生：
+
+$(s_0,\pi_0,z),(s_1,\pi_1,z),(s_2,\pi_2,z),...$ 这些训练样本。
+
+最开始：$f_\theta(s)\rightarrow(P_\theta,v_\theta)$
+
+一把结束：利用数据，使得$P_\theta\rightarrow\pi_{\text{MCTS}}$，$v_\theta\rightarrow z$
 
 课件页只要求“训练神经网络预测 policies 和 values”，没有给出完整损失或优化器；因此这里不把具体 loss、网络层数或训练 schedule 归为本讲已证明的课程结论。
 

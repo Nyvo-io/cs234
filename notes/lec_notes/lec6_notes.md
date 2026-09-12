@@ -103,6 +103,12 @@ $$
 \left(G_t^{(i)}-b(s_t^{(i)})\right).
 $$
 
+$G_t=r_t+\gamma r_{t+1}+\gamma^2r_{t+2}+\cdots$：
+**Gt​ 是你采样完一条 trajectory 后，直接用后面的 reward 算出来的**
+
+$V^\pi(s)=\mathbb E_{\pi}[G_t\mid s_t=s]$：
+而V是G多条采样的平均值
+
 Baseline 不引入 bias 的核心仍是：对固定 $s$，若 $b(s)$ 不依赖本次采样动作，则
 
 $$
@@ -189,8 +195,7 @@ Vanilla policy gradient（VPG）把 Lecture 5 的 REINFORCE 与一个可学习�
 1. **固定当前策略并收集数据。** 用 $\pi_{\theta_k}$ 采样一批完整 trajectories。
 2. **计算 Monte Carlo targets。** 对每条 trajectory 反向计算所有 $G_t$。
 3. **冻结本轮 policy 权重。** 用更新前的 baseline 计算
-
-   $$
+$$
    \hat A_t=G_t-b_{\phi_k}(s_t).
    $$
 
@@ -238,7 +243,12 @@ $$
 
 ### 2.4 Advantage 与 actor-critic：替换 Monte Carlo target
 
-*首次完整讲解：Lecture 6 §2.4「Advantage 与 actor-critic：替换 Monte Carlo target」。*
+首次完整讲解：Lecture 6 §2.4「Advantage 与 actor-critic：替换 Monte Carlo target」。
+
+MC方法：把一条轨迹真正跑完以后，用实际观察到的未来累计奖励 Gt​，作为 V(st​) 或 Q(st​,at​) 的训练目标。实际采样估计期望，不使用自己估计的V
+
+TD target：TD 不等整条轨迹结束，只走一步，然后$\boxed{y_t^{TD}=r_t+\gamma V_\phi(s_{t+1})}$，直接用神经网络估计未来的value
+
 
 优势函数（advantage function）是状态动作标量函数：
 
@@ -278,7 +288,6 @@ actor 负责：
 critic 负责：
 
 > **这个状态大概有多好？**
-
 
 
 课件以 A3C（Mnih et al., 2016）作为 actor-critic 的代表方法，但本讲只使用它说明这一算法家族，并不展开 A3C 的异步训练机制。
@@ -325,7 +334,7 @@ Critic 用 $3.7$ 作为 target，把 $\hat V_\phi(s_t)$ 从 $2$ 往上调整；a
 
 但真实的：$V^\pi(s)$，我们通常不知道。
 
-所以训练一个神经网络：$\hat V_\phi(s)$去近似它：
+==所以训练一个神经网络：$\hat V_\phi(s)$去近似它==：
 
 $\hat V_\phi(s)\approx V^\pi(s)$
 
@@ -514,7 +523,7 @@ d^\pi(s)
 \sum_{t=0}^{\infty}
 \gamma^t\Pr(s_t=s\mid\pi).
 $$
-Pr代表的是在第 t 步访问状态 s 的概率
+Pr()代表的是在第 t 步访问状态 s 的概率
 
 公式表示：
 >	把策略 π 在所有时间步访问状态 s 的概率，加权平均起来
@@ -931,6 +940,9 @@ PPO（Proximal Policy Optimization，近端策略优化）是一族近似限制�
 1. Adaptive KL penalty：直接在 surrogate 上减去 KL 惩罚，并动态调整惩罚系数。
 2. Clipped objective：把 probability ratio 的有利变化截在区间 $[1-\epsilon,1+\epsilon]$ 附近。
 
+- KL penalty：策略变化太大，就在 loss 里罚你
+- Clip：直接把 probability ratio 的收益“截住”，让你继续往太远方向改也没更多好处
+
 两种变体共享同一个外层训练循环：
 
 1. **冻结 old policy。** 令 $\pi_k=\pi_{\theta_k}$，用它采集当前数据集 $D_k$。
@@ -1009,7 +1021,7 @@ Clipped objective 并不是直接让 dπold ≈ dπθ​​
 
 它做的是：
 
-限制 πθ 相对于 πold 的动作概率不要变化太猛， 只要策略每步不要变化太猛，总体状态就不会有太大变化
+限制 πθ 相对于 πold 的动作概率不要变化太猛， 只要==策略每步不要变化太猛==，总体状态就不会有太大变化
 ​
 它通过r * A，来进行动作的校准，通过限制r，来做到状态分布的校准
 
@@ -1025,7 +1037,7 @@ $$
 
 >	采数据时 old policy：$\pi_{\text{old}}(a_t|s_t)=0.5$
 >	
->	现在 current policy：$\pi_\theta(a_t|s_t)=0.6$πθ​(at​∣st​)=0.6
+>	现在 current policy：$\pi_\theta(a_t|s_t)=0.6$
 >	
 >	那么：$r_t = \frac{0.6}{0.5} = 1.2$
 >	
@@ -1038,7 +1050,7 @@ $$
 
 如果A大于0， 那么这个动作是好动作， 也就希望提高这个动作发生的概率， 也就是使得rt>1。
 
-但如果不进行clip， 则会疯狂的加大r，导致某个动作概率疯狂提高，也就使得policy update过大。
+但如果不进行clip， 则会==疯狂的加大r==，导致某个动作概率疯狂提高，也就使得policy update过大。
 
 所以 PPO clipped objective 是
 
@@ -1054,6 +1066,9 @@ r_t(\theta)\hat A_t,
 \right)
 \right].
 $$
+
+clip的目的是：
+把 rt​ 限制在： 1−ϵ ≤rt​≤ 1+ϵ
 
 我们关心的始终是：J(πθ)−J(πold)​
 

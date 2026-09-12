@@ -11,6 +11,9 @@ from network_utils import build_mlp, device, np2torch
 from policy import CategoricalPolicy, GaussianPolicy
 from policy_gradient import PolicyGradient
 
+#这里ppo采用的是clipped objective，不是 KL penalty
+#防止一次参数更新，把policy改的太猛
+#所以引入 ratio
 class PPO(PolicyGradient):
 
     def __init__(self, env, config, seed, logger=None):
@@ -43,8 +46,48 @@ class PPO(PolicyGradient):
         observations = np2torch(observations)
         actions = np2torch(actions)
         advantages = np2torch(advantages)
+        #πθold​​，旧策略
         old_logprobs = np2torch(old_logprobs)
+        #-
+        #observations这些是用旧策略采样得到的数据
+        #我们利用刚才rollout里面采取过的动作
+        #得到当前policy的策略分布
+        distribution = self.policy.action_distribution(observations)
+        #取log，logπθ​(at​∣st​)。当前的新 policy 对“刚才那个动作”认为概率是多少？
+        new_logprobs = distribution.log_prob(actions)
 
+        #如果是高斯分布，连续的动作空间，他的动作一般不是一个数，而是一个动作向量
+        #at​=[at,1​, at,2​, at,3​] -> action = [0.2, -0.5, 0.7]
+        #log_prob 会分别算每一维，假设batch 里有 4 个 observation，对应的action
+        #[
+        #[-0.3, -0.5, -0.2],
+        #[-0.7, -0.1, -0.4],
+        #[-0.2, -0.6, -0.3],
+        #[-0.4, -0.2, -0.5]
+        #]
+        #new_logprobs.shape：这个tensor有几个维度
+        #我们要计算的是整体的π(at​∣st​)，得把上面几个动作乘起来
+        #π(at​∣st​)=π(at,1​∣st​)π(at,2​∣st​)π(at,3​∣st​)，转成log，就是相加
+        if len(new_logprobs.shape) > 1:
+            new_logprobs = torch.sum(new_logprobs, dim=-1)
+
+        advantages = advantages.squeeze(-1)
+
+        #ratio就是这个状态选这个动作的新旧概率比值
+        ratio = torch.exp(new_logprobs - old_logprobs)
+
+        surrogate1 = ratio * advantages
+        surrogate2 = torch.clamp(
+            ratio,
+            1 - self.eps_clip,
+            1 + self.eps_clip
+        ) * advantages
+
+        loss = -torch.mean(torch.min(surrogate1, surrogate2))
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()    
         #######################################################
         #########   YOUR CODE HERE - 10-15 lines.   ###########
 
@@ -114,6 +157,7 @@ class PPO(PolicyGradient):
             self.config.plot_output,
         )
 
+    #用旧策略(初始策略)采样数据
     def sample_path(self, env, num_episodes=None):
         """
         Sample paths (trajectories) from the environment.
@@ -143,15 +187,23 @@ class PPO(PolicyGradient):
         while num_episodes or t < self.config.batch_size:
             state = env.reset()
             states, actions, old_logprobs, rewards = [], [], [], []
+            #一整个episode的总reward
             episode_reward = 0
-
+            #一个episode里最多有self.config.max_ep_len步
             for step in range(self.config.max_ep_len):
+                #先保存state
                 states.append(state)
                 # Note the difference between this line and the corresponding line
                 # in PolicyGradient.
+                #policy.act：根据已有的策略，输入state采样输出action。同时计算他的log
+                #states[-1][None]:-1指的是选取列表的最后一个元素，也就是state
+                #None：增加一个batch维度。因为神经网络一般希望输入[batch_size, observation_dim]
                 action, old_logprob = self.policy.act(states[-1][None], return_log_prob = True)
                 assert old_logprob.shape == (1,)
+
                 action, old_logprob = action[0], old_logprob[0]
+                #让环境执行该动作，看看到了那个新状态，得到的reward是多少
+                #它是是 RL 最经典的 transition
                 state, reward, done, info = env.step(action)
                 actions.append(action)
                 old_logprobs.append(old_logprob)
@@ -163,7 +215,14 @@ class PPO(PolicyGradient):
                     break
                 if (not num_episodes) and t == self.config.batch_size:
                     break
-
+            
+            #一局结束，把整个trajectory 打包
+            #path = {
+            #   "observation": [s0, s1, s2, s3],
+            #    "action":      [a0, a1, a2, a3],
+            #    "reward":      [r0, r1, r2, r3],
+            #    "old_logprobs":[lp0,lp1,lp2,lp3]
+            #}
             path = {
                 "observation": np.array(states),
                 "reward": np.array(rewards),

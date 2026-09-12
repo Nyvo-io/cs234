@@ -4,6 +4,7 @@ import torch.nn as nn
 
 
 def build_mlp(input_size, output_size, n_layers, size):
+    #输入维度 输出维度 隐藏层层数 每个隐藏层 neuron 数
     """
     Args:
         input_size: int, the dimension of inputs to be given to the network
@@ -24,12 +25,40 @@ def build_mlp(input_size, output_size, n_layers, size):
 
     "nn.Linear" and "nn.Sequential" may be helpful.
     """
+    layers = []
+    #使得这么一层层的叠加起来，写网络常见写法
+    #[
+    #Linear(4,64),
+    #ReLU(),
+    #Linear(64,64)
+    # ReLU(),]
+
+    #first hidden layer
+    layers.append(nn.Linear(input_size, size))
+    layers.append(nn.ReLU())
+
+    #remaining hidden layers
+    #只需要控制循环次数，不关心循环变量i，所以用_
+    for _ in range(n_layers - 1):
+        layers.append(nn.Linear(size, size))
+        layers.append(nn.ReLU())
+
+    #output layer
+    layers.append(nn.Linear(size, output_size))
+
+    return nn.Sequential(*layers)
+    #nn.Sequential()：把多个神经网络层按照顺序连接起来
+    #如果没有*，则会把layers当作一个整体参数传入nn.Sequential()，而不是把layers中的每个元素作为单独的参数传入
+    #列表只是存东西,是一个普通容器,而nn.Sequential 是一个真正的神经网络模型。所以得先把列表东西取出
+    #一层层存入Sequential
+    #一个 PyTorch 模型，本质需要：model(x)
+
     #######################################################
     #########   YOUR CODE HERE - 7-15 lines.   ############
 
     #######################################################
     #########          END YOUR CODE.          ############
-
+    
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

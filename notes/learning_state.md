@@ -1,6 +1,6 @@
 # CS234 Learning State
 
-Last updated: 2026-08-17
+Last updated: 2026-08-25
 
 ## Current Progress
 
@@ -46,6 +46,7 @@ Last updated: 2026-08-17
 - Lecture 11 was written against all 50 physical pages of `lecture/lecture11post.pdf`. The PDF title is mislabeled Lecture 13 but explicitly says `Typo: Lecture 11`; the note covers Bayesian bandits, Bayes rule, conjugacy, Beta--Bernoulli updates, Thompson sampling, probability matching, Bayesian regret, contextual news recommendation, Gittins index, and the PAC/regret toy comparison. Mastery evidence remains none recorded.
 - Mastery evidence has not yet been recorded systematically; coverage completion does not imply mastery.
 - Mastery evidence remains none recorded for Lectures 9--10; no independent derivation, implementation, regret experiment, or alignment case analysis has been observed.
+- Assignment 2 local implementation and CartPole experiments were completed on 2026-08-25. The repository now includes the REINFORCE, baseline, and PPO code changes together with their seed-1 logs, score arrays, and training curves. This records local implementation and experiment evidence; it does not claim an official course submission or multi-seed evaluation.
 - Next lecture: inspect the course schedule after Lecture 14; the next scheduled item in the deck is a quiz.
 
 ## Lecture 13 Covered
@@ -288,14 +289,15 @@ Last updated: 2026-08-17
 
 ## Assignment 2 Readiness
 
-- Ready to start: Assignment 2 §2.1 REINFORCE return computation, categorical/Gaussian policy distributions, and the mathematical basis of `PolicyGradient.get_returns` and `update_policy`.
-- Ready to start: Assignment 2 §2.2--2.3 value baselines, MSE regression, sampled advantages, and advantage normalization.
-- Ready to start: PPO clipping, old-policy probability ratios, cached rollout log-probabilities, and `PPO.update_policy` are covered in Lecture 6.
-- Ready to start: Assignment 2 §3 trajectory/state distributions and the performance difference proof are covered across Lectures 5--6.
+- Completed locally: Assignment 2 §2.1 REINFORCE return computation, categorical/Gaussian policy distributions, and the mathematical basis of `PolicyGradient.get_returns` and `update_policy`.
+- Completed locally: Assignment 2 §2.2--2.3 value baselines, MSE regression, sampled advantages, and advantage normalization.
+- Completed locally: PPO clipping, old-policy probability ratios, cached rollout log-probabilities, and `PPO.update_policy` are implemented in the starter code.
+- Completed locally: Assignment 2 §3 trajectory/state distributions and the performance difference proof were covered across Lectures 5--6.
+- Experiment evidence: CartPole runs for no-baseline, baseline, and PPO with seed 1 are saved under `assignment/ass2/assignment2_starter_code/code/results/`, including logs, score arrays, and plots.
 - Separate reading still required: the human-subjects ethics section relies on the Belmont Report, IRB, and compliance sources linked by the assignment rather than Lecture 6.
-- Mastery evidence: none recorded for Lectures 5--6; no quiz, independent derivation, implementation, PPO tensor test, or Assignment 2 benchmark result has been observed yet.
+- Remaining validation: no multi-seed comparison, official submission check, or quiz evidence is recorded yet.
 
-现在可以开始 Assignment 2 的 policy-gradient、PPO 与 policy-induced distribution 部分；伦理部分需先完成题面指定阅读。
+Assignment 2 的 policy-gradient、baseline、PPO 与 policy-induced distribution 部分已完成本地实现和一次 CartPole 实验；伦理部分仍需完成题面指定阅读，多 seed 和正式提交检查仍待补充。
 
 ## Active Follow-Up Checks
 

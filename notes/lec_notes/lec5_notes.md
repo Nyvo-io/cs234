@@ -298,7 +298,6 @@ R(\tau)\nabla_\theta\log P(\tau;\theta)
 $$
 
 
-
 **得分函数（score function）**是参数化概率的对数对参数的梯度：
 
 $$
@@ -481,7 +480,6 @@ $$
 
 ## 4. 策略参数化与 policy gradient theorem
 
-
 前面只有抽象的策略
 
 之前我们写：$\pi_\theta(a\mid s)$
@@ -500,7 +498,7 @@ $$
 
 *首次完整讲解：Lecture 5 §4.1「Softmax 策略」。*
 
-对离散动作 比如a∈{左、右、前进、停止}，**Softmax 策略（softmax policy）**先用特征 $\phi(s,a)\in\mathbb R^d$ 和参数 $\theta\in\mathbb R^d$ 产生 logit。Logit 是每个动作的未归一化实数分数，可以为任意实数，本身不是概率：
+对离散动作 比如a∈{左、右、前进、停止}，Softmax 策略（softmax policy）先用特征 $\phi(s,a)\in\mathbb R^d$ 和 参数 $\theta\in\mathbb R^d$ (神经网络训练而成)产生  logit。Logit 是每个动作的未归一化实数分数，可以为任意实数，本身不是概率：
 
 $$
 h_\theta(s,a)=\phi(s,a)^\top\theta,
@@ -560,11 +558,10 @@ $$
 >
 > 用正权重沿这个方向更新，会提高 $L$ 的相对 logit，同时降低 $R$ 的相对 logit；若梯度权重为负，方向则相反。
 
+
 ### 4.2 Gaussian 策略
 
-
-连续动作不能用有限个 categorical 概率列举。课件使用一维 **Gaussian 策略(Gaussian policy)**：
-
+连续动作不能用有限个 categorical 概率列举。课件使用一维 **Gaussian 策略(Gaussian policy)**
 $$
 a\sim\mathcal N(\mu_\theta(s),\sigma^2),
 \qquad
@@ -572,12 +569,14 @@ a\sim\mathcal N(\mu_\theta(s),\sigma^2),
 $$
 
 在状态s下，策略产生一个高斯分布：
-
 $$\boxed{ a\sim\pi_\theta(\cdot\mid s) = \mathcal N\left( \mu_\theta(s), \sigma_\theta(s)^2 \right) }$$​
 
 通常神经网络输入状态 s，
-
 输出：$\mu_\theta(s),\qquad \sigma_\theta(s)$
+
+均值mu是神经网络生成的
+
+而标准差你可以固定成数值，也可以同样由神经网络和均值一起生成，或者也是网络参数，但不依赖状态(就是ass2里的)
 
 然后从这个分布中采样动作：$a\sim\mathcal N(\mu_\theta(s),\sigma_\theta(s)^2)$
 
@@ -622,14 +621,12 @@ $$\boxed{ \pi_\theta(a\mid s) = \mathcal N\left(a;\mu_\theta(s),\sigma_\theta^2(
 然后从这个分布中采样动作：$a\sim\pi_\theta(\cdot\mid s)$
 
 其中：
-- $\mu_\theta(s)$：策略目前最倾向的动作；
-- $\sigma_\theta(s)$：探索程度；σ越大，采样出来的动作越分散，探索越强；σ 越小，动作越接近均值，策略越确定。
+- 均值$\mu_\theta(s)$：当前策略最倾向的动作；
+- $\sigma_\theta(s)$：> 策略对这个动作的不确定程度，或者探索范围。 探索程度；σ越大，采样出来的动作越分散，探索越强；σ 越小，动作越接近均值，策略越确定。
 - θ：控制均值和方差的网络参数。
 
 
-
-
-若 $\sigma$ 固定，则对均值参数的 score function 为：
+若 $\sigma$ 固定，是一个值，不参与梯度。 则对均值参数的 score function 为：
 
 把高斯策略取对数：
 
@@ -662,7 +659,7 @@ $$
 
 **策略梯度定理(policy gradient theorem)**  说明：对可微策略和合适的 episodic、average-reward 或 discounted objective，可以把策略梯度写成：score 与动作价值的期望。
 $$\boxed{ \text{score} = \nabla_\theta\log\pi_\theta(a_t\mid s_t) }$$​
-它不是 reward，也不是 Q，而是"怎样改变参数 θ，能提高这次选中动作 at 的概率"的方向。
+它不是 reward，也不是 Q，而是"==怎样改变参数 θ，能提高这次选中动作 at 的概率"的方向==。
 
 
 沿用本讲有限 episode、$\gamma=1$ 的约定，一种不隐藏时间求和的写法是：
@@ -681,11 +678,9 @@ $$
 课件把状态访问分布和时间求和压缩进 $\mathbb E_{\pi_\theta}$。
 
 它表达的是：
-
 > 在每个时间步，根据动作 at 相对于当前策略的梯度方向 以及这个动作的价值 $Q^\pi(s_t,a_t)$，来调整策略参数。
 
-
-$Q^{\pi_\theta}(s_t,a_t)$ 是期望动作价值，不是一条轨迹的 realized return；具体 objective 不同，状态访问权重、折扣因子和整体常数也可能不同。
+$Q^{\pi_\theta}(s_t,a_t)$ 是期望动作价值，不是一条轨迹的 [realized return](academic-term-lookup:realized%20return)；具体 objective 不同，状态访问权重、折扣因子和整体常数也可能不同。
 
 不是一条轨迹的 realized return的意思是：
 
@@ -758,7 +753,7 @@ $$\nabla_\theta J = \mathbb E \left[ \sum_t Q^\pi(s_t,a_t) \nabla_\theta\log\pi_
 
 真正的“算法选择”发生在哪里？
 
-真正形成 REINFORCE，是当我们面对：$Q^\pi(s_t,a_t)$
+真正形成 REINFORCE，是当我们面对：==$Q^\pi(s_t,a_t)$==
 
 问：
 
@@ -779,7 +774,7 @@ $\boxed{ Q^\pi(s_t,a_t) \approx G_t }$
 
 例如：$Q_w(s,a)\approx Q^\pi(s,a)$
 
-或者通过：$\delta_t = r_t+\gamma V(s_{t+1})-V(s_t)$估计 advantage。
+或者通过：$\delta_t = r_t+\gamma V(s_{t+1})-V(s_t)$估计 [advantage](academic-term-lookup:advantage)。
 
 
 总结：
@@ -961,7 +956,6 @@ $$\underbrace{\nabla_\theta\log\pi_\theta(a_t|s_t)} _{\text{score：提高这个
 2. **采样完整 episodes。** 保存每个时间步的 $(s_t,a_t,r_t)$，直到终止，不能只保留总奖励。
 3. **反向计算 reward-to-go。** 对每条 episode 从 $G_T=0$ 开始，用 $G_t=r_t+\gamma G_{t+1}$ 得到每个动作自己的权重。
 4. **形成批量梯度估计。** 对 $m$ 条轨迹计算
-
    $$
    \hat g_k
    =\frac1m\sum_{i=1}^m\sum_{t=0}^{T_i-1}
@@ -972,7 +966,6 @@ $$\underbrace{\nabla_\theta\log\pi_\theta(a_t|s_t)} _{\text{score：提高这个
 5. **更新并进入下一轮。** 令 $\theta_{k+1}=\theta_k+\alpha\hat g_k$，下一批 episode 必须由更新后的 $\pi_{\theta_{k+1}}$ 采样。
 
 一次收集m条轨迹，对多个 episode 求平均。
-
 $i=\text{第几条 episode}$ 
 $t=\text{episode 中第几个时间步}$ 
 $k=\text{第几轮参数更新}$
@@ -1018,6 +1011,8 @@ REINFORCE 不要求 reward 可导，也不要求知道 [dynamics](academic-term-
 本讲的两条主要降方差路径是：利用 temporal structure，以及减去 baseline。
 Lecture 6 再加入 value function approximation 与 bootstrapping，它们通常用一定 bias 换取更低 variance。
 
+
+
 ### 5.4 Baseline：降方差但不改变梯度期望
 
 *首次完整讲解：Lecture 5 §5.4「Baseline」。Lecture 6 §2.1--§2.2 将补充完整方差分析与最优 baseline 的作用域。*
@@ -1056,6 +1051,8 @@ $$
 &=0.
 \end{aligned}
 $$
+
+$E_{a\sim\pi_\theta} [f(a)] = \sum_a P(a)f(a)$
 
 所以任意 [action-independent baseline](academic-term-lookup:action-independent%20baseline) 都不引入 bias。
 这里还假设策略可微、求导与动作求和可以交换，并且采样动作位于策略支持集内；若 $b$ 依赖当前采样动作，上述求和一般不再为 0，不能直接沿用证明。
@@ -1101,6 +1098,10 @@ $\boxed{ \mathbb E_{a\sim\mu} [ \nabla\log\pi_\theta(a|s) ] \neq0 }$
 ---
 
 一个实用选择是 $b(s)\approx V^{\pi_\theta}(s)=\mathbb E[G_t\mid s_t=s]$(最常用的 baseline 是 $V^\pi(s_t)$，也就是在状态 st 下，按照当前策略继续走，平均能拿多少 return）。
+
+优势函数Advantage：
+$$A^\pi(s,a) = Q^\pi(s,a)-V^\pi(s)$$
+这个动作比当前状态平均水平高多少
 
 此时：
 
