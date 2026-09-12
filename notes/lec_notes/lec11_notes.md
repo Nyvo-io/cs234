@@ -811,7 +811,7 @@ $$
 \text{posterior update}.
 $$
 
-![[lec11-thompson-algorithm-p20.png|900]]
+![lec11-thompson-algorithm-p20|900](../../attachments/lec11-thompson-algorithm-p20.png)
 
 *图：Lecture 11 物理 PDF 第 20 页的 Thompson sampling 算法页；来源：`lecture/lecture11post.pdf` 第 20 页。这里保留课件原始算法框架，正文对每一步作了符号澄清。*
 
@@ -876,7 +876,7 @@ $\mathbb E[\theta]=\frac{\alpha}{\alpha+\beta}$
 之前Beta(1,1)，他的theta 均值是1/2，并且在0,1之间的任何数值都等概率
 现在Beta(1,2)，均值是1/3
 
-![[Pasted image 20260817170712.png|450]]
+![Pasted image 20260817170712|450](../attachments/Pasted%20image%2020260817170712.png)
 
 theta越小，密度越高，比重越高，更有可能取到。所以均值往左偏。
 
@@ -1338,7 +1338,7 @@ argmaxUt​(a)
 
 课件最后用三个 broken-toe arm、$\epsilon=0.05$ 和前五步的 Optimism/TS 序列比较 regret 与“within $\epsilon$”指标。这里的 PAC 直观指标可以写为
 
-![[lec11-pac-regret-p50.png|900]]
+![lec11-pac-regret-p50|900](../../attachments/lec11-pac-regret-p50.png)
 
 *图：Lecture 11 物理 PDF 第 50 页的 PAC/regret toy table；来源：`lecture/lecture11post.pdf` 第 50 页。图中 `W/in \epsilon` 表示 within-$\epsilon$。*
 

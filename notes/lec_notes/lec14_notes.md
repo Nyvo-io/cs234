@@ -98,7 +98,7 @@ $$
 
 整体上，$Q(s,a)$ 表示树中已有 simulation 的价值统计，$P_\theta(a\mid s)$ 是网络给出的先验概率；访问少的边或网络先验高的边更容易获得下一次计算。$N(s,a)$、$Q(s,a)$ 在搜索中更新，$P_\theta$ 在该次 network evaluation 产生。PUCT 是 tree-selection rule，不是最终环境 reward，也不是把网络 policy 直接当成无需搜索的动作。
 
-![[lec14-11.png|900]]
+![lec14-11|900](../../attachments/lec14-11.png)
 
 *图：来源 `lecture/lecture14post.pdf` 物理 PDF 第 11 页（课件内部页脚 6/31），原图展示搜索循环和对手视角切换；这是对 Lecture 13 同一来源动画的完整 frame。*
 
@@ -205,19 +205,19 @@ $$
 
 ### 5.2 Architecture、MCTS 与整体性能图
 
-![[lec14-18.png|900]]
+![lec14-18|900](../../attachments/lec14-18.png)
 
 *图：来源 `lecture/lecture14post.pdf` 物理 PDF 第 18 页（课件内部页脚 9/31），原图比较 dual-res、sep-res、dual-conv、sep-conv；它展示的是该实验中的相对差异。*
 
 架构图中 dual-res bar 最高，sep-conv 最低，说明网络表示设计会影响最终棋力；这不是对任意任务的架构排序定理。
 
-![[lec14-19.png|900]]
+![lec14-19|900](../../attachments/lec14-19.png)
 
 *图：来源 `lecture/lecture14post.pdf` 物理 PDF 第 19 页（课件内部页脚 10/31），原图的纵轴为 Elo rating，比较 raw network、AlphaGo Zero、AlphaGo Master、AlphaGo Lee、AlphaGo Fan 以及若干外部程序。*
 
 这张图支持一个清楚的课程观察：对 raw network 加上选择性 MCTS 后，AlphaGo Zero 的 rating 显著上升；但不同系统的网络、训练数据和搜索设置也可能同时不同，所以不能把所有柱高差直接归因于一个组件。
 
-![[lec14-20.png|900]]
+![lec14-20|900](../../attachments/lec14-20.png)
 
 *图：来源 `lecture/lecture14post.pdf` 物理 PDF 第 20 页（课件内部页脚 11/31），横轴为 days，纵轴为 Elo rating，虚线为 AlphaGo Master 与 AlphaGo Lee 的参考水平。*
 

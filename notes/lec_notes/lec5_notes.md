@@ -106,7 +106,7 @@ $$
 
 它会以较高概率最终走出走廊。这里的重点不是“随机总比确定好”，而是：**当状态表示发生 aliasing，最优的可表示策略可能本来就是随机的。** 直接策略参数化能自然表达这种解。
 
-![[lec5-aliased-gridworld-p29.png|900]]
+![lec5-aliased-gridworld-p29|900](../../attachments/lec5-aliased-gridworld-p29.png)
 
 *图：aliased gridworld 中两个灰色位置共享同一表示；随机策略在两处都以 $0.5$ 向东或向西，因而能以高概率离开走廊。来源：`lecture/lecture5post.pdf`，物理 PDF 第 29 页。*
 

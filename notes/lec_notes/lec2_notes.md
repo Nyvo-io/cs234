@@ -417,7 +417,7 @@ $$
 
 状态 $s$ 的价值 = 对所有可能动作：策略选该动作的概率 × (该动作的即时奖励 + 折扣后的未来价值)
 
-![[attachments/Pasted image 20260715210558.png]]
+![Pasted image 20260715210558](../../attachments/Pasted%20image%2020260715210558.png)
 
 
 
@@ -720,7 +720,7 @@ $$
 Policy evaluation上面讲过，Policy improvement下面会讲。
 
 
-![[attachments/Pasted image 20260717020312.png]]
+![Pasted image 20260717020312](../../attachments/Pasted%20image%2020260717020312.png)
 
 
 算法：
@@ -1293,7 +1293,7 @@ $$
 
 $B^\pi$ 是“按照固定策略 $\pi$ 做一次 Bellman 更新”。它不对动作取最大值。
 
-![[attachments/Pasted image 20260718191343.png]]
+![Pasted image 20260718191343](../../attachments/Pasted%20image%2020260718191343.png)
 
 
 它解决什么问题：
@@ -1304,7 +1304,7 @@ $$
 V^\pi = B^\pi V^\pi
 $$
 
-![[attachments/Pasted image 20260718193348.png]]
+![Pasted image 20260718193348](../../attachments/Pasted%20image%2020260718193348.png)
 
 
 符号解释：
@@ -1319,9 +1319,9 @@ $$
 
 - $B$ 用于最优控制和值迭代。直接挑选给当前状态产生最大价值的最优动作
 
-![[attachments/Pasted image 20260718200231.png]]
+![Pasted image 20260718200231](../../attachments/Pasted%20image%2020260718200231.png)
 
-![[attachments/Pasted image 20260718200405.png]]
+![Pasted image 20260718200405](../../attachments/Pasted%20image%2020260718200405.png)
 
 
 
@@ -1364,7 +1364,7 @@ $$
 
 每做一次 Bellman backup，不同初始猜测之间的差异会缩小。迭代足够久后，它们都会走向同一个 $V^*$。
 
-![[attachments/Pasted image 20260718201039.png]]
+![Pasted image 20260718201039](../../attachments/Pasted%20image%2020260718201039.png)
 
 
 

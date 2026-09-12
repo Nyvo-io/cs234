@@ -219,7 +219,7 @@ $$a_t^*=\arg\max_a Q_h(s_t,a)$$
 
 之前出现
 
-![[lec13-post-08.png|900]]
+![lec13-post-08|900](../../attachments/lec13-post-08.png)
 
 *图：来源 `lecture/lecture13post.pdf` 物理 PDF 第 8 页；原图中的 $s_t$ 是根，动作节点取 max，随机后继按模型概率展开。*
 
@@ -548,7 +548,7 @@ $$
 
 首次访问的边没有可计算的均值。实际实现通常先强制每个未访问动作至少扩展一次，或把其 UCT score 设为 $+\infty$；这是实现约定，不是课件公式额外给出的定理。
 
-![[lec13-post-12.png|900]]
+![lec13-post-12|900](../../attachments/lec13-post-12.png)
 
 *图：来源 `lecture/lecture13post.pdf` 物理 PDF 第 12 页；原图明确把节点动作选择类比为 MAB，并说明每次 simulation 的 tree policy 可以变化。*
 i是第i次模拟，随着模拟次数的增加，上面的数据以及从数据推断出要选哪个动作 都是不固定的。 一次模拟就是一条路线
@@ -721,7 +721,7 @@ $Q$、$N$ 是树统计量，$P_\theta$ 和 $v_\theta$ 是网络输出。这个�
 
 
 
-![[lec13-pre-21.png|900]]
+![lec13-pre-21|900](../../attachments/lec13-pre-21.png)
 
 *图：来源 `lecture/lecture13pre.pdf` 物理 PDF 第 21 页（课件内部页脚 6/40），原图展示 repeat loop 以及在对手节点交替 value 视角。*
 
@@ -906,15 +906,15 @@ $(s_0,\pi_0,z),(s_1,\pi_1,z),(s_2,\pi_2,z),...$ 这些训练样本。
 
 课件提出三个评估问题：架构本身的影响是什么？在 learned policy/value 上再加 MCTS 带来多少增益？与 human play 或使用 human data 相比如何？这些是实验设计问题，不能只凭一张结果图回答所有因果问题。
 
-![[lec13-pre-28.png|900]]
+![lec13-pre-28|900](../../attachments/lec13-pre-28.png)
 
 *图：来源 `lecture/lecture13pre.pdf` 物理 PDF 第 28 页（课件内部页脚 9/40），原图比较 dual-res、sep-res、dual-conv、sep-conv；只能读出相对高低，不能据此推断所有架构任务上的普遍排名。*
 
-![[lec13-pre-29.png|900]]
+![lec13-pre-29|900](../../attachments/lec13-pre-29.png)
 
 *图：来源 `lecture/lecture13pre.pdf` 物理 PDF 第 29 页（课件内部页脚 10/40），原图的 raw network 约 3,000，加入 MCTS 的 AlphaGo Zero 约 5,200；其余系统是课程用来比较的实验点。*
 
-![[lec13-pre-30.png|900]]
+![lec13-pre-30|900](../../attachments/lec13-pre-30.png)
 
 *图：来源 `lecture/lecture13pre.pdf` 物理 PDF 第 30 页（课件内部页脚 11/40），原图横轴为训练天数、纵轴为 Elo rating，并标出 AlphaGo Master 与 AlphaGo Lee 的参考线。*
 

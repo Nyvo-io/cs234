@@ -18,7 +18,7 @@ tags:
 
 外部资料核验日期：2026-07-19。
 
-相关笔记：[[lec2_notes|Lecture 2：已知模型下的规划]]、[[lec4_notes|Lecture 4：无模型控制]]、[[lec5_notes|Lecture 5：Policy Gradient I]]。
+相关笔记：[Lecture 2：已知模型下的规划](lec2_notes.md)、[Lecture 4：无模型控制](lec4_notes.md)、[Lecture 5：Policy Gradient I](lec5_notes.md)。
 
 ## 0. 本讲覆盖清单
 
@@ -80,7 +80,7 @@ Value iteration 也完全可能运行超过 $|\mathcal S||\mathcal A|$ 轮。这
 
     VI 和 PI 假设你知道环境模型，可以直接计算；Lecture 3 假设你不知道模型，只能通过与环境交互获得样本，再从样本中估计价值
 
-![[Pasted image 20260720235736.png]]
+![Pasted image 20260720235736](../../attachments/Pasted%20image%2020260720235736.png)
 
 Lecture 3 的输入不再是完整的 $P,R$，而是执行策略 $\pi$ 得到的直接经验（direct experience）：
 
@@ -99,7 +99,7 @@ $$
 
 课件总结页用“估计一次产品推荐 session 的平均购买量”说明固定策略评估：策略已经确定，问题是它长期表现如何，不是在本讲寻找最优策略。
 
-![[Pasted image 20260720235820.png]]
+![Pasted image 20260720235820](../../attachments/Pasted%20image%2020260720235820.png)
 
 ### 2.3 统一时间索引
 
@@ -199,7 +199,7 @@ MC 直接平均“从当前表示开始实际观察到的完整未来”，因�
 - **MC：等整局结束，用真实完整回报更新**
 - **TD：每走一步，就用奖励和下一状态的估计值更新**
 
-![[Pasted image 20260721005925.png]]
+![Pasted image 20260721005925](../../attachments/Pasted%20image%2020260721005925.png)
 
 ### 4.1 First-visit MC
 
@@ -373,7 +373,7 @@ $1/N(s)$ 精确复现样本平均；固定 $\alpha$ 不再等价于全部历史�
 
 ==增量式更新。它不需要保存以前所有的 Gt​，但可以逐步算出平均值==
 
-![[Pasted image 20260722163456.png]]
+![Pasted image 20260722163456](../../attachments/Pasted%20image%2020260722163456.png)
 
 
 
@@ -382,7 +382,7 @@ $1/N(s)$ 精确复现样本平均；固定 $\alpha$ 不再等价于全部历史�
 
 课件第 17--20 页确实有图。第 17--19 页是逐帧展开，第 20 页是包含图例的完整终帧：
 
-![[lec3-policy-evaluation-diagram-p20.png|900]]
+![lec3-policy-evaluation-diagram-p20|900](../../attachments/lec3-policy-evaluation-diagram-p20.png)
 
 *来源：`lecture/lec3/lecture3pre.pdf` 第 20 个物理页面。*
 
@@ -530,7 +530,7 @@ $$\underbrace{ R_{t+1}+\gamma V(S_{t+1}) }_{\text{TD目标}} - \underbrace{ V(S_
 
 
 
-![[Pasted image 20260722140219.png]]
+![Pasted image 20260722140219](../../attachments/Pasted%20image%2020260722140219.png)
 
 
 
@@ -596,10 +596,10 @@ $$
 
 6.5 与 7.94 是这一次更新采用的两个不同 target，不是两种方法最终必然收敛到的两个不同真值。TD 用当前 $V(s_1)$ 换取即时更新；MC 等到结局，用实际观察到的完整未来换掉了这个估计。DP 若模型已知，则会把所有可能动作和下一状态的对应 target 都列出并按概率求平均；只有在第一步确定性到达 $s_1$ 时，它的这一层 backup 才会退化成同样的 $2+0.9V(s_1)$。
 
-![[Pasted image 20260722143515.png]]
+![Pasted image 20260722143515](../../attachments/Pasted%20image%2020260722143515.png)
 
 
-![[Pasted image 20260722143808.png]]
+![Pasted image 20260722143808](../../attachments/Pasted%20image%2020260722143808.png)
 
 
 TD例子：
@@ -951,7 +951,7 @@ $$
 ==episode（回合）和iteration/update（迭代更新）不是同一个东西==
 
 
-![[Pasted image 20260722154656.png]]
+![Pasted image 20260722154656](../../attachments/Pasted%20image%2020260722154656.png)
 
 
 ### 6.5 课件学习率判断题
@@ -1142,7 +1142,7 @@ Markov property(马尔科夫性质) 的核心是：
 > **未来只依赖当前状态，不需要知道更早的历史。**
 
 
-![[Pasted image 20260723005715.png]]
+![Pasted image 20260723005715](../../attachments/Pasted%20image%2020260723005715.png)
 
 TD认为，应该把中间那个episode算出来的V(B)，也要给第一个episode的B才行
 

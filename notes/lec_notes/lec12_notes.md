@@ -487,7 +487,7 @@ $\sum_a\pi(a\mid s)=1$
 $\left|V_1^\pi(s)-V_2^\pi(s)\right|\le\alpha+\gamma\Delta+\gamma V_{\max}\beta$
 
 
-![[lec12-simulation-lemma-p16.png|900]]
+![lec12-simulation-lemma-p16|900](../../attachments/lec12-simulation-lemma-p16.png)
 
 *图：`lecture/lecture12post.pdf` 物理 PDF 第 16 页，课件原始 simulation lemma 推导。图中 $\alpha,\beta,\Delta,V_{\max}$ 的记号保留原样；正文补充了每一项的来源。*
 
@@ -778,7 +778,7 @@ $$
 
 当 $|\mathcal S|$ 或 $|\mathcal A|$ 很大时，不能为每个 $(s,a)$ 单独维护一个均值；需要用 $\phi(s,a)$ 等特征函数表示输入与 reward 的关系。这就是 generalization 的来源：相似特征可以共享统计信息。
 
-![[lec12-contextual-regret-p31.png|900]]
+![lec12-contextual-regret-p31|900](../../attachments/lec12-contextual-regret-p31.png)
 
 *图：`lecture/lecture12post.pdf` 物理 PDF 第 31 页，课件引用 Lattimore and Szepesvári *Bandit Algorithms* 的 Figure 19.1。
 
@@ -1379,7 +1379,7 @@ $r_t+r_{\mathrm{bonus}}(s)=r_t+10$
 
 ### 5.3 Montezuma's Revenge：战略探索的收益
 
-![[lec12-montezuma-bonus-p41.png|900]]
+![lec12-montezuma-bonus-p41|900](../../attachments/lec12-montezuma-bonus-p41.png)
 
 *图：`lecture/lecture12post.pdf` 物理 PDF 第 41 页，课件引用 Bellemare et al. “Unifying Count-Based Exploration and Intrinsic Motivation”。图中比较训练 50 million frames 后，使用 count-based bonus 与不使用 bonus 时 agent 已知世界的覆盖范围。课件文字称带 bonus 的结果远好于标准 DQN 加 $\varepsilon$-greedy；这里保留为课件报告，不外推为所有游戏/任务的普遍结论。*
 
@@ -1662,7 +1662,7 @@ UCB不抽一个参数，而是利用 uncertainty 构造 optimistic Q value，构
 
 ### 6.2 Decision-Pretrained Transformer 的核心图景
 
-![[lec12-dpt-meta-rl-p46.png|900]]
+![lec12-dpt-meta-rl-p46|900](../../attachments/lec12-dpt-meta-rl-p46.png)
 
 *图：`lecture/lecture12post.pdf` 物理 PDF 第 46 页，课件中的 Decision-Pretrained Transformer for Meta RL。输入是跨任务的 trajectory/query 信息，Transformer 输出 query task 的动作预测；课件的关键句是“训练预测 $a^\star$ 可以模仿 Thompson sampling，同时捕捉更丰富的 priors”。*
 

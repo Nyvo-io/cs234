@@ -715,7 +715,7 @@ BC 在数据覆盖充分、测试状态仍接近专家状态分布时可能表�
 监督学习通常假设训练与测试样本来自同一个分布，而且每个 $(s,a)$ 样本在时间上独立。
 [MDP](academic-term-lookup:mdp) 中却有反馈回路：训练数据里的状态主要来自专家分布 $d^{\pi^*}$，部署时的状态来自学习策略自己的分布 $d^{\pi_\theta}$。
 
-![[lec7-compounding-errors-p37.png|900]]
+![lec7-compounding-errors-p37|900](../../attachments/lec7-compounding-errors-p37.png)
 
 图示说明：学习策略一次偏离专家轨迹后，后续状态也可能偏离，因为模型之前学习的就是最标准的专家示范，但如果在一个地方偏离了，就会产生一个新情况，这个情况没有出现过，模型就无法准确预测，然后做出错误判断，又出现了一个新情况。这些状态在专家示范中没有被标注，于是模型没有“如何恢复”的训练数据。原图来自 `lecture/lecture7post.pdf` 物理 PDF 第 37 页。
 
@@ -838,7 +838,7 @@ learner/mixed policy 跑出一批 visited states，然后这些 visited states �
 
 `当前 policy -> 混合策略 rollout -> 学习者状态 -> expert action query -> aggregate dataset -> supervised retraining`。
 
-![[lec7-dagger-p39.png|900]]
+![lec7-dagger-p39|900](../../attachments/lec7-dagger-p39.png)
 
 上图是课件第 39 页的源伪代码，原图来自 `lecture/lecture7post.pdf` 物理 PDF 第 39 页。理解它时应以行为顺序为主：$\beta_i$ 控制本轮有多少轨迹由专家参与，$\hat\pi_i$ 是上一轮学习到的 policy；新一轮 classifier 的训练数据包含所有历史标签，而不是只看本轮。
 
@@ -895,7 +895,7 @@ x:\mathcal S\to\mathbb R^n.
 $$
 
 
-![[Pasted image 20260807140100.png]]
+![Pasted image 20260807140100](../../attachments/Pasted%20image%2020260807140100.png)
 
 
 
@@ -1041,7 +1041,7 @@ $$
 
 在 deterministic MDP 中，固定 horizon $H$ 后，policy 可以等价地看成所有可能 $H$-step paths 上的一个 distribution：
 
-![[lec7-deterministic-path-distributions-p53.png|900]]
+![lec7-deterministic-path-distributions-p53|900](../../attachments/lec7-deterministic-path-distributions-p53.png)
 
 图中不同 path distribution 就是不同 policy 的另一种表示。原图来自 `lecture/lecture7post.pdf` 物理 PDF 第 53 页。
 
@@ -1319,7 +1319,7 @@ $D_0(B)=D_0(C)=0$
 
 课件第 58 页用 $Z_{s_i,0}=1$ 和有限 horizon 的索引写出同一递推；$R_w(s)$ 的指数位置取决于课程采用的 state-reward convention。
 
-![[lec7-maxent-irl-algorithm-p58.png|900]]
+![lec7-maxent-irl-algorithm-p58|900](../../attachments/lec7-maxent-irl-algorithm-p58.png)
 
 这是课件第 58 页算法的源视觉；原图来自 `lecture/lecture7post.pdf` 物理 PDF 第 58 页。图像中的符号是有限 horizon 的递推版本：后向 pass 算归一化常数，前向 pass 算状态频次；它不是另一种 policy-gradient 更新。
 

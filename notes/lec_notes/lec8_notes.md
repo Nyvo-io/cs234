@@ -115,7 +115,7 @@ pairwise labels 位于两者之间：人类不必写出数值 reward，只需比
 
 
 
-![[lec8-active-preference-p25.png|900]]
+![lec8-active-preference-p25|900](../../attachments/lec8-active-preference-p25.png)
 
 *图：主动偏好查询在两个候选车辆轨迹之间请求比较；来源：`lecture/lecture8post.pdf` 物理 PDF 第 25 页（课件页 25/44），原图引用 Sadigh et al., RSS 2017。图中 $\xi_A$、$\xi_B$ 是待比较的轨迹，车辆与道路环境显示了查询所针对的行为差异。*
 >	机器生成 A、B 两种行为→问人更喜欢哪个→得到 R(A)>R(B) 这样的约束→逐渐学习 reward​
@@ -488,7 +488,7 @@ $r_\phi(x,y)-\beta D_{\mathrm{KL}}\left(\pi_\theta\|\pi_{\mathrm{ref}}\right)$
 > “我要生成什么回答？”
 
 
-![[lec8-bradley-terry-p39.png|900]]
+![lec8-bradley-terry-p39|900](../../attachments/lec8-bradley-terry-p39.png)
 
 *图：文本候选的 pairwise comparison 与 reward model 预测；来源：`lecture/lecture8post.pdf` 物理 PDF 第 39 页（课件页 40/44 的配套页）。图中 “winning/losing” 说明 reward model 只需让偏好回答的分数更高，不直接获得人类的绝对价值。*
 图里的reward model 读取一个完整文本，然后输出一个scalar数值。 只要大小关系满足人类给的排序，就证明学的是对的
@@ -574,7 +574,7 @@ $r_\phi(x,y)-\beta\log\frac{\pi(y|x)}{\pi_{\rm ref}(y|x)}$
 
 
 
-![[lec8-rlhf-objective-p41.png|900]]
+![lec8-rlhf-objective-p41|900](../../attachments/lec8-rlhf-objective-p41.png)
 
 *图：课件把 reward model 输出和相对 reference 的 log-probability penalty 合在一个 RL objective 中；来源：`lecture/lecture8post.pdf` 物理 PDF 第 41 页（课件页 42/44）。图中的 $\beta$ 是 KL penalty coefficient，不是 PPO 的 clip parameter。*
 
@@ -885,7 +885,7 @@ $\boxed{\mathcal L_{\rm DPO}=-\log\sigma\left(\beta\log\frac{\pi_\theta(y_w|x)}{
 我们现在要做的就是最小化这个loss ， 这个过程中我们训练的πθ就会越来越接近最优 policy π∗
 
 
-![[lec8-dpo-loss-p58.png|900]]
+![lec8-dpo-loss-p58|900](../../attachments/lec8-dpo-loss-p58.png)
 
 *图：课件把 Bradley--Terry 的 reward loss、reward--policy transformation 和最终 DPO policy loss 叠在一起；来源：`lecture/lecture8post.pdf` 物理 PDF 第 58 页（课件页 41/44）。关键是 preferred/losing 两个 reward 的差使 log-partition term cancellation。*
 

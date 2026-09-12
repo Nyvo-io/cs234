@@ -110,7 +110,7 @@ $$
 
 **自拟例子**：当前只试过动作 $a_1$，经验均值为 2；动作 $a_2$ 从未尝试。若算法把未访问项初始化为 0 并永远 greedy，它会持续选择 $a_1$。即使 $a_2$ 的真实期望回报是 10，算法也没有数据发现这一点。探索不是附加功能，而是 control 能否识别更优动作的必要信息机制。
 
-![[Pasted image 20260724103826.png]]
+![Pasted image 20260724103826](../../attachments/Pasted%20image%2020260724103826.png)
 假设在状态 s 中，当前策略永远选择 a1：
 
 $\pi(s)=a_1$
@@ -354,9 +354,9 @@ $$Q^{\pi_i}(s,a) = \mathbb E\left[ R_{t+1} +\gamma R_{t+2} +\gamma^2R_{t+3} +\cd
 
 
 
-![[Pasted image 20260724113634.png]]
+![Pasted image 20260724113634](../../attachments/Pasted%20image%2020260724113634.png)
 
-![[Pasted image 20260724113711.png]]
+![Pasted image 20260724113711](../../attachments/Pasted%20image%2020260724113711.png)
 
 两部分相加
 
@@ -1099,7 +1099,7 @@ $$
 
 即使行为策略随后实际选择价值为 2 的探索动作，当前 target 仍使用 6，因此 Q-learning 学的是 greedy target policy，属于 off-policy(离线)。
 
-![[Pasted image 20260729011616.png]]
+![Pasted image 20260729011616](../../attachments/Pasted%20image%2020260729011616.png)
 
 对有限状态、有限动作的 tabular MDP，课件给出的收敛条件包括 GLIE、bounded rewards，以及每个状态-动作对各自满足的 Robbins--Monro 步长条件：
 
@@ -1250,7 +1250,7 @@ $$
 
 这个动作通常是通过 $\varepsilon-greedy$ 策略选出来的，所以有可能不是当前价值最大的动作。
 
-![[Pasted image 20260729011657.png]]
+![Pasted image 20260729011657](../../attachments/Pasted%20image%2020260729011657.png)
 
 
 
@@ -2061,11 +2061,11 @@ $y_t= r_{t+1} + \gamma\max_{a'}\hat Q(s_{t+1},a';w)$
 所以只能用可观察的数据构造近似标签。
 
 
-![[Pasted image 20260730141854.png]]
+![Pasted image 20260730141854](../../attachments/Pasted%20image%2020260730141854.png)
 
-![[Pasted image 20260730141911.png]]
+![Pasted image 20260730141911](../../attachments/Pasted%20image%2020260730141911.png)
 
-![[Pasted image 20260730141947.png]]
+![Pasted image 20260730141947](../../attachments/Pasted%20image%2020260730141947.png)
 
 
 
@@ -2154,7 +2154,7 @@ Target Network 主要处理 moving target 
 
 *首次完整讲解：Lecture 4 §6.2「Experience replay：把交互顺序与训练顺序解耦」。*
 
-![[lec4-experience-replay-p64.png|900]]
+![lec4-experience-replay-p64|900](../../attachments/lec4-experience-replay-p64.png)
 
 *来源：`lecture/lecture4post.pdf` 第 64 个物理页面。原图显示 transition 被写入 replay buffer，再随机抽样用于训练。*
 
@@ -2344,7 +2344,7 @@ $$
 
 *首次完整讲解：Lecture 4 §6.6「Atari DQN：一个网络同时输出全部动作价值」。*
 
-![[lec4-dqn-network-p72.png|900]]
+![lec4-dqn-network-p72|900](../../attachments/lec4-dqn-network-p72.png)
 
 *来源：`lecture/lecture4post.pdf` 第 72 个物理页面；图源在课件中标为 Mnih et al. (2015)。*
 
@@ -2366,7 +2366,7 @@ $$
 
 *首次完整讲解：Lecture 4 §6.7「消融结果：深网络本身并不够」。*
 
-![[lec4-dqn-ablation-p76.png|900]]
+![lec4-dqn-ablation-p76|900](../../attachments/lec4-dqn-ablation-p76.png)
 
 *来源：`lecture/lecture4post.pdf` 第 76 个物理页面。该表比较 linear、仅 deep network、fixed Q、replay 及二者组合。*
 

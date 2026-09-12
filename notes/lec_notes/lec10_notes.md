@@ -133,7 +133,7 @@ $$
 
 它不是本讲证明所用的简单 stochastic K-armed bandit，而是说明真实决策通常同时包含上下文、批处理、延迟反馈、非平稳性和约束。
 
-![[lec10-covid-bandit-p6.png|900]]
+![lec10-covid-bandit-p6|900](../../attachments/lec10-covid-bandit-p6.png)
 
 *图：Lecture 10 物理 PDF 第 6 页的 Covid testing 流程图；来源：`lecture/lecture10post.pdf` 第 6 页。图中展示了 contextual 输入、检测/不检测分支、延迟实验室结果和集中数据库回流；这是课件原图，不是本笔记重绘。*
 

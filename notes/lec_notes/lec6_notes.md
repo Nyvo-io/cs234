@@ -422,7 +422,7 @@ $$
 
 $\alpha_k$ 太小则学习慢；太大则可能越过局部高回报区域，使真实性能突然下降。更麻烦的是，合适步长会随当前参数与网络敏感度变化，固定 learning rate 很难始终合适。
 
-![[lec6-step-size-collapse-p30.png|900]]
+![lec6-step-size-collapse-p30|900](../../attachments/lec6-step-size-collapse-p30.png)
 
 *图：参数轴上的一次大步越过高价值区域并落入低性能区域。来源：`lecture/lecture6post.pdf`，物理 PDF 第 30 页。*
 
@@ -481,7 +481,7 @@ $$
 
 所以你单纯调learning rate 根本不够
 
-![[lec6-parameter-policy-distance-p31.png|900]]
+![lec6-parameter-policy-distance-p31|900](../../attachments/lec6-parameter-policy-distance-p31.png)
 
 *图：同一参数化中，不同 $\theta$ 对应的动作概率可能变化很快；参数空间步长不能直接代表 policy-space 距离。来源：`lecture/lecture6post.pdf`，物理 PDF 第 31 页。*
 
@@ -714,7 +714,7 @@ $$
 
 本来要求动作是必须服从新策略，但利用importance sampling ，可以把它转换成 服从于旧策略
 
-![[Pasted image 20260805010325.png]]
+![Pasted image 20260805010325](../../attachments/Pasted%20image%2020260805010325.png)
 
 
 前提是当 $\pi'(a\mid s)>0$ 时，$\pi(a\mid s)>0$。定义单步 probability ratio：
@@ -1089,7 +1089,7 @@ $$\boxed{ L^{CLIP}(\theta) }$$​
 - 若 $\hat A_t<0$，降低该动作概率是有利方向；当 $r_t<1-\epsilon$ 后，objective 进入平台，不再奖励继续减小概率。
 - Clipping 只截断“继续朝有利方向走得过远”的激励；朝不利方向移动仍会被 objective 惩罚。
 
-![[lec6-ppo-clipped-objective-p48.png|900]]
+![lec6-ppo-clipped-objective-p48|900](../../attachments/lec6-ppo-clipped-objective-p48.png)
 
 *图：左侧是 $\hat A>0$，ratio 超过 $1+\epsilon$ 后 objective 变平；右侧是 $\hat A<0$，ratio 低于 $1-\epsilon$ 后 objective 变平。来源：`lecture/lecture6post.pdf`，物理 PDF 第 48 页。*
 
